@@ -1,0 +1,303 @@
+// prisma/schema.prisma
+// [FUNGSI] Mendefinisikan semua tabel & relasi database MARMS.
+// [ALASAN] Prisma memakai file ini untuk membuat migration & men-generate
+//          client TypeScript yang aman (tipe data terjaga, anti typo kolom).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================== ENUM ==================
+
+enum Gender {
+  LAKI_LAKI
+  PEREMPUAN
+}
+
+enum ApplicantStatus {
+  BARU
+  VERIFIKASI
+  INTERVIEW
+  DITERIMA
+  DITOLAK
+}
+
+enum CrewStatus {
+  AVAILABLE
+  ON_BOARD
+  OFF_BOARD
+}
+
+enum ContractStatus {
+  AKTIF
+  BERAKHIR
+  DIPERPANJANG
+}
+
+enum VesselStatus {
+  AKTIF
+  DOCKING
+}
+
+enum PlacementStatus {
+  AKTIF
+  SELESAI
+}
+
+enum OffBoardReason {
+  RELIEF
+  CUTI
+  SAKIT
+  END_OF_CONTRACT
+}
+
+enum PayrollStatus {
+  DRAFT
+  FINAL
+  DIBAYAR
+}
+
+enum PayrollJenis {
+  GAJI
+  UANG_MAKAN
+}
+
+enum DocumentStatus {
+  PENDING
+  TERVERIFIKASI
+  DITOLAK
+}
+
+// ================== MASTER DATA ==================
+
+model Jabatan {
+  kode      String   @id
+  nama      String
+  gajiPokok Int // [ALASAN] Simpan Rupiah (tanpa desimal) agar pembulatan presisi.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pengaturan {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Kapal {
+  id           String           @id @default(cuid())
+  namaUnit     String           @unique
+  status       VesselStatus     @default(AKTIF)
+  tbNama       String
+  tbImo        String?
+  tbGt         Int?
+  tbTahun      Int?
+  bgNama       String
+  bgImo        String?
+  bgGt         Int?
+  bgTahun      Int?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  placements   Penempatan[]
+  payrolls     Payroll[]
+}
+
+// ================== REKRUTMEN ==================
+
+model Pelamar {
+  id               String          @id @default(cuid())
+  nomorPendaftaran String          @unique
+  namaLengkap      String
+  tempatLahir      String
+  tanggalLahir     DateTime
+  jenisKelamin     Gender
+  noHp             String          @unique // [ALASAN] Cegah duplikat no HP.
+  email            String          @unique // [ALASAN] Cegah duplikat email.
+  alamat           String
+  kontakReferensi  String?
+  posisiDilamar    String
+  pengalamanTahun  Int?
+  kapalTerakhir    String?
+  jabatanTerakhir  String?
+  status           ApplicantStatus @default(BARU)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  documents        Dokumen[]
+  crew             Crew?
+}
+
+model Dokumen {
+  id             String         @id @default(cuid())
+  applicantId    String
+  jenis          String // contoh: PASSPORT, BUKU_PELAUT, KTP, dsb.
+  filePath       String
+  nomor          String?
+  tanggalTerbit  DateTime?
+  tanggalExpired DateTime?
+  status         DocumentStatus @default(PENDING)
+  catatan        String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  applicant      Pelamar        @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+}
+
+// ================== CREW & PENEMPATAN ==================
+
+model Crew {
+  id              String       @id @default(cuid())
+  applicantId     String       @unique
+  tanggalBergabung DateTime    @default(now())
+  status          CrewStatus   @default(AVAILABLE)
+  totalMasaKerja  Int          @default(0) // [ALASAN] Total hari semua segmen (kumulatif).
+  jumlahLeavePay  Int          @default(0)
+  namaBank        String?
+  noRekening      String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  applicant       Pelamar      @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  contracts       Kontrak[]
+  placements      Penempatan[]
+  seaServiceRecords SeaServiceRecord[]
+  leavePayDisbursements LeavePayDisbursement[]
+  payrollDetails  PayrollDetail[]
+}
+
+model Kontrak {
+  id             String         @id @default(cuid())
+  nomorKontrak   String         @unique
+  crewId         String
+  jabatanKode    String
+  tanggalMulai   DateTime
+  tanggalSelesai DateTime?
+  durasi         Int?
+  status         ContractStatus @default(AKTIF)
+  catatan        String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  crew           Crew           @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  placements     Penempatan[]
+}
+
+model Penempatan {
+  id             String          @id @default(cuid())
+  crewId         String
+  kontrakId      String
+  vesselId       String
+  jabatanKode    String
+  tanggalMulai   DateTime
+  tanggalSelesai DateTime?
+  status         PlacementStatus @default(AKTIF)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  crew           Crew            @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  kontrak        Kontrak         @relation(fields: [kontrakId], references: [id], onDelete: Cascade)
+  vessel         Kapal           @relation(fields: [vesselId], references: [id], onDelete: Cascade)
+  segments       Segmen[]
+}
+
+model Segmen {
+  id                String          @id @default(cuid())
+  placementId       String
+  onBoardTanggal    DateTime
+  onBoardPelabuhan  String
+  offBoardTanggal   DateTime?
+  offBoardPelabuhan String?
+  alasanOffBoard    OffBoardReason?
+  durasi            Int? // [ALASAN] Hitung otomatis dari on/off board (hari).
+  catatan           String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  placement         Penempatan      @relation(fields: [placementId], references: [id], onDelete: Cascade)
+  seaServiceRecord  SeaServiceRecord?
+}
+
+model SeaServiceRecord {
+  id               String   @id @default(cuid())
+  crewId           String
+  segmentId        String   @unique
+  namaCrew         String
+  jabatan          String
+  namaKapal        String
+  imo              String?
+  onBoardTanggal   DateTime
+  offBoardTanggal  DateTime?
+  onBoardPelabuhan String
+  offBoardPelabuhan String?
+  totalHari        Int
+  tanggalGenerate  DateTime @default(now())
+  crew             Crew     @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  segment          Segmen   @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+}
+
+// ================== PAYROLL ==================
+
+model Payroll {
+  id                String         @id @default(cuid())
+  vesselId          String
+  bulan             Int
+  tahun             Int
+  jumlahHari        Int
+  status            PayrollStatus  @default(DRAFT)
+  jenis             PayrollJenis   @default(GAJI)
+  tanggalFinalisasi DateTime?
+  tanggalPembayaran DateTime?
+  dibuatOleh        String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  vessel            Kapal          @relation(fields: [vesselId], references: [id], onDelete: Cascade)
+  details           PayrollDetail[]
+
+  @@unique([vesselId, bulan, tahun, jenis])
+}
+
+model PayrollDetail {
+  id                String  @id @default(cuid())
+  payrollId         String
+  crewId            String
+  jabatanKode       String
+  jabatanNama       String
+  segmentId         String?
+  periodeKerja      String?
+  hariAktif         Int
+  gajiPokokSnapshot Int // [ALASAN] Nilai dibekukan (snapshot) saat Final.
+  gajiProrata       Int
+  uangMakanSnapshot Int
+  uangMakanProrata  Int
+  total             Int
+  namaBank          String?
+  noRekening        String?
+  payroll           Payroll @relation(fields: [payrollId], references: [id], onDelete: Cascade)
+  crew              Crew    @relation(fields: [crewId], references: [id], onDelete: Cascade)
+}
+
+// ================== LEAVE PAY ==================
+
+model LeavePayDisbursement {
+  id                String   @id @default(cuid())
+  crewId            String
+  tanggalPencairan  DateTime @default(now())
+  nominal           Int
+  pencairanKe       Int
+  masaKerjaSnapshot Int
+  catatanPerforma   String?
+  dinilaiOleh       String?
+  dicairkanOleh     String?
+  createdAt         DateTime @default(now())
+  crew              Crew     @relation(fields: [crewId], references: [id], onDelete: Cascade)
+}
+
+// ================== ADMIN ==================
+
+model Admin {
+  id                  String   @id @default(cuid())
+  email               String   @unique
+  passwordHash        String
+  mustChangePassword  Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}

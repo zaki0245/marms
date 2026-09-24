@@ -1,0 +1,25 @@
+# .gitignore — file yang TIDAK boleh di-commit ke Git
+# [FUNGSI] Mencegah file rahasia/berukuran besar masuk ke repository.
+# [ALASAN] Keamanan (.env berisi password) & kebersihan repo.
+
+# Dependency
+node_modules/
+client/node_modules/
+
+# Hasil build
+dist/
+build/
+client/dist/
+
+# Environment (berisi password/secret)
+.env
+.env.*
+!.env.example
+
+# Upload dokumen pelamar (data pribadi)
+uploads/
+
+# Log & file sementara
+*.log
+.DS_Store
+Thumbs.db

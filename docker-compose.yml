@@ -1,0 +1,83 @@
+# ============================================================
+# docker-compose.yml — MARMS (app + PostgreSQL + Adminer)
+# ============================================================
+# [FUNGSI] Menjalankan semua service MARMS dengan satu perintah.
+# [ALASAN] Mempermudah setup: cukup `docker compose up --build`,
+#          semua service (aplikasi, database, admin database) ikut jalan.
+# [CATATAN] Setiap service diberi resource limits agar laptop tidak hang.
+
+services:
+  # ---------- Database PostgreSQL ----------
+  db:
+    image: postgres:16-alpine
+    container_name: marms_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-marms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marms_password}
+      POSTGRES_DB: ${POSTGRES_DB:-marms}
+    ports:
+      # [CATATAN] Jika port 5432 di laptop sudah terpakai, ubah angka kiri jadi 5433.
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-marms} -d ${POSTGRES_DB:-marms}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # [FUNGSI] Batasi CPU & memori database.
+    # [ALASAN] Cegah Docker memakan seluruh resource laptop.
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 768M
+
+  # ---------- Aplikasi MARMS ----------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: marms_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-marms}:${POSTGRES_PASSWORD:-marms_password}@db:5432/${POSTGRES_DB:-marms}?schema=public
+      SESSION_SECRET: ${SESSION_SECRET:-ganti-dengan-kunci-rahasia-panjang}
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/uploads
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 768M
+
+  # ---------- Adminer (kelola database lewat browser) ----------
+  adminer:
+    image: adminer:latest
+    container_name: marms_adminer
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # [CATATAN] Akses Adminer dari browser: http://localhost:8080
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+
+volumes:
+  pgdata:
+    # [FUNGSI] Menyimpan data database agar tidak hilang saat container restart.
+  uploads:
+    # [FUNGSI] Menyimpan file dokumen pelamar di luar container.

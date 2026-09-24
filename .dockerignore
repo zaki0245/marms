@@ -1,0 +1,19 @@
+# .dockerignore — file yang TIDAK dikirim ke dalam build Docker
+# [FUNGSI] Mengecualikan file besar/rahasia dari konteks build Docker.
+# [ALASAN] Build jadi lebih cepat & rahasia tidak bocor ke dalam image.
+
+node_modules
+client/node_modules
+client/dist
+dist
+build
+.git
+.gitignore
+.env
+.env.*
+uploads
+*.log
+docs
+*.md
+Dockerfile
+docker-compose.yml
