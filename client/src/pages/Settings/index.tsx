@@ -57,7 +57,8 @@ export default function Settings() {
       <div className="mt-4 max-w-md rounded-lg bg-white p-5 text-sm shadow-sm">
         <h3 className="font-semibold text-navy">Lupa Password?</h3>
         <p className="mt-2 text-gray-500">
-          Reset dilakukan manual lewat database. Lihat panduan di file SECURITY.md.
+          Reset dilakukan manual lewat database: hash password baru dengan bcrypt, lalu update
+          kolom <code>passwordHash</code> di tabel <code>Admin</code>.
         </p>
       </div>
     </div>

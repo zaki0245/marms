@@ -126,7 +126,7 @@ export async function assignCrewToVessel(crewId: string, input: AssignInput) {
 export async function offBoardCrew(crewId: string, input: OffBoardInput) {
   const crew = await prisma.crew.findUnique({
     where: { id: crewId },
-    include: { placements: { include: { segments: true } } },
+    include: { applicant: true, placements: { include: { segments: true, vessel: true } } },
   });
   if (!crew) throw new AppError(404, 'Crew tidak ditemukan');
   if (crew.status !== 'ON_BOARD') throw new AppError(400, 'Crew tidak sedang On Board');
@@ -157,6 +157,25 @@ export async function offBoardCrew(crewId: string, input: OffBoardInput) {
     await prisma.penempatan.update({
       where: { id: activePlacement.id },
       data: { status: 'SELESAI', tanggalSelesai: offBoardTanggal },
+    });
+
+    // [FUNGSI] Catat masa laut segmen ini ke Sea Service Record.
+    // [ALASAN] Riwayat pelayaran per segmen untuk keperluan administrasi (buku pelaut).
+    const jabatan = await prisma.jabatan.findUnique({ where: { kode: activePlacement.jabatanKode } });
+    await prisma.seaServiceRecord.create({
+      data: {
+        crewId,
+        segmentId: activeSegmen.id,
+        namaCrew: crew.applicant.namaLengkap,
+        jabatan: jabatan?.nama ?? activePlacement.jabatanKode,
+        namaKapal: activePlacement.vessel.namaUnit,
+        imo: activePlacement.vessel.tbImo ?? null,
+        onBoardTanggal: activeSegmen.onBoardTanggal,
+        offBoardTanggal,
+        onBoardPelabuhan: activeSegmen.onBoardPelabuhan,
+        offBoardPelabuhan: input.offBoardPelabuhan || '',
+        totalHari: durasi,
+      },
     });
   }
 

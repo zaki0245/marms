@@ -285,8 +285,6 @@ model LeavePayDisbursement {
   pencairanKe       Int
   masaKerjaSnapshot Int
   catatanPerforma   String?
-  dinilaiOleh       String?
-  dicairkanOleh     String?
   createdAt         DateTime @default(now())
   crew              Crew     @relation(fields: [crewId], references: [id], onDelete: Cascade)
 }

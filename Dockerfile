@@ -20,8 +20,9 @@ RUN npm run build
 FROM node:20-alpine AS backend-build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
 COPY prisma ./prisma
+RUN npm ci
+COPY tsconfig.json ./
 COPY src ./src
 # [FUNGSI] Compile TypeScript menjadi JavaScript.
 # [ALASAN] Hasil compile (dist/) yang akan dijalankan di runtime.

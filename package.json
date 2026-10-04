@@ -13,7 +13,7 @@
     "db:generate": "prisma generate",
     "db:seed": "prisma db seed",
     "hash:password": "tsx scripts/hash-password.ts",
-    "test": "echo \"belum ada test - ditambahkan di modul berikutnya\""
+    "test": "tsx --test tests/*.test.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

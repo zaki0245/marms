@@ -25,7 +25,7 @@ export async function generateNomorPendaftaran(): Promise<string> {
   return `${prefix}${String(next).padStart(4, '0')}`;
 }
 
-// [FUNGSI] Simpan pendaftaran pelamar + 9 dokumen.
+// [FUNGSI] Simpan pendaftaran pelamar + 21 dokumen.
 // [ALASAN] Satu transaksi agar data pelamar & dokumen selalu konsisten.
 export async function createPelamar(
   input: PelamarInput,

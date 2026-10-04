@@ -23,3 +23,5 @@ uploads/
 *.log
 .DS_Store
 Thumbs.db
+.ai-backup/
+graphify-out/

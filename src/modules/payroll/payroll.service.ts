@@ -4,15 +4,10 @@
 
 import { prisma } from '../../shared/prisma';
 import { AppError } from '../../shared/AppError';
+import { prorata } from '../../shared/prorata';
 import type { GenerateInput } from './payroll.model';
 
 const DAY = 86400000;
-
-// [FUNGSI] Pembulatan round half up ke Rupiah terdekat (tanpa desimal).
-// [ALASAN] Aturan bisnis: hasil prorata dibulatkan ke satuan Rupiah.
-function roundRupiah(n: number): number {
-  return Math.round(n);
-}
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');
@@ -85,8 +80,8 @@ export async function generatePayroll(input: GenerateInput) {
     const jabatanNama = jabatan?.nama ?? jabatanKode;
 
     // [FUNGSI] Hitung prorata sesuai jenis (GAJI atau UANG_MAKAN).
-    const gajiProrata = jenis === 'GAJI' ? roundRupiah((gajiPokok / jumlahHari) * hariAktif) : 0;
-    const uangMakanProrata = jenis === 'UANG_MAKAN' ? roundRupiah((uangMakan / jumlahHari) * hariAktif) : 0;
+    const gajiProrata = jenis === 'GAJI' ? prorata(gajiPokok, jumlahHari, hariAktif) : 0;
+    const uangMakanProrata = jenis === 'UANG_MAKAN' ? prorata(uangMakan, jumlahHari, hariAktif) : 0;
 
     const lastDay = new Date(endExclusive.getTime() - DAY);
     const periodeKerja = `${pad(start.getUTCDate())}-${pad(lastDay.getUTCDate())}`;

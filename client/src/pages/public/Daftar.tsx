@@ -1,5 +1,5 @@
 // client/src/pages/public/Daftar.tsx
-// [FUNGSI] Form pendaftaran pelamar publik + upload 9 dokumen.
+// [FUNGSI] Form pendaftaran pelamar publik + upload 21 dokumen.
 // [ALASAN] Pintu masuk data pelamar; duplikat email/HP ditolak oleh backend.
 
 import { FormEvent, useEffect, useState } from 'react';

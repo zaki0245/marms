@@ -6,7 +6,7 @@ import type { Request, Response } from 'express';
 import * as service from './recruitment.service';
 import { DOKUMEN_LIST, dokumenSchema, pelamarSchema, statusSchema } from './recruitment.model';
 
-// [FUNGSI] Terima pendaftaran pelamar (multipart form + 9 file dokumen).
+// [FUNGSI] Terima pendaftaran pelamar (multipart form + 21 file dokumen).
 export async function createPelamar(req: Request, res: Response) {
   const input = pelamarSchema.parse(req.body);
   const files = (req.files ?? {}) as Record<string, Express.Multer.File[] | undefined>;

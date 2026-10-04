@@ -76,7 +76,9 @@ const CREW_STATUS: Record<string, string> = {
 
 const ALASAN: Record<string, string> = {
   RELIEF: 'Relief',
-  END_OF_CONTRACT: 'End of Contract',
+  CUTI: 'Cuti',
+  SAKIT: 'Sakit',
+  END_OF_CONTRACT: 'Habis Kontrak',
 };
 
 interface AssignTarget {

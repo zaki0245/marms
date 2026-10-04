@@ -5,6 +5,7 @@
 >
 > **Kenapa Ini Penting:** Konsistensi membuat aplikasi terlihat profesional dan mudah dipakai.
 > Dengan panduan ini, setiap halaman baru langsung tampil seragam tanpa nebak-nebak.
+> Nilai di bawah mengikuti `client/tailwind.config.js` dan `client/src/index.css`.
 
 ## 1. Mood
 Profesional, data-dense, bersih, fokus keterbacaan tabel & angka.
@@ -13,39 +14,55 @@ Seperti dashboard logistik/perbankan. Tidak playful.
 ## 2. Warna
 | Nama | Hex | Kegunaan |
 |---|---|---|
-| Navy Blue | `#0F2C4C` | Warna utama: header, sidebar, tombol utama |
-| Abu-abu Netral | `#F5F6F8` | Background halaman |
-| Hijau Tua | `#1E7A46` | Positif: sukses, "Aktif", "Dibayar", "Diterima" |
-| Merah Bata | `#B3261E` | Negatif: gagal, "Ditolak", "Expired", "Off Board" |
+| Navy | `#0F2C4C` | Warna utama: header, sidebar, tombol utama, judul |
+| Navy Light | `#EAF0F7` | Header tabel & highlight navy muda |
+| Surface | `#F5F6F8` | Background halaman |
+| Positive (Hijau) | `#1E7A46` | Positif: sukses, "Aktif", "Dibayar", "Diterima" |
+| Negative (Merah Bata) | `#B3261E` | Negatif: gagal, "Ditolak", "Expired", "Off Board" |
 | Putih | `#FFFFFF` | Kartu, tabel, area konten |
-| Abu-abu border | `#E2E5EA` | Garis tabel dan pembatas |
-| Teks utama | `#1F2937` | Teks isi |
-| Teks sekunder | `#6B7280` | Label, keterangan |
+| Amber (Tailwind) | `amber-100` / `amber-700` | Badge netral: "Verifikasi", "Wawancara", "Draf" |
+| Gray (Tailwind default) | `gray-100`…`gray-800` | Border (`gray-200/300`), teks sekunder (`gray-500`), teks isi (`gray-800`) |
+
+> Warna navy/navy-light/surface/positive/negative didefinisikan di `tailwind.config.js`;
+> gray & amber memakai palet bawaan Tailwind.
 
 ## 3. Tipografi
-- Font: `Inter` (fallback: system-ui, sans-serif).
-- Judul halaman: 24px, bold.
-- Judul tabel/kartu: 16px, semibold.
-- Isi tabel: 14px, angka rata kanan, teks rata kiri.
-- Angka gaji/uang: gunakan font tabular (agar digit sejajar).
+- Font: system-ui stack — `system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`.
+- Judul halaman: 24px bold navy (`text-2xl font-bold text-navy`).
+- Judul kartu/modal: 18px bold navy (`text-lg font-bold text-navy`).
+- Sub-judul bagian: 16px semibold navy (`font-semibold text-navy`).
+- Label form: 12px abu-abu (`text-xs text-gray-500`), diletakkan di atas input.
+- Isi tabel: 14px (`text-sm`); angka rata kanan + `tabular-nums` agar digit sejajar.
+- Kode/nomor (nomor pendaftaran, kode jabatan, periode kerja): `font-mono`.
 
-## 4. Spacing (skala 4px)
-- Padding kartu: 16px / 24px.
-- Jarak antar elemen: 8, 12, 16, 24 px.
-- Radius kartu/input: 8px.
+## 4. Spacing
+- Padding kartu: 16px (`p-4`) atau 20px (`p-5`); modal `p-6`.
+- Jarak antar elemen: `mt-3`/`mt-4`/`mt-6`, gap `gap-2`/`gap-3`/`gap-4`.
+- Radius: kartu/input `rounded`/`rounded-lg`; kartu publik kadang `rounded-xl`.
 
 ## 5. Komponen
-- **Tombol:** Primary (Navy solid), Secondary (putih + border navy), Danger (Merah).
-- **Tabel:** header navy muda `#EAF0F7` dengan teks navy, baris zebra, hover abu terang.
-- **Badge status:** hijau (Aktif/Final/Dibayar/Diterima), merah (Ditolak/Expired),
-  abu (Draf), kuning (Verifikasi/Wawancara).
-- **Form:** label di atas input, input tinggi 40px, border abu, fokus border navy.
-- **Sidebar:** background navy, teks putih, item aktif diberi aksen lebih terang.
+- **Tombol:**
+  - Primary: `bg-navy text-white rounded px-4 py-2 text-sm font-semibold`.
+  - Secondary (outline): `border border-navy text-navy`.
+  - Danger: teks `text-negative` (link aksi) atau `bg-negative text-white` (submit merusak, mis. off board).
+  - Aksi tabel berbentuk link: `text-navy`/`text-positive`/`text-negative` + `hover:underline`.
+- **Tabel:** header `bg-navy-light text-navy`, baris dipisah `border-t border-gray-100`, baris kosong `text-gray-400`.
+- **Badge status:**
+  - Hijau (`bg-positive/10 text-positive`): Diterima, Dibayar, Aktif.
+  - Merah (`bg-negative/10 text-negative`): Ditolak, Expired.
+  - Navy (`bg-navy/10 text-navy`): Baru, Final.
+  - Amber (`bg-amber-100 text-amber-700`): Verifikasi, Wawancara, Draf.
+  - Abu (`bg-gray-200 text-gray-600`): Docking.
+- **Form:** label di atas input, input `rounded border border-gray-300 px-3 py-2`, fokus `ring-2 ring-navy/30`.
+- **Sidebar:** lebar `w-60`, `bg-navy text-white`, item aktif `bg-white/15`, group "Crewing" bisa dibuka/tutup.
+- **Modal:** overlay `bg-black/40` + kartu `bg-white rounded-lg shadow-xl p-6`.
+- **Pesan:** sukses `bg-positive/10 text-positive`, error `bg-negative/10 text-negative`.
 
 ## 6. Angka & Uang
-- Format Rupiah: `Rp 10.500.000` (titik sebagai pemisah ribuan, tanpa desimal).
+- Format Rupiah: `'Rp ' + n.toLocaleString('id-ID')` → contoh `Rp 10.500.000` (tanpa desimal).
 - Semua hasil prorata dibulatkan ke Rupiah terdekat (round half up).
 
 ## 7. Responsif
-- Minimal nyaman di tablet (768px) dan HP (360px).
-- Tabel lebar boleh scroll horizontal di layar kecil.
+- Grid kartu: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`.
+- Form dua kolom: `grid-cols-1 sm:grid-cols-2`.
+- Tabel lebar boleh scroll horizontal di layar kecil; sidebar tetap di kiri (belum collapse di mobile).

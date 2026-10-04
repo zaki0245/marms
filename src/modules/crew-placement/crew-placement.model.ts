@@ -22,7 +22,7 @@ export type BankInput = z.infer<typeof bankSchema>;
 
 // [FUNGSI] Validasi input off board (turun kapal).
 export const offBoardSchema = z.object({
-  alasan: z.enum(['RELIEF', 'END_OF_CONTRACT']),
+  alasan: z.enum(['RELIEF', 'CUTI', 'SAKIT', 'END_OF_CONTRACT']),
   offBoardTanggal: z.string().min(1, 'Tanggal off board wajib diisi'),
   offBoardPelabuhan: z.string().optional(),
 });
