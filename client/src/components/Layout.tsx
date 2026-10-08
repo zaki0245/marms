@@ -1,14 +1,17 @@
 // client/src/components/Layout.tsx
 // [FUNGSI] Kerangka halaman admin: sidebar, autentikasi, logout, ganti password wajib.
 // [ALASAN] Melindungi panel admin & memaksa ganti password saat login pertama.
+// [ALASAN] Sidebar dikelompokkan per payung bisnis (Crewing/Finance) sesuai role.
 
 import { FormEvent, useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import Logo from './Logo';
 
-// [FUNGSI] Daftar menu sidebar (modul-modul MARMS).
-const MENU = [
+type Role = 'SUPERADMIN' | 'CREWING' | 'FINANCE';
+
+// [FUNGSI] Menu modul Crewing.
+const CREWING_MENU = [
   { to: '/admin', label: 'Dashboard', exact: true },
   { to: '/admin/master-data', label: 'Master Data' },
   { to: '/admin/recruitment', label: 'Rekrutmen' },
@@ -17,13 +20,18 @@ const MENU = [
   { to: '/admin/reports', label: 'Laporan' },
 ];
 
+// [FUNGSI] Menu modul Finance (scaffold awal).
+const FINANCE_MENU = [{ to: '/admin/finance', label: 'Finance', exact: false }];
+
 interface Admin {
   email: string;
+  role: Role;
   mustChangePassword: boolean;
 }
 
 export default function Layout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [pelamarBaru, setPelamarBaru] = useState(0);
   const [open, setOpen] = useState(true);
   const [admin, setAdmin] = useState<Admin | null>(null);
@@ -41,12 +49,19 @@ export default function Layout() {
       .finally(() => setChecking(false));
   }, []);
 
-  // [FUNGSI] Muat jumlah pelamar baru untuk badge di menu Rekrutmen (setelah login).
+  // [FUNGSI] Muat jumlah pelamar baru untuk badge di menu Rekrutmen (hanya role Crewing).
   useEffect(() => {
-    if (admin) {
+    if (admin && admin.role !== 'FINANCE') {
       api.get('/recruitment/stats').then(({ data }) => setPelamarBaru(data.pelamarBaru ?? 0)).catch(() => undefined);
     }
   }, [admin]);
+
+  // [FUNGSI] User FINANCE diarahkan ke halaman Finance (bukan Dashboard crew).
+  useEffect(() => {
+    if (admin && admin.role === 'FINANCE' && location.pathname === '/admin') {
+      navigate('/admin/finance', { replace: true });
+    }
+  }, [admin, location.pathname, navigate]);
 
   async function handleLogout() {
     try {
@@ -75,6 +90,9 @@ export default function Layout() {
   if (checking) return <p className="p-6 text-gray-500">Memuat...</p>;
   if (!admin) return null; // sedang diarahkan ke halaman login
 
+  const canCrewing = admin.role === 'SUPERADMIN' || admin.role === 'CREWING';
+  const canFinance = admin.role === 'SUPERADMIN' || admin.role === 'FINANCE';
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -84,41 +102,81 @@ export default function Layout() {
           <span className="text-lg font-bold tracking-wide">MARMS</span>
         </div>
         <nav className="px-2">
-          {/* [FUNGSI] Tombol modul Crewing: klik untuk buka/tutup submodul. */}
-          <button
-            onClick={() => setOpen((o) => !o)}
-            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/70 hover:bg-white/10"
-          >
-            <span>Crewing</span>
-            <svg className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none">
-              <path d="M5 7.5 L10 12.5 L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          {open && (
-            <div className="space-y-1 pt-1">
-              {MENU.map((m) => (
-                <NavLink
-                  key={m.to}
-                  to={m.to}
-                  end={m.exact}
-                  className={({ isActive }) =>
-                    `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
-                      isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'
-                    }`
-                  }
-                >
-                  <span>{m.label}</span>
-                  {m.label === 'Rekrutmen' && pelamarBaru > 0 && (
-                    <span className="rounded-full bg-negative px-2 py-0.5 text-xs font-bold">
-                      {pelamarBaru}
-                    </span>
-                  )}
-                </NavLink>
-              ))}
+          {/* [FUNGSI] Payung bisnis Crewing — hanya untuk role Crewing/Superadmin. */}
+          {canCrewing && (
+            <>
+              <button
+                onClick={() => setOpen((o) => !o)}
+                className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/70 hover:bg-white/10"
+              >
+                <span>Crewing</span>
+                <svg className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none">
+                  <path d="M5 7.5 L10 12.5 L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {open && (
+                <div className="space-y-1 pt-1">
+                  {CREWING_MENU.map((m) => (
+                    <NavLink
+                      key={m.to}
+                      to={m.to}
+                      end={m.exact}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
+                          isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'
+                        }`
+                      }
+                    >
+                      <span>{m.label}</span>
+                      {m.label === 'Rekrutmen' && pelamarBaru > 0 && (
+                        <span className="rounded-full bg-negative px-2 py-0.5 text-xs font-bold">
+                          {pelamarBaru}
+                        </span>
+                      )}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* [FUNGSI] Payung bisnis Finance — hanya untuk role Finance/Superadmin. */}
+          {canFinance && (
+            <div className="mt-2 border-t border-white/10 pt-1">
+              <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/70">Finance</div>
+              <div className="space-y-1">
+                {FINANCE_MENU.map((m) => (
+                  <NavLink
+                    key={m.to}
+                    to={m.to}
+                    end={m.exact}
+                    className={({ isActive }) =>
+                      `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
+                        isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'
+                      }`
+                    }
+                  >
+                    <span>{m.label}</span>
+                  </NavLink>
+                ))}
+              </div>
             </div>
           )}
-          {/* [FUNGSI] Modul Pengaturan terpisah (di luar Crewing). */}
+
+          {/* [FUNGSI] Pengaturan & Kelola Akun (di luar payung bisnis). */}
           <div className="mt-2 border-t border-white/10 pt-1">
+            {admin.role === 'SUPERADMIN' && (
+              <NavLink
+                to="/admin/accounts"
+                className={({ isActive }) =>
+                  `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
+                    isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'
+                  }`
+                }
+              >
+                <span>Kelola Akun</span>
+              </NavLink>
+            )}
             <NavLink
               to="/admin/settings"
               className={({ isActive }) =>

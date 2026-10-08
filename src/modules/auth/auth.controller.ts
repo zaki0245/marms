@@ -4,7 +4,7 @@
 
 import type { Request, Response } from 'express';
 import * as service from './auth.service';
-import { changePasswordSchema, loginSchema } from './auth.model';
+import { changePasswordSchema, createAccountSchema, loginSchema, updateAccountSchema } from './auth.model';
 
 export async function login(req: Request, res: Response) {
   const input = loginSchema.parse(req.body);
@@ -34,4 +34,18 @@ export async function changePassword(req: Request, res: Response) {
   const input = changePasswordSchema.parse(req.body);
   await service.changePassword(req.session.adminId, input.passwordLama, input.passwordBaru);
   res.json({ ok: true });
+}
+
+export async function listAccounts(_req: Request, res: Response) {
+  res.json(await service.listAccounts());
+}
+
+export async function createAccount(req: Request, res: Response) {
+  const input = createAccountSchema.parse(req.body);
+  res.status(201).json(await service.createAccount(input));
+}
+
+export async function updateAccount(req: Request, res: Response) {
+  const input = updateAccountSchema.parse(req.body);
+  res.json(await service.updateAccount(req.params.id, input));
 }

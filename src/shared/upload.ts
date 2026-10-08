@@ -46,3 +46,20 @@ export const upload = multer({
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // [ALASAN] Maksimal 5 MB per file.
 });
+
+// [FUNGSI] Verifikasi magic bytes (isi file), bukan cuma ekstensi.
+// [ALASAN] File .exe yang di-rename jadi .pdf lolos filter ekstensi; cek isi menolaknya.
+export function verifyFileSignature(filePath: string): boolean {
+  const fd = fs.openSync(filePath, 'r');
+  try {
+    const buf = Buffer.alloc(8);
+    const read = fs.readSync(fd, buf, 0, 8, 0);
+    const head = buf.subarray(0, read);
+    if (head.length >= 4 && head.subarray(0, 4).toString('latin1') === '%PDF') return true;
+    if (head.length >= 3 && head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return true;
+    if (head.length >= 8 && head.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return true;
+    return false;
+  } finally {
+    fs.closeSync(fd);
+  }
+}

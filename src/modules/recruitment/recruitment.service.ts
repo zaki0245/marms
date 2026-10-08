@@ -5,7 +5,19 @@
 import { prisma } from '../../shared/prisma';
 import { AppError } from '../../shared/AppError';
 import { ApplicantStatus, DocumentStatus } from '@prisma/client';
+import { makeRateLimiter } from '../../shared/rateLimit';
+import { UPLOAD_DIR, verifyFileSignature } from '../../shared/upload';
+import fs from 'fs';
+import path from 'path';
 import { DOKUMEN_LIST, type DokumenInput, type PelamarInput } from './recruitment.model';
+
+// [FUNGSI] Rate limiting pendaftaran per IP (in-memory).
+// [ALASAN] Cegah spam upload dari endpoint publik.
+const pelamarLimiter = makeRateLimiter({
+  maxAttempts: 20,
+  lockMs: 15 * 60 * 1000,
+  message: 'Terlalu banyak percobaan pendaftaran. Coba lagi 15 menit.',
+});
 
 // [FUNGSI] Buat nomor pendaftaran otomatis: PLR-YYYY-NNNN (reset tiap tahun).
 // [ALASAN] Nomor unik per tahun, sesuai aturan bisnis.
@@ -31,7 +43,11 @@ export async function createPelamar(
   input: PelamarInput,
   files: Record<string, Express.Multer.File[] | undefined>,
   expiryDates: Record<string, string>,
+  clientIp?: string,
 ) {
+  // [FUNGSI] Batasi jumlah pendaftaran per IP.
+  if (clientIp) pelamarLimiter.check(clientIp);
+
   // [FUNGSI] Cek duplikat email ATAU no HP (tolak otomatis).
   const exists = await prisma.pelamar.findFirst({
     where: { OR: [{ email: input.email }, { noHp: input.noHp }] },
@@ -48,6 +64,11 @@ export async function createPelamar(
   for (const d of DOKUMEN_LIST) {
     const file = files?.[`dokumen_${d.kode}`]?.[0];
     if (!file) continue;
+    // [FUNGSI] Verifikasi isi file; hapus bila bukan PDF/JPG/PNG asli.
+    if (!verifyFileSignature(path.join(UPLOAD_DIR, file.filename))) {
+      fs.unlinkSync(path.join(UPLOAD_DIR, file.filename));
+      throw new AppError(400, 'File tidak valid (bukan PDF/JPG/PNG)');
+    }
     const tanggalExpired = d.expired && expiryDates[d.kode] ? new Date(expiryDates[d.kode]) : null;
     documents.push({ jenis: d.kode, filePath: `/uploads/${file.filename}`, tanggalExpired });
   }
@@ -142,6 +163,11 @@ export async function updateDokumenFile(
 
   const data: { filePath?: string; tanggalExpired?: Date | null } = {};
   if (input.file) {
+    // [FUNGSI] Verifikasi isi file; hapus bila bukan PDF/JPG/PNG asli.
+    if (!verifyFileSignature(path.join(UPLOAD_DIR, input.file.filename))) {
+      fs.unlinkSync(path.join(UPLOAD_DIR, input.file.filename));
+      throw new AppError(400, 'File tidak valid (bukan PDF/JPG/PNG)');
+    }
     data.filePath = `/uploads/${input.file.filename}`;
   }
   if (input.tanggalExpired !== undefined) {

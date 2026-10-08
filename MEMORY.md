@@ -49,7 +49,7 @@
 ## Hal yang Sering Terlupa
 - Jangan commit `.env`, `node_modules`, `uploads/`.
 - Perubahan skema DB wajib lewat migration (`npx prisma migrate dev --name <nama>`).
-- Setelah ganti struktur database, restart `npm run dev` (agar Prisma client dimuat ulang).
+- Setelah ganti struktur database, jalankan `docker compose up -d --build` (agar Prisma client dimuat ulang).
 - Akun admin awal: `admin@marms.com` / `Admin123!` (wajib ganti saat login pertama).
 
 ## Catatan Keamanan (diketahui, belum diubah)

@@ -73,6 +73,12 @@ enum DocumentStatus {
   DITOLAK
 }
 
+enum Role {
+  SUPERADMIN
+  CREWING
+  FINANCE
+}
+
 // ================== MASTER DATA ==================
 
 model Jabatan {
@@ -295,6 +301,8 @@ model Admin {
   id                  String   @id @default(cuid())
   email               String   @unique
   passwordHash        String
+  role                Role     @default(SUPERADMIN)
+  active              Boolean  @default(true)
   mustChangePassword  Boolean  @default(true)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

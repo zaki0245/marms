@@ -13,14 +13,15 @@ Frontend React + Vite + Tailwind. Semua kode dalam satu repo, satu container app
 
 ## 2. Perintah Utama (jalankan di dalam WSL, folder `~/projects/marms`)
 ```bash
-npm install              # pasang dependency root
-cd client && npm install # pasang dependency frontend
-npm run dev              # jalankan backend (tsx watch)
-cd client && npm run build  # build frontend (hasil di client/dist, disajikan Express)
-npx prisma migrate dev --name <nama>  # buat migration untuk perubahan schema
+npm install              # pasang dependency root (sekali saat setup)
+cd client && npm install # pasang dependency frontend (sekali saat setup)
+docker compose up -d --build  # jalankan app (backend + frontend + DB) via Docker
+npx prisma migrate dev --name <nama>  # buat migration untuk perubahan schema (di host)
 npx prisma migrate reset --force      # reset database + seed ulang
-docker compose up -d db               # nyalakan database
 ```
+
+> Aplikasi dijalankan **hanya lewat Docker** (`docker compose up -d --build`), bukan
+> `npm run dev`. Prisma CLI tetap dipakai di host hanya untuk **membuat migration**.
 
 ## 3. Struktur & Konvensi
 - Backend per modul di `src/modules/<modul>/`: `master-data`, `recruitment`, `crew-placement`,
@@ -48,5 +49,5 @@ docker compose up -d db               # nyalakan database
 ## 5. Validasi Sebelum Selesai
 - `npx tsc --noEmit` (root) dan `cd client && npx tsc --noEmit` harus sukses.
 - `cd client && npm run build` harus sukses.
-- Setelah mengubah schema/instal dependency baru, restart `npm run dev`.
+- Setelah mengubah schema/instal dependency baru, jalankan `docker compose up -d --build`.
 - Pastikan tidak menambahkan `.env`, `node_modules`, atau `uploads/` ke git.

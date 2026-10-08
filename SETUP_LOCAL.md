@@ -12,17 +12,10 @@ Pastikan sudah terpasang di WSL Ubuntu:
 - Docker + Docker Compose: `docker -v` dan `docker compose version`
 - Git: `git --version`
 
-## Pilih Mode Setup
-Ada dua cara menjalankan MARMS:
+## Cara Menjalankan (Docker saja)
 
-| Mode | Kapan dipakai | Perintah utama |
-|---|---|---|
-| **A. Native dev** | Pengembangan harian (backend hot-reload, frontend di-build) | `npm run dev` |
-| **B. Full Docker** | Menjalankan semua service sekaligus (app + DB + Adminer) | `docker compose up --build` |
-
----
-
-## Mode A — Native Dev (backend + DB lokal)
+MARMS dijalankan **hanya lewat Docker** (`docker compose up -d --build`), bukan
+`npm run dev`. Prisma CLI di host hanya dipakai untuk membuat migration.
 
 ### 1. Masuk Folder Project
 ```bash
@@ -32,48 +25,28 @@ cd ~/projects/marms
 ### 2. Salin Konfigurasi
 ```bash
 cp .env.example .env
-# lalu edit .env bila perlu (DATABASE_URL, SESSION_SECRET, dll)
+# edit .env: isi SESSION_SECRET & ADMIN_PASSWORD (wajib, keduanya diminta docker-compose)
 ```
 
-### 3. Install Dependency (root + frontend)
+### 3. Install Dependency (root + frontend) — sekali
 ```bash
 npm install              # dependency backend (otomatis prisma generate lewat postinstall)
 cd client && npm install # dependency frontend
 cd ..
 ```
 
-### 4. Nyalakan Database
+### 4. Buat Tabel & Isi Data Awal (sekali, saat database baru)
 ```bash
 docker compose up -d db
-```
-
-### 5. Buat Tabel & Isi Data Awal
-```bash
 npx prisma migrate dev --name init   # buat tabel (sekali saat pertama)
 npm run db:seed                      # isi 8 jabatan, uang makan, akun admin
 ```
 
-### 6. Build Frontend
+### 5. Jalankan Aplikasi
 ```bash
-cd client && npm run build
-cd ..
+docker compose up -d --build
 ```
-> Frontend di-build ke `client/dist` dan disajikan langsung oleh Express (satu URL, satu proses).
-
-### 7. Jalankan Aplikasi
-```bash
-npm run dev
-```
-Tunggu muncul `MARMS API berjalan di http://localhost:3000`.
-
----
-
-## Mode B — Full Docker (semua service)
-
-Jalankan seluruh stack (build image + start `db`, `app`, dan `adminer`):
-```bash
-docker compose up --build
-```
+Tunggu service `app` berstatus `Up (healthy)`, lalu buka browser.
 
 Service yang jalan:
 | Service | Port | Keterangan |
@@ -100,7 +73,7 @@ Tanpa urutan ini, `npm ci` akan gagal (prisma generate tidak menemukan schema) d
 ## 8. Akses dari Browser Windows
 - Beranda publik (rekrutmen): `http://localhost:3000`
 - Login admin: `http://localhost:3000/admin/login`
-- Adminer (Mode B): `http://localhost:8080`
+- Adminer: `http://localhost:8080`
 - Akun admin awal: `admin@marms.com` / `Admin123!` (wajib ganti saat login pertama)
 
 ## 9. Verifikasi Cepat
@@ -111,6 +84,6 @@ Tanpa urutan ini, `npm ci` akan gagal (prisma generate tidak menemukan schema) d
 ## 10. Jika Error
 - Cek log: `docker compose logs db` (atau `docker compose logs app`).
 - Port bentrok → ubah port di `.env` dan `docker-compose.yml`.
-- Setelah mengubah schema/instal dependency, restart `npm run dev`.
+- Setelah mengubah schema/instal dependency, jalankan `docker compose up -d --build`.
 - Error `401` di API → login ulang (sesi berakhir).
 - Reset data dari nol: `npx prisma migrate reset --force` (membuat ulang DB + seed).

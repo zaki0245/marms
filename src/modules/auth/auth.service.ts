@@ -5,39 +5,59 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../shared/prisma';
 import { AppError } from '../../shared/AppError';
+import { makeRateLimiter } from '../../shared/rateLimit';
+import type { Role } from '@prisma/client';
 
-// [FUNGSI] Rate limiting sederhana per email (in-memory).
-const rateLimits = new Map<string, { count: number; lockedUntil: number }>();
-const MAX_ATTEMPTS = 5;
-const LOCK_MS = 15 * 60 * 1000;
+// [FUNGSI] Rate limiting per email (in-memory).
+const loginLimiter = makeRateLimiter({
+  maxAttempts: 5,
+  lockMs: 15 * 60 * 1000,
+  message: 'Terlalu banyak percobaan. Coba lagi 15 menit.',
+});
 
 export async function login(email: string, password: string) {
-  const now = Date.now();
-  const rl = rateLimits.get(email);
-  if (rl && rl.lockedUntil > now) {
-    throw new AppError(429, 'Terlalu banyak percobaan. Coba lagi 15 menit.');
-  }
+  loginLimiter.check(email);
 
   const admin = await prisma.admin.findUnique({ where: { email } });
-  const valid = admin && (await bcrypt.compare(password, admin.passwordHash));
+  const valid = admin && admin.active && (await bcrypt.compare(password, admin.passwordHash));
   if (!valid) {
-    const count = (rl?.count ?? 0) + 1;
-    if (count >= MAX_ATTEMPTS) {
-      rateLimits.set(email, { count, lockedUntil: now + LOCK_MS });
-      throw new AppError(429, 'Terlalu banyak percobaan. Coba lagi 15 menit.');
-    }
-    rateLimits.set(email, { count, lockedUntil: 0 });
     throw new AppError(401, 'Email atau password salah');
   }
 
-  rateLimits.delete(email);
-  return { id: admin.id, email: admin.email, mustChangePassword: admin.mustChangePassword };
+  loginLimiter.reset(email);
+  return { id: admin.id, email: admin.email, role: admin.role, mustChangePassword: admin.mustChangePassword };
 }
 
 export function getAdmin(id: string) {
   return prisma.admin.findUnique({
     where: { id },
-    select: { id: true, email: true, mustChangePassword: true },
+    select: { id: true, email: true, role: true, mustChangePassword: true },
+  });
+}
+
+// [FUNGSI] Daftar semua akun admin (untuk SUPERADMIN).
+export function listAccounts() {
+  return prisma.admin.findMany({
+    select: { id: true, email: true, role: true, active: true, mustChangePassword: true, createdAt: true },
+    orderBy: { createdAt: 'asc' },
+  });
+}
+
+// [FUNGSI] Buat akun admin baru dengan role tertentu.
+export async function createAccount(input: { email: string; password: string; role: Role }) {
+  const passwordHash = await bcrypt.hash(input.password, 10);
+  return prisma.admin.create({
+    data: { email: input.email, passwordHash, role: input.role, mustChangePassword: true },
+    select: { id: true, email: true, role: true, active: true, mustChangePassword: true },
+  });
+}
+
+// [FUNGSI] Ubah role / status aktif sebuah akun.
+export function updateAccount(id: string, input: { role?: Role; active?: boolean }) {
+  return prisma.admin.update({
+    where: { id },
+    data: { ...(input.role ? { role: input.role } : {}), ...(input.active !== undefined ? { active: input.active } : {}) },
+    select: { id: true, email: true, role: true, active: true, mustChangePassword: true },
   });
 }
 

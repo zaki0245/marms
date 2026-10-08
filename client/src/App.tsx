@@ -18,6 +18,8 @@ import Crew from './pages/Crew';
 import Payroll from './pages/Payroll';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import Finance from './pages/Finance';
+import Accounts from './pages/Accounts';
 
 export default function App() {
   return (
@@ -41,6 +43,8 @@ export default function App() {
         <Route path="crew" element={<Crew />} />
         <Route path="payroll" element={<Payroll />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="finance" element={<Finance />} />
+        <Route path="accounts" element={<Accounts />} />
         <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>

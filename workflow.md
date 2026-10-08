@@ -9,22 +9,22 @@
 ## 1. Setup Awal (sekali saja)
 1. Pastikan berada di WSL Ubuntu, folder `~/projects/marms`.
 2. Jalankan `npm install` lalu `cd client && npm install`.
-3. Salin `.env.example` menjadi `.env`.
+3. Salin `.env.example` menjadi `.env` (isi `SESSION_SECRET` & `ADMIN_PASSWORD`).
 4. `docker compose up -d db` → `npx prisma migrate dev --name init` → `npm run db:seed`.
-5. `cd client && npm run build` (build frontend).
 
-## 2. Menjalankan di Lokal (mode development)
+## 2. Menjalankan di Lokal (Docker)
 ```bash
-npm run dev
+docker compose up -d --build
 ```
 Akses dari browser Windows:
 - Beranda publik: `http://localhost:3000/`
 - Login admin: `http://localhost:3000/admin/login`
 
 ## 3. Setiap Ada Perubahan Kode
-- **Backend** (`src/`): `npm run dev` otomatis reload (tsx watch).
-- **Frontend** (`client/`): jalankan `cd client && npm run build` lalu refresh browser.
-- **Schema database**: jalankan `npx prisma migrate dev --name <nama>` lalu **restart** `npm run dev`.
+- **Backend** (`src/`) atau **Frontend** (`client/`): jalankan `docker compose up -d --build`
+  (image dibangun ulang otomatis).
+- **Schema database**: jalankan `npx prisma migrate dev --name <nama>` (di host) lalu
+  `docker compose up -d --build`.
 
 ## 4. Alur Kerja per Fitur
 1. Kerjakan SATU fitur sampai selesai & bisa dites.
@@ -42,7 +42,7 @@ git push                   # kirim ke GitHub
 Aturan commit: satu commit = satu perubahan yang jelas (contoh: "tambah fitur leave pay").
 
 ## 6. Troubleshooting Cepat
-- Aplikasi tidak jalan → cek `docker compose ps` dan restart `npm run dev`.
+- Aplikasi tidak jalan → cek `docker compose ps` dan jalankan `docker compose up -d --build`.
 - Database tidak tersambung → cek `.env` (DATABASE_URL) dan service `db` sudah `Up (healthy)`.
 - Error `401` di API → login ulang (sesi berakhir setelah 30 menit tidak aktif).
 - Port bentrok → ganti port di `.env` dan `docker-compose.yml`.

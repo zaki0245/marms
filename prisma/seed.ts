@@ -40,13 +40,18 @@ async function main() {
   // [FUNGSI] Buat akun admin awal dengan password ter-hash.
   // [ALASAN] Password TIDAK boleh disimpan mentah; pakai bcrypt.
   const email = process.env.ADMIN_EMAIL ?? 'admin@marms.com';
-  const password = process.env.ADMIN_PASSWORD ?? 'Admin123!';
+  const envPassword = process.env.ADMIN_PASSWORD;
+  // [FUNGSI] Wajibkan ADMIN_PASSWORD di produksi agar tidak memakai default lemah.
+  if (!envPassword && process.env.NODE_ENV === 'production') {
+    throw new Error('ADMIN_PASSWORD wajib diisi di produksi');
+  }
+  const password = envPassword ?? 'Admin123!';
   const passwordHash = await bcrypt.hash(password, 10);
 
   await prisma.admin.upsert({
     where: { email },
     update: {},
-    create: { email, passwordHash, mustChangePassword: true },
+    create: { email, passwordHash, role: 'SUPERADMIN', active: true, mustChangePassword: true },
   });
 
   console.log('Seed selesai: 8 jabatan, 1 pengaturan, 1 akun admin.');

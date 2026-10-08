@@ -16,7 +16,7 @@ export async function createPelamar(req: Request, res: Response) {
     const v = req.body[`tanggalExpired_${d.kode}`];
     if (v) expiryDates[d.kode] = v;
   }
-  const pelamar = await service.createPelamar(input, files, expiryDates);
+  const pelamar = await service.createPelamar(input, files, expiryDates, req.ip);
   res.status(201).json(pelamar);
 }
 

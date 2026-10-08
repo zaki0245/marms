@@ -48,7 +48,10 @@ services:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-marms}:${POSTGRES_PASSWORD:-marms_password}@db:5432/${POSTGRES_DB:-marms}?schema=public
-      SESSION_SECRET: ${SESSION_SECRET:-ganti-dengan-kunci-rahasia-panjang}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET wajib diisi}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@marms.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD wajib diisi}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     ports:
       - "3000:3000"
     volumes:

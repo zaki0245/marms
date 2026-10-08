@@ -6,10 +6,12 @@
 import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import path from 'path';
 import { ZodError } from 'zod';
 import { AppError } from './shared/AppError';
 import { UPLOAD_DIR } from './shared/upload';
+import { getCurrentAdmin } from './shared/authorization';
 import { masterDataRoutes } from './modules/master-data';
 import { recruitmentRoutes } from './modules/recruitment';
 import { crewPlacementRoutes } from './modules/crew-placement';
@@ -17,13 +19,24 @@ import { payrollRoutes } from './modules/payroll';
 import { reportsRoutes } from './modules/reports';
 import { authRoutes } from './modules/auth';
 import { leavePayRoutes } from './modules/leave-pay';
+import { financeRoutes } from './modules/finance';
 import { sessionMiddleware } from './shared/session';
 
 const app = express();
 
+// [FUNGSI] Percayai 1 hop proxy (Railway/nginx/Caddy) untuk IP & protokol asli.
+// [ALASAN] Tanpa ini req.ip menjadi IP proxy, sehingga rate limit per-IP tidak
+//          berguna dan deteksi HTTPS keliru.
+app.set('trust proxy', 1);
+
+// [FUNGSI] Header keamanan dasar (nosniff, X-Frame-Options, dsb.).
+// [ALASAN] Melindungi app & file upload dari interpretasi konten berbahaya.
+app.use(helmet());
+
 // [FUNGSI] Middleware dasar: izinkan CORS & parsing body JSON.
 // [ALASAN] Frontend (React) butuh akses API; JSON untuk kirim/terima data.
-app.use(cors());
+// [ALASAN] Origin dibatasi (bukan wildcard) + credentials untuk cookie sesi.
+app.use(cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 
 // [FUNGSI] Middleware sesi login.
@@ -32,13 +45,32 @@ app.use(sessionMiddleware);
 // [FUNGSI] Route autentikasi (login/logout/me/ganti password) — sebelum proteksi.
 app.use('/api/auth', authRoutes);
 
-// [FUNGSI] Lindungi semua endpoint /api kecuali whitelist publik.
-app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+// [FUNGSI] Lindungi semua endpoint /api kecuali whitelist publik, dan batasi per role.
+// [ALASAN] Payung bisnis: modul Crewing hanya untuk CREWING/SUPERADMIN, Finance hanya
+//          untuk FINANCE/SUPERADMIN. Role & status aktif dicek dari database.
+app.use('/api', async (req: Request, res: Response, next: NextFunction) => {
   const isPublic =
     (req.method === 'POST' && req.path === '/recruitment/pelamar') ||
     (req.method === 'GET' && req.path === '/master-data/jabatan');
-  if (isPublic || req.session?.adminId) return next();
-  res.status(401).json({ error: 'Belum login' });
+  if (isPublic) return next();
+
+  try {
+    const admin = await getCurrentAdmin(req);
+    if (!admin || !admin.active) {
+      res.status(401).json({ error: 'Belum login' });
+      return;
+    }
+    // [FUNGSI] Tentukan role yang diizinkan berdasarkan prefix path.
+    const isFinance = req.path.startsWith('/finance');
+    const allowed = isFinance ? ['FINANCE', 'SUPERADMIN'] : ['CREWING', 'SUPERADMIN'];
+    if (!allowed.includes(admin.role)) {
+      res.status(403).json({ error: 'Akses ditolak' });
+      return;
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // [FUNGSI] Endpoint /health untuk dicek Docker (HEALTHCHECK).
@@ -55,15 +87,30 @@ app.use('/api/crew', crewPlacementRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/leave-pay', leavePayRoutes);
+app.use('/api/finance', financeRoutes);
 
 // [FUNGSI] Sajikan hasil build frontend (client/dist) sebagai file statis.
 // [ALASAN] Satu server (satu URL, satu proses) menyajikan UI + API sekaligus.
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDist));
 
-// [FUNGSI] Sajikan file dokumen pelamar dari folder uploads.
-// [ALASAN] Link dokumen (path /uploads/...) bisa dibuka di browser.
-app.use('/uploads', express.static(UPLOAD_DIR));
+// [FUNGSI] Sajikan file dokumen pelamar (hanya untuk admin login).
+// [ALASAN] Dokumen penting tidak boleh dibuka publik; akses dibatasi sesi + validasi nama file.
+app.get('/uploads/:filename', (req: Request, res: Response, next: NextFunction) => {
+  if (!req.session?.adminId) {
+    res.status(401).json({ error: 'Belum login' });
+    return;
+  }
+  // [FUNGSI] Pastikan nama file sesuai pola UUID + ekstensi yang diizinkan.
+  // [ALASAN] Regex mencegah path traversal & akses file di luar folder uploads.
+  if (!/^[0-9a-f-]{36}\.(pdf|jpe?g|png)$/i.test(req.params.filename)) {
+    res.status(404).json({ error: 'Dokumen tidak ditemukan' });
+    return;
+  }
+  res.sendFile(path.join(UPLOAD_DIR, req.params.filename), (err) => {
+    if (err) next();
+  });
+});
 
 // [FUNGSI] SPA fallback: semua route non-/api dikembalikan ke index.html.
 // [ALASAN] React Router menangani navigasi halaman di sisi browser.
