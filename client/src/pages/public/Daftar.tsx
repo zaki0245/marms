@@ -173,7 +173,7 @@ export default function Daftar() {
 
           {/* Dokumen */}
           <section className="rounded-lg bg-white p-5 shadow-sm">
-            <h2 className="font-semibold text-navy">Dokumen (opsional)</h2>
+            <h2 className="font-semibold text-navy">Dokumen (Unggah dokumen atau data pendukung yang Anda miliki)</h2>
             <p className="text-xs text-gray-500">PDF/JPG/PNG, maksimal 5 MB per file. Boleh diunggah sebagian.</p>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {DOKUMEN.map((d) => (
