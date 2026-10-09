@@ -127,8 +127,8 @@ export default function Daftar() {
                 <input required value={form.noHp} onChange={(e) => setField('noHp', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Email *</label>
-                <input required type="email" value={form.email} onChange={(e) => setField('email', e.target.value)} className={inputCls} />
+                <label className="block text-xs text-gray-500">Email</label>
+                <input type="email" value={form.email} onChange={(e) => setField('email', e.target.value)} className={inputCls} />
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs text-gray-500">Alamat *</label>

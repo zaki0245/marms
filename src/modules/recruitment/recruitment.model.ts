@@ -36,7 +36,7 @@ export const pelamarSchema = z.object({
   tanggalLahir: z.string().min(1, 'Tanggal lahir wajib diisi'),
   jenisKelamin: z.enum(['LAKI_LAKI', 'PEREMPUAN']),
   noHp: z.string().min(6, 'No HP wajib diisi'),
-  email: z.string().email('Format email tidak valid'),
+  email: z.union([z.string().email('Format email tidak valid'), z.literal('')]).optional(),
   alamat: z.string().min(1, 'Alamat wajib diisi'),
   kontakReferensi: z.string().optional(),
   posisiDilamar: z.string().min(1, 'Posisi dilamar wajib diisi'),

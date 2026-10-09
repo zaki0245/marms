@@ -123,7 +123,7 @@ model Pelamar {
   tanggalLahir     DateTime
   jenisKelamin     Gender
   noHp             String          @unique // [ALASAN] Cegah duplikat no HP.
-  email            String          @unique // [ALASAN] Cegah duplikat email.
+  email            String?         @unique // [ALASAN] Cegah duplikat email (opsional).
   alamat           String
   kontakReferensi  String?
   posisiDilamar    String

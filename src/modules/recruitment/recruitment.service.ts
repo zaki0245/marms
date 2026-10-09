@@ -48,13 +48,16 @@ export async function createPelamar(
   // [FUNGSI] Batasi jumlah pendaftaran per IP.
   if (clientIp) pelamarLimiter.check(clientIp);
 
-  // [FUNGSI] Cek duplikat email ATAU no HP (tolak otomatis).
+  // [FUNGSI] Cek duplikat email ATAU no HP (tolak otomatis). Email opsional.
+  const or: { email?: string; noHp?: string }[] = [];
+  if (input.email) or.push({ email: input.email });
+  or.push({ noHp: input.noHp });
   const exists = await prisma.pelamar.findFirst({
-    where: { OR: [{ email: input.email }, { noHp: input.noHp }] },
+    where: { OR: or },
     select: { email: true, noHp: true },
   });
   if (exists) {
-    if (exists.email === input.email) throw new AppError(409, 'Email sudah terdaftar');
+    if (input.email && exists.email === input.email) throw new AppError(409, 'Email sudah terdaftar');
     throw new AppError(409, 'No HP sudah terdaftar');
   }
 
@@ -83,7 +86,7 @@ export async function createPelamar(
       tanggalLahir: new Date(input.tanggalLahir),
       jenisKelamin: input.jenisKelamin,
       noHp: input.noHp,
-      email: input.email,
+      email: input.email || null,
       alamat: input.alamat,
       kontakReferensi: input.kontakReferensi || null,
       posisiDilamar: input.posisiDilamar,

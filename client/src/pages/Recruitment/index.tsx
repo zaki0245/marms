@@ -21,7 +21,7 @@ interface Pelamar {
   tanggalLahir: string;
   jenisKelamin: string;
   noHp: string;
-  email: string;
+  email: string | null;
   alamat: string;
   kontakReferensi?: string | null;
   posisiDilamar: string;
@@ -225,7 +225,7 @@ export default function Recruitment() {
 
             <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
               <div><span className="text-gray-500">No HP:</span> {selected.noHp}</div>
-              <div><span className="text-gray-500">Email:</span> {selected.email}</div>
+              <div><span className="text-gray-500">Email:</span> {selected.email ?? '-'}</div>
               <div>
                 <span className="text-gray-500">TTL:</span> {selected.tempatLahir}, {selected.tanggalLahir?.slice(0, 10)}
               </div>

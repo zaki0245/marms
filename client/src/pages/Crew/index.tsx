@@ -19,7 +19,7 @@ interface Applicant {
   namaLengkap: string;
   posisiDilamar: string;
   noHp: string;
-  email: string;
+  email: string | null;
   tanggalLahir: string;
   alamat: string;
   status: string;
@@ -453,7 +453,7 @@ export default function Crew() {
               <div><span className="text-gray-500">Bergabung:</span> {selected.tanggalBergabung?.slice(0, 10)}</div>
               <div><span className="text-gray-500">Masa Kerja:</span> {selected.masaKerja ?? selected.totalMasaKerja} hari</div>
               <div><span className="text-gray-500">No HP:</span> {selected.applicant.noHp}</div>
-              <div><span className="text-gray-500">Email:</span> {selected.applicant.email}</div>
+              <div><span className="text-gray-500">Email:</span> {selected.applicant.email ?? '-'}</div>
               <div><span className="text-gray-500">Alamat:</span> {selected.applicant.alamat}</div>
             </div>
 
