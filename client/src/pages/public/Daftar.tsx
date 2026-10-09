@@ -155,7 +155,7 @@ export default function Daftar() {
                 <select value={form.pengalamanTahun} onChange={(e) => setField('pengalamanTahun', e.target.value)} className={inputCls}>
                   <option value="">Pilih pengalaman</option>
                   <option value="0">Kurang dari 1 Tahun</option>
-                  {Array.from({ length: 30 }, (_, i) => i + 1).map((n) => (
+                  {Array.from({ length: 50 }, (_, i) => i + 1).map((n) => (
                     <option key={n} value={String(n)}>{n} Tahun</option>
                   ))}
                 </select>
