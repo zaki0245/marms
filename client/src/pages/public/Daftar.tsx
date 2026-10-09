@@ -151,8 +151,14 @@ export default function Daftar() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Pengalaman (tahun)</label>
-                <input type="number" min={0} value={form.pengalamanTahun} onChange={(e) => setField('pengalamanTahun', e.target.value)} className={inputCls} />
+                <label className="block text-xs text-gray-500">Pengalaman</label>
+                <select value={form.pengalamanTahun} onChange={(e) => setField('pengalamanTahun', e.target.value)} className={inputCls}>
+                  <option value="">Pilih pengalaman</option>
+                  <option value="0">Kurang dari 1 Tahun</option>
+                  {Array.from({ length: 30 }, (_, i) => i + 1).map((n) => (
+                    <option key={n} value={String(n)}>{n} Tahun</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-xs text-gray-500">Kapal Terakhir</label>
@@ -167,7 +173,7 @@ export default function Daftar() {
 
           {/* Dokumen */}
           <section className="rounded-lg bg-white p-5 shadow-sm">
-            <h2 className="font-semibold text-navy">Dokumen</h2>
+            <h2 className="font-semibold text-navy">Dokumen (opsional)</h2>
             <p className="text-xs text-gray-500">PDF/JPG/PNG, maksimal 5 MB per file. Boleh diunggah sebagian.</p>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {DOKUMEN.map((d) => (

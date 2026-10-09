@@ -230,7 +230,7 @@ export default function Recruitment() {
                 <span className="text-gray-500">TTL:</span> {selected.tempatLahir}, {selected.tanggalLahir?.slice(0, 10)}
               </div>
               <div className="col-span-2"><span className="text-gray-500">Alamat:</span> {selected.alamat}</div>
-              <div><span className="text-gray-500">Pengalaman:</span> {selected.pengalamanTahun ?? '-'} thn</div>
+              <div><span className="text-gray-500">Pengalaman:</span> {selected.pengalamanTahun === 0 ? 'Kurang dari 1 Tahun' : (selected.pengalamanTahun ?? '-') + ' thn'}</div>
               <div><span className="text-gray-500">Kapal terakhir:</span> {selected.kapalTerakhir ?? '-'}</div>
             </div>
 
