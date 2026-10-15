@@ -79,6 +79,30 @@ enum Role {
   FINANCE
 }
 
+enum InvoiceCategory {
+  FREIGHT
+  OPERATION
+  OTHERS
+}
+
+enum InvoiceType {
+  REGULAR
+  DP
+  PELUNASAN
+}
+
+enum FakturPajakStatus {
+  SUDAH_DITERIMA
+  BELUM_DITERIMA
+  TIDAK_ADA
+}
+
+enum PaymentStatus {
+  BELUM_BAYAR
+  SEBAGIAN
+  LUNAS
+}
+
 // ================== MASTER DATA ==================
 
 model Jabatan {
@@ -293,6 +317,112 @@ model LeavePayDisbursement {
   catatanPerforma   String?
   createdAt         DateTime @default(now())
   crew              Crew     @relation(fields: [crewId], references: [id], onDelete: Cascade)
+}
+
+// ================== FINANCE ==================
+
+model Vendor {
+  id        String        @id @default(cuid())
+  nama      String        @unique
+  npwp      String?
+  alamat    String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  banks     VendorBank[]
+  invoices  Invoice[]
+  pvs       Pv[]
+}
+
+model VendorBank {
+  id          String @id @default(cuid())
+  vendorId    String
+  accountNo   String
+  accountName String
+  bank        String
+  vendor      Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id               String            @id @default(cuid())
+  no               String            @unique
+  kategori         InvoiceCategory   @default(OTHERS)
+  tipe             InvoiceType       @default(REGULAR)
+  tanggal          DateTime
+  bupot            String?
+  vendorId         String
+  vendorName       String
+  vendorNpwp       String?
+  vendorAlamat     String?
+  bankAccountId    String?
+  bankAccountNo    String?
+  bankAccountName  String?
+  bank             String?
+  inv              String?
+  ref              String?
+  keterangan       String?
+  dpp              Decimal           @db.Decimal(15, 2)
+  ppn              Decimal?          @db.Decimal(15, 2)
+  pphPasal         String?
+  pph              Decimal?          @db.Decimal(15, 2)
+  total            Decimal           @db.Decimal(15, 2)
+  dueDate          DateTime?
+  masaPajakPPN     String?
+  masaPajakPPH     String?
+  statusFakturPajak FakturPajakStatus @default(BELUM_DITERIMA)
+  statusPembayaran  PaymentStatus     @default(BELUM_BAYAR)
+  parentInvoiceId  String?
+  incomplete       Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  vendor           Vendor            @relation(fields: [vendorId], references: [id])
+  parent           Invoice?          @relation("InvoiceChildren", fields: [parentInvoiceId], references: [id])
+  children         Invoice[]         @relation("InvoiceChildren")
+  fakturPajak      FakturPajak[]
+  pvItems          PvItem[]
+
+  @@unique([vendorId, inv])
+}
+
+model FakturPajak {
+  id        String  @id @default(cuid())
+  invoiceId String
+  nomor     String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Pv {
+  id              String    @id @default(cuid())
+  pvNo            String    @unique
+  tanggal         DateTime
+  vendorId        String
+  vendorName      String
+  vendorNpwp      String?
+  vendorAlamat    String?
+  bankAccountNo   String?
+  bankAccountName String?
+  bank            String?
+  chequeNo        String?
+  issuedDate      DateTime?
+  bankCharge      Decimal?  @db.Decimal(15, 2)
+  balance         Decimal?  @db.Decimal(15, 2)
+  keterangan      String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  vendor          Vendor    @relation(fields: [vendorId], references: [id])
+  items           PvItem[]
+}
+
+model PvItem {
+  id         String  @id @default(cuid())
+  pvId       String
+  invoiceId  String
+  nominal    Decimal @db.Decimal(15, 2)
+  includeTax Boolean @default(false)
+  pv         Pv      @relation(fields: [pvId], references: [id], onDelete: Cascade)
+  invoice    Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([pvId])
+  @@index([invoiceId])
 }
 
 // ================== ADMIN ==================

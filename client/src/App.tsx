@@ -19,6 +19,12 @@ import Payroll from './pages/Payroll';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Finance from './pages/Finance';
+import FinanceDaftarInvoice from './pages/Finance/DaftarInvoice';
+import FinanceInputInvoice from './pages/Finance/InputInvoice';
+import FinanceCetakPv from './pages/Finance/CetakPv';
+import FinanceVendor from './pages/Finance/Vendor';
+import FinanceLaporan from './pages/Finance/Laporan';
+import FinanceKonfigurasi from './pages/Finance/Konfigurasi';
 import Accounts from './pages/Accounts';
 
 export default function App() {
@@ -44,6 +50,13 @@ export default function App() {
         <Route path="payroll" element={<Payroll />} />
         <Route path="reports" element={<Reports />} />
         <Route path="finance" element={<Finance />} />
+        <Route path="finance/invoice" element={<FinanceDaftarInvoice />} />
+        <Route path="finance/invoice/input" element={<FinanceInputInvoice />} />
+        <Route path="finance/invoice/input/:id" element={<FinanceInputInvoice />} />
+        <Route path="finance/cetak-pv" element={<FinanceCetakPv />} />
+        <Route path="finance/vendor" element={<FinanceVendor />} />
+        <Route path="finance/laporan" element={<FinanceLaporan />} />
+        <Route path="finance/konfigurasi" element={<FinanceKonfigurasi />} />
         <Route path="accounts" element={<Accounts />} />
         <Route path="settings" element={<Settings />} />
       </Route>

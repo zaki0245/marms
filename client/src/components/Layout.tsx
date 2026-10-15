@@ -20,8 +20,15 @@ const CREWING_MENU = [
   { to: '/admin/reports', label: 'Laporan' },
 ];
 
-// [FUNGSI] Menu modul Finance (scaffold awal).
-const FINANCE_MENU = [{ to: '/admin/finance', label: 'Finance', exact: false }];
+// [FUNGSI] Menu modul Finance (urutan tetap sesuai spesifikasi).
+const FINANCE_MENU = [
+  { to: '/admin/finance', label: 'Dashboard', exact: true },
+  { to: '/admin/finance/invoice/input', label: 'Input Invoice', exact: false },
+  { to: '/admin/finance/invoice', label: 'Daftar Invoice', exact: false },
+  { to: '/admin/finance/cetak-pv', label: 'Cetak PV', exact: false },
+  { to: '/admin/finance/vendor', label: 'Vendor', exact: false },
+  { to: '/admin/finance/laporan', label: 'Laporan', exact: false },
+];
 
 interface Admin {
   email: string;
@@ -34,6 +41,7 @@ export default function Layout() {
   const location = useLocation();
   const [pelamarBaru, setPelamarBaru] = useState(0);
   const [open, setOpen] = useState(true);
+  const [financeOpen, setFinanceOpen] = useState(true);
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [checking, setChecking] = useState(true);
   const [passwordBaru, setPasswordBaru] = useState('');
@@ -143,23 +151,33 @@ export default function Layout() {
           {/* [FUNGSI] Payung bisnis Finance — hanya untuk role Finance/Superadmin. */}
           {canFinance && (
             <div className="mt-2 border-t border-white/10 pt-1">
-              <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/70">Finance</div>
-              <div className="space-y-1">
-                {FINANCE_MENU.map((m) => (
-                  <NavLink
-                    key={m.to}
-                    to={m.to}
-                    end={m.exact}
-                    className={({ isActive }) =>
-                      `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
-                        isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'
-                      }`
-                    }
-                  >
-                    <span>{m.label}</span>
-                  </NavLink>
-                ))}
-              </div>
+              <button
+                onClick={() => setFinanceOpen((o) => !o)}
+                className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/70 hover:bg-white/10"
+              >
+                <span>Finance</span>
+                <svg className={`h-3 w-3 transition-transform ${financeOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none">
+                  <path d="M5 7.5 L10 12.5 L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {financeOpen && (
+                <div className="space-y-1 pt-1">
+                  {FINANCE_MENU.map((m) => (
+                    <NavLink
+                      key={m.to}
+                      to={m.to}
+                      end={m.exact}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
+                          isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'
+                        }`
+                      }
+                    >
+                      <span>{m.label}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

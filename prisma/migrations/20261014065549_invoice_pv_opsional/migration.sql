@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Invoice" ALTER COLUMN "pvNo" DROP NOT NULL;
