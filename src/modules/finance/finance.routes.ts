@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { asyncHandler } from '../../shared/asyncHandler';
 import * as vendor from './vendor.controller';
+import * as customer from './customer.controller';
 import * as invoice from './invoice.controller';
 import * as pv from './pv.controller';
 import * as laporan from './laporan.controller';
@@ -18,6 +19,13 @@ router.post('/vendor', asyncHandler(vendor.create));
 router.get('/vendor/:id', asyncHandler(vendor.get));
 router.put('/vendor/:id', asyncHandler(vendor.update));
 router.delete('/vendor/:id', asyncHandler(vendor.remove));
+
+// Customer
+router.get('/customer', asyncHandler(customer.list));
+router.post('/customer', asyncHandler(customer.create));
+router.get('/customer/:id', asyncHandler(customer.get));
+router.put('/customer/:id', asyncHandler(customer.update));
+router.delete('/customer/:id', asyncHandler(customer.remove));
 
 // Invoice
 router.get('/invoice', asyncHandler(invoice.list));
@@ -39,6 +47,6 @@ router.put('/konfigurasi', asyncHandler(konfigurasi.update));
 
 // Laporan
 router.get('/laporan/dashboard', asyncHandler(laporan.dashboard));
-router.get('/laporan/rekap-ap', asyncHandler(laporan.rekapAp));
+router.get('/laporan/rekap', asyncHandler(laporan.rekap));
 
 export default router;

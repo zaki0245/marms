@@ -1,6 +1,6 @@
 // client/src/pages/Finance/Laporan.tsx
-// [FUNGSI] Laporan Rekap AP: semua PV (cicilan) + data invoice, filter bulan/tahun, search, export Excel.
-// [ALASAN] Satu laporan ringkas untuk hutang/AP.
+// [FUNGSI] Laporan Rekap (AR & AP): semua voucher + data invoice, filter bulan/tahun, search, export Excel.
+// [ALASAN] Satu laporan ringkas untuk hutang (AP) & piutang (AR).
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../api/client';
@@ -10,8 +10,9 @@ import { num, formatUang } from './utils';
 interface Row {
   id: string;
   pvNo: string;
+  jenis: string;
   tanggal: string;
-  vendorName: string;
+  counterpartyName: string;
   inv: string | null;
   ref: string | null;
   keterangan: string | null;
@@ -25,28 +26,32 @@ interface Row {
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
 const COLS = [
-  'No', 'PV No', 'Tanggal', 'Vendor', 'INV', 'REF', 'Keterangan', 'DPP', 'PPN', 'PPH', 'Bank Charge', 'Balance', 'Total Bayar',
+  'No', 'Voucher', 'Tanggal', 'Counterparty', 'INV', 'REF', 'Keterangan', 'DPP', 'PPN', 'PPH', 'Bank Charge', 'Balance', 'Total',
 ];
 
 function matches(r: Row, q: string): boolean {
   if (!q) return true;
   const s = q.toLowerCase();
-  return [r.pvNo, r.vendorName, r.inv, r.ref, r.keterangan].some((v) => v && v.toLowerCase().includes(s));
+  return [r.pvNo, r.counterpartyName, r.inv, r.ref, r.keterangan].some((v) => v && v.toLowerCase().includes(s));
 }
 
 export default function Laporan() {
+  const [jenis, setJenis] = useState<'AP' | 'AR'>('AP');
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
 
+  const voucherJenis = jenis === 'AR' ? 'RV' : 'PV';
+
   useEffect(() => {
-    api.get<Row[]>('/finance/laporan/rekap-ap')
+    setLoading(true);
+    api.get<Row[]>('/finance/laporan/rekap', { params: { jenis: voucherJenis } })
       .then(({ data }) => setRows(data))
       .catch(() => setRows([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [voucherJenis]);
 
   const years = useMemo(() => {
     const set = new Set<string>();
@@ -69,7 +74,7 @@ export default function Laporan() {
       String(i + 1),
       r.pvNo,
       r.tanggal?.slice(0, 10) ?? '',
-      r.vendorName,
+      r.counterpartyName,
       r.inv ?? '',
       r.ref ?? '',
       r.keterangan ?? '',
@@ -80,22 +85,30 @@ export default function Laporan() {
       r.balance != null ? formatUang(r.balance) : '',
       formatUang(num(r.dpp) + num(r.ppn) - num(r.pph) + num(r.bankCharge) + num(r.balance)),
     ]);
-    exportExcel({ title: 'Rekap AP', subtitle: 'Finance', filename: 'rekap-ap', columns: COLS, rows: data, totalLabel: '', totalValue: '' });
+    exportExcel({ title: jenis === 'AR' ? 'Rekap AR' : 'Rekap AP', subtitle: 'Finance', filename: jenis === 'AR' ? 'rekap-ar' : 'rekap-ap', columns: COLS, rows: data, totalLabel: '', totalValue: '' });
   }
 
   const inputCls = 'rounded border border-gray-300 px-3 py-2 text-sm';
 
+  const tabCls = (active: boolean) =>
+    `rounded-t px-4 py-2 text-sm font-semibold ${active ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
+
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-navy">Rekap AP</h2>
+        <h2 className="text-2xl font-bold text-navy">Rekap</h2>
         <button onClick={doExport} className="rounded border border-navy px-4 py-2 text-sm text-navy">Export Excel</button>
+      </div>
+
+      <div className="mt-4 flex border-b border-gray-200">
+        <button onClick={() => setJenis('AP')} className={tabCls(jenis === 'AP')}>AP (Hutang)</button>
+        <button onClick={() => setJenis('AR')} className={tabCls(jenis === 'AR')}>AR (Piutang)</button>
       </div>
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
         <div>
           <label className="block text-xs text-gray-500">Search</label>
-          <input placeholder="Cari PV, vendor, INV, REF, keterangan..." value={search} onChange={(e) => setSearch(e.target.value)} className={`${inputCls} w-72`} />
+          <input placeholder={`Cari ${voucherJenis}, counterparty, INV, REF, keterangan...`} value={search} onChange={(e) => setSearch(e.target.value)} className={`${inputCls} w-72`} />
         </div>
         <div>
           <label className="block text-xs text-gray-500">Bulan</label>
@@ -118,9 +131,9 @@ export default function Laporan() {
           <thead className="bg-navy-light text-navy">
             <tr>
               <th className="px-3 py-2">No</th>
-              <th className="px-3 py-2">PV No</th>
+              <th className="px-3 py-2">Voucher</th>
               <th className="px-3 py-2">Tanggal</th>
-              <th className="px-3 py-2">Vendor</th>
+              <th className="px-3 py-2">Counterparty</th>
               <th className="px-3 py-2">INV</th>
               <th className="px-3 py-2">REF</th>
               <th className="px-3 py-2">Keterangan</th>
@@ -129,7 +142,7 @@ export default function Laporan() {
               <th className="px-3 py-2 text-right">PPH</th>
               <th className="px-3 py-2 text-right">Bank Charge</th>
               <th className="px-3 py-2 text-right">Balance</th>
-              <th className="px-3 py-2 text-right">Total Bayar</th>
+              <th className="px-3 py-2 text-right">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -140,7 +153,7 @@ export default function Laporan() {
                 <td className="px-3 py-2">{i + 1}</td>
                 <td className="px-3 py-2">{r.pvNo}</td>
                 <td className="px-3 py-2">{r.tanggal?.slice(0, 10)}</td>
-                <td className="px-3 py-2">{r.vendorName}</td>
+                <td className="px-3 py-2">{r.counterpartyName}</td>
                 <td className="px-3 py-2">{r.inv ?? '-'}</td>
                 <td className="px-3 py-2">{r.ref ?? '-'}</td>
                 <td className="px-3 py-2">{r.keterangan ?? '-'}</td>

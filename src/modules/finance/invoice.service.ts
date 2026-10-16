@@ -1,6 +1,6 @@
 // src/modules/finance/invoice.service.ts
-// [FUNGSI] Logika bisnis Invoice Finance.
-// [ALASAN] Nomor otomatis, cek duplikat, snapshot vendor, hitung total terpusat di sini.
+// [FUNGSI] Logika bisnis Invoice Finance (AR & AP).
+// [ALASAN] Nomor otomatis, cek duplikat, snapshot counterparty, hitung total terpusat di sini.
 
 import { prisma } from '../../shared/prisma';
 import { AppError } from '../../shared/AppError';
@@ -24,8 +24,7 @@ export async function generateNoInvoice(): Promise<string> {
   return `${prefix}${String(next).padStart(4, '0')}`;
 }
 
-// [FUNGSI] Ambil snapshot vendor + satu rekening bank.
-// [ALASAN] Dipakai bersama oleh Invoice & PV agar nilai vendor beku saat dibuat.
+// [FUNGSI] Ambil snapshot vendor + satu rekening bank (untuk AP).
 export async function resolveVendorSnapshot(vendorId: string, bankAccountId?: string | null) {
   const vendor = await prisma.vendor.findUnique({ where: { id: vendorId }, include: { banks: true } });
   if (!vendor) throw new AppError(404, 'Vendor tidak ditemukan');
@@ -40,22 +39,37 @@ export async function resolveVendorSnapshot(vendorId: string, bankAccountId?: st
   };
 }
 
+// [FUNGSI] Ambil snapshot customer + satu rekening bank (untuk AR).
+export async function resolveCustomerSnapshot(customerId: string, bankAccountId?: string | null) {
+  const customer = await prisma.customer.findUnique({ where: { id: customerId }, include: { banks: true } });
+  if (!customer) throw new AppError(404, 'Customer tidak ditemukan');
+  const bank = customer.banks.find((b) => b.id === bankAccountId) ?? customer.banks[0] ?? null;
+  return {
+    customerName: customer.nama,
+    customerNpwp: customer.npwp ?? null,
+    customerAlamat: customer.alamat ?? null,
+    bankAccountNo: bank?.accountNo ?? null,
+    bankAccountName: bank?.accountName ?? null,
+    bank: bank?.bank ?? null,
+  };
+}
+
 // [FUNGSI] Susun data Invoice dari input (dipakai create & update).
 async function buildData(input: InvoiceInput): Promise<Omit<Prisma.InvoiceUncheckedCreateInput, 'no'>> {
-  const snap = await resolveVendorSnapshot(input.vendorId, input.bankAccountId);
+  const jenis = input.jenis ?? 'AP';
   // [FUNGSI] Invoice DP tidak membawa PPN/PPH; PPN/PPH hanya di Pelunasan/final.
   const isDp = (input.tipe ?? 'REGULAR') === 'DP';
   const ppn = isDp ? null : input.ppn ?? null;
   const pph = isDp ? null : input.pph ?? null;
   const total = (input.dpp ?? 0) + (ppn ?? 0) - (pph ?? 0);
-  return {
+
+  const base = {
+    jenis,
     kategori: input.kategori ?? 'OTHERS',
     tipe: input.tipe ?? 'REGULAR',
     tanggal: new Date(input.tanggal),
     bupot: input.bupot || null,
-    vendorId: input.vendorId,
     bankAccountId: input.bankAccountId || null,
-    ...snap,
     inv: input.inv?.trim() || null,
     ref: input.ref || null,
     keterangan: input.keterangan || null,
@@ -73,20 +87,49 @@ async function buildData(input: InvoiceInput): Promise<Omit<Prisma.InvoiceUnchec
     incomplete: !input.bupot,
     fakturPajak: { create: input.fakturPajak ?? [] },
   };
+
+  if (jenis === 'AR') {
+    if (!input.customerId) throw new AppError(400, 'Customer wajib diisi untuk invoice AR');
+    const snap = await resolveCustomerSnapshot(input.customerId, input.bankAccountId);
+    return {
+      ...base,
+      vendorId: null,
+      vendorName: null,
+      vendorNpwp: null,
+      vendorAlamat: null,
+      customerId: input.customerId,
+      ...snap,
+    };
+  }
+
+  if (!input.vendorId) throw new AppError(400, 'Vendor wajib diisi untuk invoice AP');
+  const snap = await resolveVendorSnapshot(input.vendorId, input.bankAccountId);
+  return {
+    ...base,
+    vendorId: input.vendorId,
+    customerId: null,
+    customerName: null,
+    customerNpwp: null,
+    customerAlamat: null,
+    ...snap,
+  };
 }
 
-export function listInvoices(params: { q?: string; status?: string } = {}) {
+export function listInvoices(params: { q?: string; status?: string; jenis?: string } = {}) {
   const statuses = params.status
     ? params.status.split(',').filter((s) => s && s !== 'SEMUA')
     : [];
+  const jenis = params.jenis && params.jenis !== 'SEMUA' ? (params.jenis as any) : undefined;
   return prisma.invoice.findMany({
     where: {
+      ...(jenis ? { jenis } : {}),
       ...(statuses.length ? { statusPembayaran: { in: statuses as any } } : {}),
     },
     include: {
       fakturPajak: true,
       pvItems: { select: { id: true, invoiceId: true, nominal: true } },
       vendor: { select: { id: true, nama: true } },
+      customer: { select: { id: true, nama: true } },
     },
     orderBy: { no: 'desc' },
   });
@@ -99,6 +142,7 @@ export function getInvoice(id: string) {
       fakturPajak: true,
       pvItems: true,
       vendor: { include: { banks: true } },
+      customer: { include: { banks: true } },
       parent: true,
       children: true,
     },
@@ -106,10 +150,15 @@ export function getInvoice(id: string) {
 }
 
 export async function createInvoice(input: InvoiceInput) {
+  const jenis = input.jenis ?? 'AP';
   const inv = input.inv?.trim() || null;
   if (inv) {
-    const exists = await prisma.invoice.findFirst({ where: { vendorId: input.vendorId, inv } });
-    if (exists) throw new AppError(409, 'Vendor + nomor invoice sudah ada (duplikat)');
+    const exists = await prisma.invoice.findFirst({
+      where: jenis === 'AR'
+        ? { customerId: input.customerId ?? undefined, inv }
+        : { vendorId: input.vendorId ?? undefined, inv },
+    });
+    if (exists) throw new AppError(409, jenis === 'AR' ? 'Customer + nomor invoice sudah ada (duplikat)' : 'Vendor + nomor invoice sudah ada (duplikat)');
   }
 
   const no = await generateNoInvoice();
@@ -121,12 +170,15 @@ export async function updateInvoice(id: string, input: InvoiceInput) {
   const existing = await prisma.invoice.findUnique({ where: { id } });
   if (!existing) throw new AppError(404, 'Invoice tidak ditemukan');
 
+  const jenis = input.jenis ?? 'AP';
   const inv = input.inv?.trim() || null;
   if (inv) {
     const exists = await prisma.invoice.findFirst({
-      where: { vendorId: input.vendorId, inv, NOT: { id } },
+      where: jenis === 'AR'
+        ? { customerId: input.customerId ?? undefined, inv, NOT: { id } }
+        : { vendorId: input.vendorId ?? undefined, inv, NOT: { id } },
     });
-    if (exists) throw new AppError(409, 'Vendor + nomor invoice sudah ada (duplikat)');
+    if (exists) throw new AppError(409, jenis === 'AR' ? 'Customer + nomor invoice sudah ada (duplikat)' : 'Vendor + nomor invoice sudah ada (duplikat)');
   }
 
   const data = await buildData(input);
@@ -138,7 +190,7 @@ export async function updateInvoice(id: string, input: InvoiceInput) {
   });
 }
 
-// [FUNGSI] Hitung ulang status pembayaran invoice dari akumulasi DPP + pajak PV.
+// [FUNGSI] Hitung ulang status pembayaran invoice dari akumulasi DPP + pajak PV/RV.
 // [ALASAN] Status BELUM_BAYAR/SEBAGIAN/LUNAS jadi otomatis (bukan manual).
 export async function recomputeStatus(invoiceId: string) {
   const invoice = await prisma.invoice.findUnique({
@@ -169,7 +221,7 @@ export async function deleteInvoice(id: string) {
     throw new AppError(409, 'Invoice punya invoice DP/Pelunasan, tidak bisa dihapus');
   }
   if (existing.pvItems.length > 0) {
-    throw new AppError(409, 'Invoice sudah dibayar (ada PV), tidak bisa dihapus');
+    throw new AppError(409, 'Invoice sudah dibayar (ada voucher), tidak bisa dihapus');
   }
   return prisma.invoice.delete({ where: { id } });
 }

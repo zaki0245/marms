@@ -6,8 +6,8 @@ import type { Request, Response } from 'express';
 import * as service from './pv.service';
 import { pvSchema } from './finance.model';
 
-export async function list(_req: Request, res: Response) {
-  res.json(await service.listPv());
+export async function list(req: Request, res: Response) {
+  res.json(await service.listPv(req.query.jenis as string | undefined));
 }
 
 export async function get(req: Request, res: Response) {

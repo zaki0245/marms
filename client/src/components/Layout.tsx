@@ -25,8 +25,9 @@ const FINANCE_MENU = [
   { to: '/admin/finance', label: 'Dashboard', exact: true },
   { to: '/admin/finance/invoice/input', label: 'Input Invoice', exact: false },
   { to: '/admin/finance/invoice', label: 'Daftar Invoice', exact: false },
-  { to: '/admin/finance/cetak-pv', label: 'Cetak PV', exact: false },
+  { to: '/admin/finance/cetak', label: 'Cetak', exact: false },
   { to: '/admin/finance/vendor', label: 'Vendor', exact: false },
+  { to: '/admin/finance/customer', label: 'Customer', exact: false },
   { to: '/admin/finance/laporan', label: 'Laporan', exact: false },
 ];
 

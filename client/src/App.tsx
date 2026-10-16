@@ -21,8 +21,9 @@ import Settings from './pages/Settings';
 import Finance from './pages/Finance';
 import FinanceDaftarInvoice from './pages/Finance/DaftarInvoice';
 import FinanceInputInvoice from './pages/Finance/InputInvoice';
-import FinanceCetakPv from './pages/Finance/CetakPv';
+import FinanceCetakPv from './pages/Finance/Cetak';
 import FinanceVendor from './pages/Finance/Vendor';
+import FinanceCustomer from './pages/Finance/Customer';
 import FinanceLaporan from './pages/Finance/Laporan';
 import FinanceKonfigurasi from './pages/Finance/Konfigurasi';
 import Accounts from './pages/Accounts';
@@ -53,8 +54,9 @@ export default function App() {
         <Route path="finance/invoice" element={<FinanceDaftarInvoice />} />
         <Route path="finance/invoice/input" element={<FinanceInputInvoice />} />
         <Route path="finance/invoice/input/:id" element={<FinanceInputInvoice />} />
-        <Route path="finance/cetak-pv" element={<FinanceCetakPv />} />
+        <Route path="finance/cetak" element={<FinanceCetakPv />} />
         <Route path="finance/vendor" element={<FinanceVendor />} />
+        <Route path="finance/customer" element={<FinanceCustomer />} />
         <Route path="finance/laporan" element={<FinanceLaporan />} />
         <Route path="finance/konfigurasi" element={<FinanceKonfigurasi />} />
         <Route path="accounts" element={<Accounts />} />

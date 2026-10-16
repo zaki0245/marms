@@ -25,6 +25,7 @@ export interface PvPrintData {
     ttdApproved: string;
   };
   pvNo: string;
+  jenis: 'RV' | 'PV';
   payTo: string;
   vendorAlamat: string;
   tanggal: string;
@@ -176,6 +177,7 @@ function drawFooter(
   doc: jsPDF,
   pvNo: string,
   companyName: string,
+  jenis: 'RV' | 'PV',
 ) {
   const pageCount = doc.getNumberOfPages();
 
@@ -197,7 +199,7 @@ function drawFooter(
     );
 
     doc.text(
-      `PV No: ${pvNo || '-'}`,
+      `${jenis === 'RV' ? 'RV No' : 'PV No'}: ${pvNo || '-'}`,
       PAGE_W / 2,
       FOOTER_TEXT_Y,
       { align: 'center' },
@@ -214,6 +216,8 @@ function drawFooter(
 
 export async function cetakPV(d: PvPrintData) {
   const k = d.konfigurasi;
+  const isRv = d.jenis === 'RV';
+  const voucherTitle = isRv ? 'RECEIPT VOUCHER' : 'PAYMENT VOUCHER';
 
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -225,8 +229,8 @@ export async function cetakPV(d: PvPrintData) {
   const logo = await loadLogo();
 
   doc.setProperties({
-    title: `Payment Voucher ${d.pvNo}`,
-    subject: `Payment Voucher - ${d.payTo}`,
+    title: `${voucherTitle} ${d.pvNo}`,
+    subject: `${voucherTitle} - ${d.payTo}`,
     author: k.perusahaanNama,
     creator: 'Maritim Armada Raya Finance',
   });
@@ -287,7 +291,7 @@ export async function cetakPV(d: PvPrintData) {
   doc.setTextColor(...COLORS.muted);
 
   doc.text(
-    'PAYMENT VOUCHER NO.',
+    isRv ? 'RECEIPT VOUCHER NO.' : 'PAYMENT VOUCHER NO.',
     pvBoxX + pvBoxW / 2,
     14,
     { align: 'center' },
@@ -316,7 +320,7 @@ export async function cetakPV(d: PvPrintData) {
   doc.setFontSize(15);
   doc.setTextColor(...COLORS.navy);
 
-  doc.text('PAYMENT VOUCHER', PAGE_W / 2, 40, {
+  doc.text(voucherTitle, PAGE_W / 2, 40, {
     align: 'center',
   });
 
@@ -341,7 +345,7 @@ export async function cetakPV(d: PvPrintData) {
 
   // Description dihapus dari Payment Information.
   const infoRows: [string, string][] = [
-    ['Pay To', d.payTo],
+    [isRv ? 'Received From' : 'Pay To', d.payTo],
     ['Address', d.vendorAlamat],
   ];
 
@@ -580,7 +584,7 @@ export async function cetakPV(d: PvPrintData) {
   doc.setTextColor(...COLORS.muted);
 
   doc.text(
-    'TOTAL PEMBAYARAN',
+    isRv ? 'TOTAL PENERIMAAN' : 'TOTAL PEMBAYARAN',
     totalBoxX + totalBoxW / 2,
     totalBoxY + 4.5,
     { align: 'center' },
@@ -744,7 +748,7 @@ export async function cetakPV(d: PvPrintData) {
   // FOOTER & SAVE PDF
   // =========================================================
 
-  drawFooter(doc, d.pvNo, k.perusahaanNama);
+  drawFooter(doc, d.pvNo, k.perusahaanNama, d.jenis);
 
   const safePvNo = (d.pvNo || 'draft').replace(/[\\/:*?"<>|]/g, '-');
 

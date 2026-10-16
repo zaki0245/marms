@@ -1,7 +1,7 @@
 // client/src/pages/Finance/InputInvoice.tsx
-// [FUNGSI] Form input/edit invoice Finance.
-// [ALASAN] Input header invoice, faktur pajak multi, pilih vendor+rekening, total otomatis.
-// [ALASAN] Field pembayaran (PV, Bank Charge, Balance, Issued Date) diisi di modul Cetak PV.
+// [FUNGSI] Form input/edit invoice Finance (AR & AP).
+// [ALASAN] Input header invoice, faktur pajak multi, pilih vendor/customer+rekening, total otomatis.
+// [ALASAN] Field pembayaran (RV/PV, Bank Charge, Balance, Issued Date) diisi di modul Cetak.
 
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,13 +21,22 @@ interface Vendor {
   alamat?: string | null;
   banks: Bank[];
 }
+interface Customer {
+  id: string;
+  nama: string;
+  npwp?: string | null;
+  alamat?: string | null;
+  banks: Bank[];
+}
 
 const emptyForm = {
+  jenis: 'AP',
   kategori: 'FREIGHT',
   tipe: 'REGULAR',
   tanggal: '',
   bupot: '',
   vendorId: '',
+  customerId: '',
   bankAccountId: '',
   inv: '',
   ref: '',
@@ -49,7 +58,8 @@ export default function InputInvoice() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [parents, setParents] = useState<{ id: string; no: string; inv: string }[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [parents, setParents] = useState<{ id: string; no: string; inv: string; jenis: string }[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [faktur, setFaktur] = useState<string[]>([]);
   const [error, setError] = useState('');
@@ -61,26 +71,34 @@ export default function InputInvoice() {
     setVendors(data);
   }
 
+  async function loadCustomers() {
+    const { data } = await api.get<Customer[]>('/finance/customer');
+    setCustomers(data);
+  }
+
   async function loadParents() {
     const { data } = await api.get<any[]>('/finance/invoice');
-    setParents(data.map((d) => ({ id: d.id, no: d.no, inv: d.inv })));
+    setParents(data.map((d) => ({ id: d.id, no: d.no, inv: d.inv, jenis: d.jenis })));
   }
 
   useEffect(() => {
     loadVendors().catch(() => undefined);
+    loadCustomers().catch(() => undefined);
     loadParents().catch(() => undefined);
     if (id) {
       api
         .get(`/finance/invoice/${id}`)
         .then(({ data }) => {
           setForm({
+            jenis: data.jenis ?? 'AP',
             kategori: data.kategori,
             tipe: data.tipe,
             tanggal: data.tanggal?.slice(0, 10) ?? '',
             bupot: data.bupot ?? '',
-            vendorId: data.vendorId,
+            vendorId: data.vendorId ?? '',
+            customerId: data.customerId ?? '',
             bankAccountId: data.bankAccountId ?? '',
-            inv: data.inv,
+            inv: data.inv ?? '',
             ref: data.ref ?? '',
             keterangan: data.keterangan ?? '',
             dpp: data.dpp != null ? String(data.dpp) : '',
@@ -123,19 +141,47 @@ export default function InputInvoice() {
     setQuickForm((qf) => ({ ...qf, banks: qf.banks.filter((_, i) => i !== idx) }));
   }
 
+  const isAr = form.jenis === 'AR';
   const selectedVendor = vendors.find((v) => v.id === form.vendorId);
+  const selectedCustomer = customers.find((c) => c.id === form.customerId);
+  const selectedBanks = isAr ? (selectedCustomer?.banks ?? []) : (selectedVendor?.banks ?? []);
   const isDp = form.tipe === 'DP';
   const total = num(form.dpp) + num(form.ppn) - num(form.pph);
+
+  function resetQuick() {
+    setQuickForm({ nama: '', npwp: '', alamat: '', banks: [{ ...emptyBank }] });
+    setQuick(false);
+  }
 
   async function handleQuickAdd(e: FormEvent) {
     e.preventDefault();
     setError('');
-    // [FUNGSI] Bila vendor dengan nama sama sudah ada, langsung pilih vendor tsb.
+    if (isAr) {
+      const existing = customers.find((c) => c.nama.toLowerCase() === quickForm.nama.trim().toLowerCase());
+      if (existing) {
+        setForm((f) => ({ ...f, customerId: existing.id }));
+        resetQuick();
+        return;
+      }
+      try {
+        const { data } = await api.post('/finance/customer', {
+          nama: quickForm.nama,
+          npwp: quickForm.npwp || null,
+          alamat: quickForm.alamat || null,
+          banks: quickForm.banks.filter((b) => b.accountNo || b.accountName || b.bank),
+        });
+        setForm((f) => ({ ...f, customerId: data.id }));
+        resetQuick();
+        loadCustomers();
+      } catch (err: any) {
+        setError(err?.response?.data?.error ?? 'Gagal menambah customer');
+      }
+      return;
+    }
     const existing = vendors.find((v) => v.nama.toLowerCase() === quickForm.nama.trim().toLowerCase());
     if (existing) {
       setForm((f) => ({ ...f, vendorId: existing.id }));
-      setQuick(false);
-      setQuickForm({ nama: '', npwp: '', alamat: '', banks: [{ ...emptyBank }] });
+      resetQuick();
       return;
     }
     try {
@@ -146,8 +192,7 @@ export default function InputInvoice() {
         banks: quickForm.banks.filter((b) => b.accountNo || b.accountName || b.bank),
       });
       setForm((f) => ({ ...f, vendorId: data.id }));
-      setQuick(false);
-      setQuickForm({ nama: '', npwp: '', alamat: '', banks: [{ ...emptyBank }] });
+      resetQuick();
       loadVendors();
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal menambah vendor');
@@ -159,11 +204,13 @@ export default function InputInvoice() {
     setError('');
     const money = (v: string) => (v === '' ? null : Number(v));
     const payload = {
+      jenis: form.jenis,
       kategori: form.kategori,
       tipe: form.tipe,
       tanggal: form.tanggal,
       bupot: form.bupot || null,
-      vendorId: form.vendorId,
+      vendorId: isAr ? null : form.vendorId || null,
+      customerId: isAr ? form.customerId || null : null,
       bankAccountId: form.bankAccountId || null,
       inv: form.inv || null,
       ref: form.ref || null,
@@ -207,6 +254,13 @@ export default function InputInvoice() {
         <section className="rounded-lg bg-white p-5 shadow-sm">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div>
+              <label className="block text-xs text-gray-500">Jenis (AR/AP)</label>
+              <select value={form.jenis} onChange={(e) => { setField('jenis', e.target.value); setField('vendorId', ''); setField('customerId', ''); setField('bankAccountId', ''); }} className={inputCls}>
+                <option value="AP">AP (Hutang - Vendor)</option>
+                <option value="AR">AR (Piutang - Customer)</option>
+              </select>
+            </div>
+            <div>
               <label className="block text-xs text-gray-500">Kategori</label>
               <select value={form.kategori} onChange={(e) => setField('kategori', e.target.value)} className={inputCls}>
                 <option value="FREIGHT">Freight</option>
@@ -231,12 +285,19 @@ export default function InputInvoice() {
               <input value={form.bupot} onChange={(e) => setField('bupot', e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Vendor *</label>
+              <label className="block text-xs text-gray-500">{isAr ? 'Customer' : 'Vendor'} *</label>
               <div className="flex gap-1">
-                <select required value={form.vendorId} onChange={(e) => { setField('vendorId', e.target.value); setField('bankAccountId', ''); }} className={inputCls}>
-                  <option value="">Pilih vendor</option>
-                  {vendors.map((v) => <option key={v.id} value={v.id}>{v.nama}</option>)}
-                </select>
+                {isAr ? (
+                  <select required value={form.customerId} onChange={(e) => { setField('customerId', e.target.value); setField('bankAccountId', ''); }} className={inputCls}>
+                    <option value="">Pilih customer</option>
+                    {customers.map((c) => <option key={c.id} value={c.id}>{c.nama}</option>)}
+                  </select>
+                ) : (
+                  <select required value={form.vendorId} onChange={(e) => { setField('vendorId', e.target.value); setField('bankAccountId', ''); }} className={inputCls}>
+                    <option value="">Pilih vendor</option>
+                    {vendors.map((v) => <option key={v.id} value={v.id}>{v.nama}</option>)}
+                  </select>
+                )}
                 <button type="button" onClick={() => setQuick(!quick)} className="whitespace-nowrap rounded border border-gray-300 px-2 text-xs text-navy">+ Baru</button>
               </div>
             </div>
@@ -256,7 +317,7 @@ export default function InputInvoice() {
               <label className="block text-xs text-gray-500">Rekening Bank</label>
               <select value={form.bankAccountId} onChange={(e) => setField('bankAccountId', e.target.value)} className={inputCls}>
                 <option value="">Pilih rekening</option>
-                {(selectedVendor?.banks ?? []).map((b) => <option key={b.id} value={b.id}>{b.bank} - {b.accountNo}</option>)}
+                {selectedBanks.map((b) => <option key={b.id} value={b.id}>{b.bank} - {b.accountNo}</option>)}
               </select>
             </div>
             {(form.tipe === 'DP' || form.tipe === 'PELUNASAN') && (
@@ -264,7 +325,7 @@ export default function InputInvoice() {
                 <label className="block text-xs text-gray-500">Invoice Induk</label>
                 <select value={form.parentInvoiceId} onChange={(e) => setField('parentInvoiceId', e.target.value)} className={inputCls}>
                   <option value="">Pilih invoice induk</option>
-                  {parents.map((p) => <option key={p.id} value={p.id}>{p.no} ({p.inv})</option>)}
+                  {parents.filter((p) => p.jenis === form.jenis).map((p) => <option key={p.id} value={p.id}>{p.no} ({p.inv})</option>)}
                 </select>
               </div>
             )}
@@ -273,7 +334,7 @@ export default function InputInvoice() {
           {quick && (
             <div className="mt-3 space-y-2 rounded bg-gray-50 p-3">
               <div className="flex gap-2">
-                <input placeholder="Nama vendor *" value={quickForm.nama} onChange={(e) => setQuickForm({ ...quickForm, nama: e.target.value })} className="w-full rounded border border-gray-300 px-3 py-2" />
+                <input placeholder={`Nama ${isAr ? 'customer' : 'vendor'} *`} value={quickForm.nama} onChange={(e) => setQuickForm({ ...quickForm, nama: e.target.value })} className="w-full rounded border border-gray-300 px-3 py-2" />
                 <input placeholder="NPWP" value={quickForm.npwp} onChange={(e) => setQuickForm({ ...quickForm, npwp: e.target.value })} className="w-full rounded border border-gray-300 px-3 py-2" />
               </div>
               <input placeholder="Alamat" value={quickForm.alamat} onChange={(e) => setQuickForm({ ...quickForm, alamat: e.target.value })} className="w-full rounded border border-gray-300 px-3 py-2" />
@@ -288,7 +349,7 @@ export default function InputInvoice() {
               ))}
               <div className="flex gap-2">
                 <button type="button" onClick={addQuickBank} className="text-sm text-navy underline">+ Tambah rekening</button>
-                <button type="button" onClick={handleQuickAdd} className="rounded bg-navy px-3 py-2 text-sm text-white">Simpan Vendor</button>
+                <button type="button" onClick={handleQuickAdd} className="rounded bg-navy px-3 py-2 text-sm text-white">Simpan {isAr ? 'Customer' : 'Vendor'}</button>
               </div>
             </div>
           )}

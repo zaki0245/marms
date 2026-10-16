@@ -9,6 +9,6 @@ export async function dashboard(_req: Request, res: Response) {
   res.json(await service.dashboard());
 }
 
-export async function rekapAp(_req: Request, res: Response) {
-  res.json(await service.rekapAp());
+export async function rekap(req: Request, res: Response) {
+  res.json(await service.rekap(req.query.jenis as string | undefined));
 }

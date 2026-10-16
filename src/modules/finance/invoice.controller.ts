@@ -7,7 +7,10 @@ import * as service from './invoice.service';
 import { invoiceSchema } from './finance.model';
 
 export async function list(req: Request, res: Response) {
-  res.json(await service.listInvoices({ status: req.query.status as string | undefined }));
+  res.json(await service.listInvoices({
+    status: req.query.status as string | undefined,
+    jenis: req.query.jenis as string | undefined,
+  }));
 }
 
 export async function get(req: Request, res: Response) {
