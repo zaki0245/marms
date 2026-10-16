@@ -40,24 +40,38 @@ marms/
 │   └── seed.ts             # data awal (8 jabatan, uang makan, admin)
 ├── src/
 │   ├── modules/
-│   │   ├── master-data/    # Jabatan, Kapal, Pengaturan (uang makan)
-│   │   ├── recruitment/    # pendaftaran & seleksi pelamar
-│   │   ├── crew-placement/ # assign, off board, info bank
-│   │   ├── payroll/        # gaji & uang makan prorata
-│   │   ├── reports/        # dashboard & laporan (baca-saja)
-│   │   ├── leave-pay/      # kelayakan & pencairan leave pay
-│   │   └── auth/           # login, logout, ganti password
-│   ├── shared/             # prisma, AppError, asyncHandler, session, upload, masaKerja
-│   ├── types/              # deklarasi tipe express-session
-│   └── app.ts              # titik masuk backend
+│   │   ├── crewing/           # payung bisnis Crewing
+│   │   │   ├── master-data/   # Jabatan, Kapal, Pengaturan (uang makan)
+│   │   │   ├── recruitment/   # pendaftaran & seleksi pelamar
+│   │   │   ├── crew-placement/# assign, off board, info bank
+│   │   │   ├── payroll/       # gaji & uang makan prorata
+│   │   │   ├── reports/       # dashboard & laporan (baca-saja)
+│   │   │   └── leave-pay/     # kelayakan & pencairan leave pay
+│   │   ├── finance/           # payung bisnis Finance (AR/AP)
+│   │   │   ├── vendor/        # master Vendor (AP)
+│   │   │   ├── customer/      # master Customer (AR)
+│   │   │   ├── invoice/       # invoice AR & AP
+│   │   │   ├── pv/            # voucher PV (AP) & RV (AR)
+│   │   │   ├── konfigurasi/   # nama/alamat perusahaan & penandatangan
+│   │   │   └── laporan/       # rekap & dashboard finance
+│   │   └── auth/              # login, logout, ganti password (lintas modul)
+│   ├── shared/                # prisma, AppError, asyncHandler, session, upload, masaKerja
+│   ├── types/                 # deklarasi tipe express-session
+│   └── app.ts                 # titik masuk backend
 ├── client/
-│   ├── src/api/client.ts   # instance axios + format Rupiah
-│   ├── src/components/     # Layout (sidebar + auth), Logo
-│   ├── src/constants.ts    # daftar 21 dokumen
-│   ├── src/pages/          # Dashboard, MasterData, Recruitment, Crew, Payroll, Reports, Settings, Login, public/
-│   └── src/utils/export.ts # export Excel/PDF
-├── uploads/                # dokumen pelamar (Docker volume)
-└── docs/                   # dokumentasi
+│   ├── src/api/client.ts      # instance axios + format Rupiah
+│   ├── src/components/        # Layout (sidebar + auth), Logo
+│   ├── src/constants.ts       # daftar 21 dokumen
+│   ├── src/pages/
+│   │   ├── Crewing/           # Dashboard, MasterData, Recruitment, Crew, Payroll, Reports
+│   │   ├── Finance/           # Dashboard, Input/Daftar Invoice, Cetak (PV/RV), Vendor, Customer, Laporan, Konfigurasi
+│   │   ├── Accounts/          # kelola akun (superadmin)
+│   │   ├── Settings/          # pengaturan
+│   │   ├── Login.tsx          # login admin
+│   │   └── public/            # form pendaftaran publik
+│   └── src/utils/             # export Excel/PDF, pvPrint (PDF voucher)
+├── uploads/                   # dokumen pelamar (Docker volume)
+└── docs/                      # dokumentasi
 ```
 
 ## 4. Aturan Modul (Public API)

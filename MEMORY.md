@@ -36,6 +36,13 @@
 - Gaji dari master jabatan, bukan kontrak; uang makan ikut prorata.
 - Pembulatan round half up ke Rupiah terdekat.
 - Info bank crew (nama bank, no rekening) bisa diedit admin saat assign maupun via menu Crew.
+- **Finance (AP/AR):** dibagi dua entitas — AP (hutang ke Vendor → voucher PV) & AR (piutang dari
+  Customer → voucher RV). Invoice punya kolom `jenis` (AR/AP). Satu voucher bisa memuat banyak
+  invoice dari satu counterparty. `PvItem.nominal` = DPP yang dibayar; flag `includeTax` menandakan
+  voucher melunasi PPN/PPH (dibayar sekali, biasanya di pelunasan). Invoice DP tidak membawa
+  PPN/PPH. Status invoice (`BELUM_BAYAR/SEBAGIAN/LUNAS`) otomatis dari akumulasi nominal.
+- Cetak voucher: PDF meniru template PVN (logo, terbilang, tabel invoice, bank, tanda tangan);
+  judul/label menyesuaikan jenis (`PAYMENT VOUCHER` vs `RECEIPT VOUCHER`).
 
 ## Catatan Data Sensitif
 - Data berisi: identitas, dokumen, no rekening, gaji → validasi ketat & tidak di-commit ke git.
@@ -60,6 +67,8 @@
 
 ## Status Terakhir
 - **Semua submodul Crewing + Leave Pay + Pengaturan selesai dan berjalan di lokal.**
+- **Modul Finance (AP/AR) selesai:** Vendor, Customer, Invoice (AR/AP), Cetak voucher (PV/RV),
+  Laporan, Dashboard hutang/piutang, Konfigurasi.
 - Termasuk: auth/login, leave pay, export Excel/PDF, perbarui dokumen expired, info bank.
 - Sea Service Record kini dibuat otomatis saat off board; alasan off board ada 4 (Relief/Cuti/Sakit/Habis Kontrak).
 - Test minimal sudah ada (`npm test`): prorata & masa kerja live.

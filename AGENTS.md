@@ -7,9 +7,11 @@
 > struktur modul, dan mengikuti konvensi yang sudah disepakati.
 
 ## 1. Ringkasan Project
-MARMS = aplikasi web internal crewing (rekrutmen, rotasi crew, payroll, leave pay) berbentuk
-Modular Monolith. Backend Node.js + Express + TypeScript + Prisma + PostgreSQL.
-Frontend React + Vite + Tailwind. Semua kode dalam satu repo, satu container app + satu DB.
+MARMS = aplikasi web internal berbentuk Modular Monolith dengan dua payung bisnis:
+**Crewing** (rekrutmen, rotasi crew, payroll, leave pay) dan **Finance** (AP/AR: hutang ke
+vendor & piutang dari customer, invoice, voucher PV/RV). Backend Node.js + Express + TypeScript
++ Prisma + PostgreSQL. Frontend React + Vite + Tailwind. Semua kode satu repo, satu container
+app + satu DB.
 
 ## 2. Perintah Utama (jalankan di dalam WSL, folder `~/projects/marms`)
 ```bash
@@ -24,12 +26,16 @@ npx prisma migrate reset --force      # reset database + seed ulang
 > `npm run dev`. Prisma CLI tetap dipakai di host hanya untuk **membuat migration**.
 
 ## 3. Struktur & Konvensi
-- Backend per modul di `src/modules/<modul>/`: `master-data`, `recruitment`, `crew-placement`,
-  `payroll`, `reports`, `auth`, `leave-pay`. Isi: `controller`, `service`, `routes`, `model`.
+- Backend per payung bisnis di `src/modules/<payung>/`:
+  - `crewing/`: `master-data`, `recruitment`, `crew-placement`, `payroll`, `reports`, `leave-pay`.
+  - `finance/`: `vendor`, `customer`, `invoice`, `pv` (voucher PV/RV), `konfigurasi`, `laporan`.
+  - `auth/`: login/logout (lintas payung).
+  Isi tiap modul: `controller`, `service`, `routes`, `model`.
 - Modul mengekspor fungsi publik lewat `index.ts`; JANGAN akses tabel modul lain langsung
-  (kecuali modul baca-saja `reports`).
+  (kecuali modul baca-saja `reports`/`laporan`).
 - Util bersama di `src/shared/`: `prisma`, `AppError`, `asyncHandler`, `session`, `upload`, `masaKerja`.
-- Frontend di `client/src/`; halaman di `client/src/pages/`.
+- Frontend di `client/src/`; halaman dikelompokkan per payung: `client/src/pages/Crewing/` dan
+  `client/src/pages/Finance/` (plus `Accounts`, `Settings`, `Login`, `public`).
 - Semua komentar kode dalam Bahasa Indonesia, format:
   `// [FUNGSI] <apa yang dilakukan> | [ALASAN] <kenapa ada di sini>`.
 - Schema database di `prisma/schema.prisma`; perubahan struktur WAJIB lewat migration.
@@ -44,6 +50,12 @@ npx prisma migrate reset --force      # reset database + seed ulang
 - Dokumen expired memblokir penempatan baru; admin bisa perbarui dokumen expired.
 - Masa kerja live: bertambah saat crew On Board (lihat `src/shared/masaKerja.ts`).
 - Leave pay: tiap kelipatan 180 hari.
+- Finance dibagi dua entitas: **AP** (hutang ke Vendor → voucher **PV**) dan **AR** (piutang dari
+  Customer → voucher **RV**). Invoice punya kolom `jenis` (AR/AP).
+- Satu voucher (PV/RV) bisa memuat banyak invoice dari satu counterparty.
+- Kolom `nominal` di `PvItem` = **DPP yang dibayar** (bukan total); flag `includeTax` menandakan
+  voucher itu melunasi PPN/PPH (dibayar sekali, biasanya di pelunasan).
+- Status invoice (`BELUM_BAYAR`/`SEBAGIAN`/`LUNAS`) dihitung otomatis dari akumulasi nominal.
 - Jangan buat file DevOps (Docker production, K3s, CI/CD, OCI) di fase ini.
 
 ## 5. Validasi Sebelum Selesai

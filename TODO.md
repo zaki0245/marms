@@ -51,6 +51,14 @@
 - [x] Rate limiting login (5x salah → 15 menit).
 - [x] Logout & proteksi endpoint `/api/*` (whitelist publik: daftar pelamar + list jabatan).
 
+## Modul 7 — Finance (AP/AR)
+- [x] Master Vendor (AP) & Customer (AR) + rekening bank.
+- [x] Invoice dengan jenis AR/AP (kategori, tipe DP/Pelunasan, DPP/PPN/PPH, faktur pajak).
+- [x] Daftar invoice dengan tab AR/AP, status pembayaran otomatis.
+- [x] Voucher PV (AP) & RV (AR): satu voucher banyak invoice, DPP per item, flag lunasi PPN/PPH.
+- [x] Cetak PDF voucher (logo, terbilang, tabel invoice, bank, tanda tangan).
+- [x] Dashboard Finance (hutang/piutang) & Laporan Rekap AR/AP (export Excel).
+
 ## Fase Akhir — Tersisa
 - [x] Generate `SeaServiceRecord` otomatis saat off board (`imo` dari `tbImo`).
 - [x] Aktifkan alasan off board Cuti & Sakit di form (Relief/Cuti/Sakit/Habis Kontrak).

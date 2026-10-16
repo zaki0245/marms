@@ -11,8 +11,8 @@
 ## 1. Identitas Proyek
 - Nama: MARMS (Maritim Armada Raya Management System)
 - Pemilik: PT. Maritim Armada Raya
-- Jenis: Aplikasi web internal operasional crewing
-- Modul awal: CREWING (Rekrutmen, Rotasi Crew, Payroll) + Leave Pay
+- Jenis: Aplikasi web internal operasional crewing & finance
+- Modul: CREWING (Rekrutmen, Rotasi Crew, Payroll, Leave Pay) + FINANCE (AP/AR, Invoice, Voucher PV/RV)
 - Bahasa antarmuka: Indonesia
 - Fase saat ini: **Lokal** (WSL2 + PostgreSQL), DevOps menyusul
 
@@ -36,6 +36,9 @@ kumulatif, tidak ada riwayat terpusat per crew, dokumen sering expired, rekap ga
    → Draf → Final (snapshot) → Dibayar → export Excel/PDF.
 4. **Leave Pay:** Setiap kelipatan 180 hari masa kerja kumulatif → admin input nominal +
    tanggal pencairan → catat riwayat pencairan.
+5. **Finance (AP/AR):** Input invoice (pilih jenis AR/AP) → daftar invoice (tab AR/AP) →
+   cetak voucher (RV untuk AR, PV untuk AP). Satu voucher bisa membayar banyak invoice dari
+   satu vendor/customer; pembayaran sebagian didukung (DPP per voucher + flag lunasi PPN/PPH).
 
 ## 5. Entitas Bisnis (Ringkas)
 - **Pelamar:** nomor pendaftaran `PLR-YYYY-NNNN` (reset tiap tahun), data pribadi (nama, tempat/tanggal
@@ -53,6 +56,12 @@ kumulatif, tidak ada riwayat terpusat per crew, dokumen sering expired, rekap ga
 - **Leave Pay Disbursement:** pencairan per crew, nominal manual, tanggal pencairan, catatan performa.
 - **Master Jabatan:** 8 jabatan fixed dengan gaji pokok.
 - **Pengaturan Umum:** uang makan/bulan = Rp 1.650.000.
+- **Vendor (AP):** lawan transaksi hutang (nama, npwp, alamat, rekening bank).
+- **Customer (AR):** lawan transaksi piutang (nama, npwp, alamat, rekening bank).
+- **Invoice:** jenis AR/AP, kategori (Freight/Operation/Others), tipe (Regular/DP/Pelunasan),
+  DPP/PPN/PPH/total, nomor invoice (opsional), ref, keterangan, status faktur & pembayaran.
+- **Voucher (Pv):** jenis RV/PV, nomor, tanggal, counterparty, bank, bank charge, balance,
+  keterangan, item (invoice + DPP + flag includeTax).
 
 ### Daftar 21 Dokumen
 Foto 4x6, CV, KTP, NPWP, Paspor*, Buku Pelaut*, SKCK*, MCU*, BPJS Kesehatan, BPJS Ketenagakerjaan,
@@ -88,6 +97,10 @@ CoC/ANT/ATT*, BST*, SCRB*, AFF*, MFA*, MC*, RADAR*, ARPA*, GOC/GMDSS*, MOORING M
 | Leave Pay | Kelayakan (kelipatan 180 hari), pencairan, riwayat. |
 | Laporan | Crew per kapal, dokumen akan expired, masa kerja. |
 | Pengaturan | Info akun admin, ganti password. |
+| Finance: Vendor/Customer | Master Vendor (AP) & Customer (AR) + rekening bank. |
+| Finance: Invoice | Input invoice AR/AP, daftar invoice (tab AR/AP), status faktur & pembayaran. |
+| Finance: Cetak | Cetak voucher RV (AR) & PV (AP) ke PDF. |
+| Finance: Laporan | Rekap AR/AP (filter bulan/tahun, export Excel). |
 
 ## 9. Fitur & Batasan
 - Login admin di `/admin/login` (1 akun, full access), ganti password wajib saat login pertama.

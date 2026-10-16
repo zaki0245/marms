@@ -35,8 +35,8 @@ menentukan payung mana yang bisa dibuka:
 - Akun admin pertama (dari seed) otomatis jadi `SUPERADMIN`.
 - Menu **Kelola Akun** (khusus SUPERADMIN) untuk membuat akun, memilih role, dan
   mengaktifkan/nonaktifkan akun.
-- Modul **Finance** saat ini masih **kosong** (scaffold). Men-deploy Crewing dulu
-  aman — Finance tidak mengganggu fitur Crewing sama sekali.
+- Modul **Finance (AP/AR)** sudah lengkap: Vendor, Customer, Invoice, Cetak voucher (PV/RV),
+  Laporan, Dashboard. Termasuk dua entitas AR (piutang) & AP (hutang).
 
 ---
 
@@ -159,6 +159,20 @@ Untuk lokal: `docker compose up -d --build`.
 | Fitur biasa | `docker compose up -d --build` | `git push` (otomatis) |
 | Ubah schema | `prisma migrate dev` + build | commit migration + `git push` |
 | Data awal baru | build | `railway run npx prisma db seed` |
+
+### Mengatasi migration gagal di produksi (P3009)
+
+Bila `migrate deploy` error `P3009` (ada migration failed), bersihkan record gagalnya lewat
+shell **di dalam network Railway** (bukan `railway run`, yang jalan lokal):
+
+```bash
+railway shell   # atau Shell dari dashboard Railway
+npx prisma migrate resolve --rolled-back <nama_migration>
+exit
+```
+
+Lalu redeploy: `railway redeploy`. Gunakan `--rolled-back` bila migration itu gagal tanpa
+perubahan (harus di-apply ulang), atau `--applied` bila ingin menandainya selesai.
 
 ---
 

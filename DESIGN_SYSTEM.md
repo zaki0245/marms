@@ -47,6 +47,10 @@ Seperti dashboard logistik/perbankan. Tidak playful.
   - Danger: teks `text-negative` (link aksi) atau `bg-negative text-white` (submit merusak, mis. off board).
   - Aksi tabel berbentuk link: `text-navy`/`text-positive`/`text-negative` + `hover:underline`.
 - **Tabel:** header `bg-navy-light text-navy`, baris dipisah `border-t border-gray-100`, baris kosong `text-gray-400`.
+- **Tab:** kontainer `flex border-b border-gray-200`; tombol tab
+  `rounded-t px-4 py-2 text-sm font-semibold`, aktif `bg-white text-navy border-b-2 border-navy`,
+  non-aktif `text-gray-500 hover:text-navy`. Dipakai konsisten di Crewing (Payroll, Crew, Laporan,
+  Master Data) dan Finance (AR/AP, PV/RV).
 - **Badge status:**
   - Hijau (`bg-positive/10 text-positive`): Diterima, Dibayar, Aktif.
   - Merah (`bg-negative/10 text-negative`): Ditolak, Expired.

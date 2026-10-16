@@ -20,6 +20,12 @@
 | `PayrollStatus` | DRAFT, FINAL, DIBAYAR |
 | `PayrollJenis` | GAJI, UANG_MAKAN |
 | `DocumentStatus` | PENDING, TERVERIFIKASI, DITOLAK |
+| `InvoiceJenis` | AR, AP |
+| `VoucherJenis` | RV, PV |
+| `InvoiceCategory` | FREIGHT, OPERATION, OTHERS |
+| `InvoiceType` | REGULAR, DP, PELUNASAN |
+| `FakturPajakStatus` | SUDAH_DITERIMA, BELUM_DITERIMA, TIDAK_ADA |
+| `PaymentStatus` | BELUM_BAYAR, SEBAGIAN, LUNAS |
 
 > Catatan: enum `OffBoardReason` punya 4 nilai (RELIEF, CUTI, SAKIT, END_OF_CONTRACT),
 > dan keempatnya tersedia di form off board.
@@ -42,6 +48,14 @@
 | `PayrollDetail` | id, payrollId, crewId, jabatanKode, jabatanNama, segmentId, periodeKerja, hariAktif, gajiPokokSnapshot, gajiProrata, uangMakanSnapshot, uangMakanProrata, total, namaBank, noRekening | ← Payroll, Crew |
 | `LeavePayDisbursement` | id, crewId, tanggalPencairan, nominal, pencairanKe, masaKerjaSnapshot, catatanPerforma | ← Crew |
 | `Admin` | id, email (unik), passwordHash, mustChangePassword | — |
+| `Vendor` | id, nama (unik), npwp, alamat | → VendorBank, Invoice, Pv |
+| `VendorBank` | id, vendorId, accountNo, accountName, bank | ← Vendor |
+| `Customer` | id, nama (unik), npwp, alamat | → CustomerBank, Invoice, Pv |
+| `CustomerBank` | id, customerId, accountNo, accountName, bank | ← Customer |
+| `Invoice` | id, no (unik), jenis (AR/AP), kategori, tipe, tanggal, bupot, vendorId?, customerId?, vendorName/customerName (snapshot), bankAccount*, inv?, ref, keterangan, dpp, ppn, pphPasal, pph, total, dueDate, statusFakturPajak, statusPembayaran, parentInvoiceId, incomplete | ← Vendor/Customer; → FakturPajak, PvItem |
+| `FakturPajak` | id, invoiceId, nomor | ← Invoice |
+| `Pv` (voucher) | id, pvNo (unik), jenis (RV/PV), tanggal, vendorId?, customerId?, vendorName/customerName (snapshot), bankAccount*, chequeNo, issuedDate, bankCharge, balance, keterangan | ← Vendor/Customer; → PvItem |
+| `PvItem` | id, pvId, invoiceId, nominal (DPP), includeTax | ← Pv, Invoice |
 
 ## ERD
 
@@ -161,3 +175,6 @@ Crew --punya--> LeavePayDisbursement (per pencairan)
 - Payroll di-snapshot: `PayrollDetail` menyimpan gaji/uang makan yang sudah dibekukan.
 - Masa kerja kumulatif di `Crew.totalMasaKerja` (segmen tertutup); masa kerja live dihitung dari segmen yang masih On Board (`src/shared/masaKerja.ts`).
 - `SeaServiceRecord` dibuat otomatis saat crew off board (`crew-placement.service.ts`); kolom `imo` diisi dari `tbImo` (tugboat).
+- Finance: `Invoice.jenis` (AR/AP) menentukan counterparty (Customer/Vendor) & snapshot yang diisi.
+  `Pv` (voucher) memakai `jenis` RV/PV; `PvItem.nominal` = DPP, `includeTax` = melunasi PPN/PPH.
+  Status invoice dihitung otomatis dari akumulasi nominal (`recomputeStatus`).
