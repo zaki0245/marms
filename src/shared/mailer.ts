@@ -1,13 +1,13 @@
 // src/shared/mailer.ts
-// [FUNGSI] Kirim email via SMTP (nodemailer).
-// [ALASAN] Dipakai untuk approval voucher; transporter dibuat lazy dari env.
+// [FUNGSI] Kirim email: prioritas Resend HTTP API (jalan di semua plan Railway),
+//          fallback ke SMTP nodemailer bila RESEND_API_KEY tidak diisi.
+// [ALASAN] Railway memblokir outbound SMTP di plan Free/Trial/Hobby; Resend via HTTPS (port 443) tidak diblokir.
 
 import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
 let transporter: Transporter | null = null;
 
-// [FUNGSI] Buat transporter sekali; kembalikan null bila SMTP belum dikonfigurasi.
 function getTransporter() {
   if (transporter) return transporter;
   if (!process.env.SMTP_HOST) return null;
@@ -22,10 +22,41 @@ function getTransporter() {
   return transporter;
 }
 
-// [FUNGSI] Kirim email HTML. `to` & `cc` boleh string berkoma untuk banyak penerima.
+// [FUNGSI] Pisahkan string berkoma menjadi array email.
+function toArray(v?: string | null): string[] {
+  if (!v) return [];
+  return v.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+// [FUNGSI] Kirim email. Prioritas: Resend API (bila RESEND_API_KEY ada), lalu SMTP.
 export async function sendMail(to: string, cc: string | undefined, subject: string, html: string) {
+  const resendKey = process.env.RESEND_API_KEY;
+
+  // Mode Resend (HTTPS, jalan di semua plan Railway)
+  if (resendKey) {
+    const body: Record<string, unknown> = {
+      from: process.env.RESEND_FROM ?? 'onboarding@resend.dev',
+      to: toArray(to),
+      subject,
+      html,
+    };
+    const ccArr = toArray(cc);
+    if (ccArr.length) body.cc = ccArr;
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      throw new Error(`Resend gagal (${res.status}): ${await res.text()}`);
+    }
+    return;
+  }
+
+  // Mode SMTP (fallback)
   const t = getTransporter();
-  if (!t) throw new Error('SMTP belum dikonfigurasi');
+  if (!t) throw new Error('SMTP/Resend belum dikonfigurasi');
   await t.sendMail({
     from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
     to,
