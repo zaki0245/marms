@@ -14,6 +14,8 @@ const empty = {
   ttdPrepared: '',
   ttdVerified: '',
   ttdApproved: '',
+  approvalEmail: '',
+  approvalCc: '',
 };
 
 export default function Konfigurasi() {
@@ -78,6 +80,20 @@ export default function Konfigurasi() {
           <div>
             <label className="block text-xs text-gray-500">Approved by (BOD)</label>
             <input value={form.ttdApproved} onChange={(e) => setField('ttdApproved', e.target.value)} className={inputCls} />
+          </div>
+        </div>
+
+        <h3 className="mt-5 font-semibold text-navy">Approval Email</h3>
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs text-gray-500">Email Approver</label>
+            <input value={form.approvalEmail} onChange={(e) => setField('approvalEmail', e.target.value)} placeholder="approver@example.com" className={inputCls} />
+            <p className="mt-1 text-xs text-gray-400">Pisahkan dengan koma untuk banyak penerima.</p>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500">Email CC</label>
+            <input value={form.approvalCc} onChange={(e) => setField('approvalCc', e.target.value)} placeholder="cc@example.com" className={inputCls} />
+            <p className="mt-1 text-xs text-gray-400">Pisahkan dengan koma untuk banyak penerima.</p>
           </div>
         </div>
 

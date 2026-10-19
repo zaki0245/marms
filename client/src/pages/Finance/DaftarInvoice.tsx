@@ -22,6 +22,8 @@ interface Invoice {
   statusPembayaran: string;
   statusFakturPajak: string;
   incomplete: boolean;
+  approvalStatus: string;
+  approvalSentAt: string | null;
 }
 
 const STATUS_FAKTUR: Record<string, string> = { SUDAH_DITERIMA: 'Diterima', BELUM_DITERIMA: 'Belum diterima', TIDAK_ADA: 'Tidak ada' };
@@ -61,6 +63,17 @@ export default function DaftarInvoice() {
       load();
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal menghapus');
+    }
+  }
+
+  async function sendApproval(id: string) {
+    if (!window.confirm('Kirim email approval untuk invoice ini?')) return;
+    setError('');
+    try {
+      await api.post(`/finance/invoice/${id}/send-approval`);
+      load();
+    } catch (err: any) {
+      setError(err?.response?.data?.error ?? 'Gagal mengirim email');
     }
   }
 
@@ -110,13 +123,14 @@ export default function DaftarInvoice() {
               <th className="px-3 py-2 text-right">Total</th>
               <th className="px-3 py-2">Faktur</th>
               <th className="px-3 py-2">Status</th>
+              {jenis === 'AP' && <th className="px-3 py-2">Approval</th>}
               <th className="px-3 py-2 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={11} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
+            {loading && <tr><td colSpan={jenis === 'AP' ? 12 : 11} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
             {!loading && items.length === 0 && (
-              <tr><td colSpan={11} className="px-3 py-6 text-center text-gray-400">Belum ada invoice.</td></tr>
+              <tr><td colSpan={jenis === 'AP' ? 12 : 11} className="px-3 py-6 text-center text-gray-400">Belum ada invoice.</td></tr>
             )}
             {!loading && items
               .filter((i) => !search || [i.no, i.vendorName, i.customerName, i.inv].some((v) => v && v.toLowerCase().includes(search.toLowerCase())))
@@ -140,8 +154,22 @@ export default function DaftarInvoice() {
                     i.statusPembayaran === 'SEBAGIAN' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
                   }`}>{statusLabel(i.statusPembayaran)}</span>
                 </td>
+                {jenis === 'AP' && (
+                  <td className="px-3 py-2">
+                    {i.approvalStatus === 'SUDAH_DIAPPROVE' ? (
+                      <span className="rounded px-2 py-0.5 text-xs bg-positive/10 text-positive">Sudah di Approve</span>
+                    ) : (
+                      <span className="rounded px-2 py-0.5 text-xs bg-gray-100 text-gray-600">Belum di Approve</span>
+                    )}
+                  </td>
+                )}
                 <td className="px-3 py-2 text-right whitespace-nowrap">
                   <button onClick={() => navigate(`/admin/finance/invoice/input/${i.id}`)} className="text-navy hover:underline">Edit</button>
+                  {jenis === 'AP' && i.approvalStatus !== 'SUDAH_DIAPPROVE' && (
+                    <button onClick={() => sendApproval(i.id)} className="ml-3 text-navy hover:underline">
+                      {i.approvalSentAt ? 'Kirim Ulang' : 'Kirim Approval'}
+                    </button>
+                  )}
                   <button onClick={() => handleDelete(i.id)} className="ml-3 text-negative hover:underline">Hapus</button>
                 </td>
               </tr>

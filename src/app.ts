@@ -20,6 +20,7 @@ import { reportsRoutes } from './modules/crewing/reports';
 import { authRoutes } from './modules/auth';
 import { leavePayRoutes } from './modules/crewing/leave-pay';
 import { financeRoutes } from './modules/finance';
+import approveRoutes from './modules/finance/approve.routes';
 import { sessionMiddleware } from './shared/session';
 
 const app = express();
@@ -44,6 +45,9 @@ app.use(sessionMiddleware);
 
 // [FUNGSI] Route autentikasi (login/logout/me/ganti password) — sebelum proteksi.
 app.use('/api/auth', authRoutes);
+
+// [FUNGSI] Route publik approval voucher (tautan dari email) — sebelum proteksi.
+app.use('/api/approve', approveRoutes);
 
 // [FUNGSI] Lindungi semua endpoint /api kecuali whitelist publik, dan batasi per role.
 // [ALASAN] Payung bisnis: modul Crewing hanya untuk CREWING/SUPERADMIN, Finance hanya

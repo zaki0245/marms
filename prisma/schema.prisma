@@ -113,6 +113,11 @@ enum VoucherJenis {
   PV
 }
 
+enum ApprovalStatus {
+  BELUM_DIAPPROVE
+  SUDAH_DIAPPROVE
+}
+
 // ================== MASTER DATA ==================
 
 model Jabatan {
@@ -401,6 +406,8 @@ model Invoice {
   pphPasal         String?
   pph              Decimal?          @db.Decimal(15, 2)
   total            Decimal           @db.Decimal(15, 2)
+  cargoQuantity    Decimal?          @db.Decimal(18, 3)
+  unitPrice        Decimal?          @db.Decimal(18, 3)
   dueDate          DateTime?
   masaPajakPPN     String?
   masaPajakPPH     String?
@@ -408,6 +415,11 @@ model Invoice {
   statusPembayaran  PaymentStatus     @default(BELUM_BAYAR)
   parentInvoiceId  String?
   incomplete       Boolean           @default(false)
+  approvalStatus   ApprovalStatus    @default(BELUM_DIAPPROVE)
+  approvalToken    String?           @unique
+  approvalSentAt   DateTime?
+  approvalSentTo   String?
+  approvedAt       DateTime?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   vendor           Vendor?           @relation(fields: [vendorId], references: [id])

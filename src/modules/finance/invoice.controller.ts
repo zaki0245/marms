@@ -36,3 +36,7 @@ export async function remove(req: Request, res: Response) {
   await service.deleteInvoice(req.params.id);
   res.json({ ok: true });
 }
+
+export async function sendApproval(req: Request, res: Response) {
+  res.json(await service.sendApproval(req.params.id));
+}

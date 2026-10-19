@@ -194,6 +194,7 @@ export default function Cetak() {
     }
   }
 
+
   function handleCetak(pv: Pv) {
     cetakPV({
       konfigurasi,

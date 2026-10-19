@@ -51,6 +51,8 @@ export const invoiceSchema = z.object({
   ppn: uang.optional().nullable(),
   pphPasal: z.string().optional().nullable(),
   pph: uang.optional().nullable(),
+  cargoQuantity: uang.optional().nullable(),
+  unitPrice: uang.optional().nullable(),
   dueDate: z.string().optional().nullable(),
   masaPajakPPN: z.string().optional().nullable(),
   masaPajakPPH: z.string().optional().nullable(),
@@ -92,5 +94,7 @@ export const konfigurasiSchema = z.object({
   ttdPrepared: z.string().optional(),
   ttdVerified: z.string().optional(),
   ttdApproved: z.string().optional(),
+  approvalEmail: z.string().optional(),
+  approvalCc: z.string().optional(),
 });
 export type KonfigurasiInput = z.infer<typeof konfigurasiSchema>;

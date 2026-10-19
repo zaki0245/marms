@@ -33,6 +33,7 @@ router.post('/invoice', asyncHandler(invoice.create));
 router.get('/invoice/:id', asyncHandler(invoice.get));
 router.put('/invoice/:id', asyncHandler(invoice.update));
 router.delete('/invoice/:id', asyncHandler(invoice.remove));
+router.post('/invoice/:id/send-approval', asyncHandler(invoice.sendApproval));
 
 // Payment Voucher (PV)
 router.get('/pv', asyncHandler(pv.list));

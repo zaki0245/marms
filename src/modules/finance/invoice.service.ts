@@ -4,8 +4,11 @@
 
 import { prisma } from '../../shared/prisma';
 import { AppError } from '../../shared/AppError';
+import { getKonfigurasi } from './konfigurasi.service';
+import { sendMail } from '../../shared/mailer';
 import type { InvoiceInput } from './finance.model';
 import type { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 // [FUNGSI] Buat nomor invoice otomatis: INV-YYYY-NNNN (reset tiap tahun).
 export async function generateNoInvoice(): Promise<string> {
@@ -78,6 +81,8 @@ async function buildData(input: InvoiceInput): Promise<Omit<Prisma.InvoiceUnchec
     pphPasal: input.pphPasal || null,
     pph,
     total,
+    cargoQuantity: input.cargoQuantity ?? null,
+    unitPrice: input.unitPrice ?? null,
     dueDate: input.dueDate ? new Date(input.dueDate) : null,
     masaPajakPPN: input.masaPajakPPN || null,
     masaPajakPPH: input.masaPajakPPH || null,
@@ -224,4 +229,138 @@ export async function deleteInvoice(id: string) {
     throw new AppError(409, 'Invoice sudah dibayar (ada voucher), tidak bisa dihapus');
   }
   return prisma.invoice.delete({ where: { id } });
+}
+
+const fmtRp = (n: unknown) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+
+const KATEGORI_LABEL: Record<string, string> = { FREIGHT: 'Freight', OPERATION: 'Operation', OTHERS: 'Others' };
+const TIPE_LABEL: Record<string, string> = { REGULAR: 'Regular', DP: 'DP', PELUNASAN: 'Pelunasan' };
+const FAKTUR_LABEL: Record<string, string> = { SUDAH_DITERIMA: 'Sudah diterima', BELUM_DITERIMA: 'Belum diterima', TIDAK_ADA: 'Tidak ada' };
+
+// [FUNGSI] Susun detail lengkap invoice menjadi tabel HTML untuk email approval.
+function invoiceHtml(inv: any): string {
+  const faktur = (inv.fakturPajak ?? []).map((f: any) => f.nomor).join(', ') || '-';
+  return `
+    <table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse;border-color:#ddd;font-size:14px">
+      <tr><td><b>No Invoice</b></td><td>${inv.no}</td></tr>
+      <tr><td><b>Jenis</b></td><td>${inv.jenis}</td></tr>
+      <tr><td><b>Kategori</b></td><td>${KATEGORI_LABEL[inv.kategori] ?? inv.kategori}</td></tr>
+      <tr><td><b>Tipe</b></td><td>${TIPE_LABEL[inv.tipe] ?? inv.tipe}</td></tr>
+      <tr><td><b>Tanggal</b></td><td>${inv.tanggal ? new Date(inv.tanggal).toLocaleDateString('id-ID') : '-'}</td></tr>
+      <tr><td><b>Bupot</b></td><td>${inv.bupot ?? '-'}</td></tr>
+      <tr><td><b>Vendor</b></td><td>${inv.vendorName ?? '-'}</td></tr>
+      <tr><td><b>NPWP Vendor</b></td><td>${inv.vendorNpwp ?? '-'}</td></tr>
+      <tr><td><b>Alamat Vendor</b></td><td>${inv.vendorAlamat ?? '-'}</td></tr>
+      <tr><td><b>Bank</b></td><td>${inv.bank ?? '-'}</td></tr>
+      <tr><td><b>No Rekening</b></td><td>${inv.bankAccountNo ?? '-'}</td></tr>
+      <tr><td><b>Atas Nama</b></td><td>${inv.bankAccountName ?? '-'}</td></tr>
+      <tr><td><b>Nomor Invoice (vendor)</b></td><td>${inv.inv ?? '-'}</td></tr>
+      <tr><td><b>REF</b></td><td>${inv.ref ?? '-'}</td></tr>
+      <tr><td><b>Keterangan</b></td><td><b>${inv.keterangan ?? '-'}</b></td></tr>
+      <tr><td><b>DPP</b></td><td>${fmtRp(inv.dpp)}</td></tr>
+      <tr><td><b>PPN</b></td><td>${fmtRp(inv.ppn)}</td></tr>
+      <tr><td><b>PPh Pasal</b></td><td>${inv.pphPasal ?? '-'}</td></tr>
+      <tr><td><b>PPh</b></td><td>${fmtRp(inv.pph)}</td></tr>
+      <tr><td><b>Total</b></td><td><b>${fmtRp(inv.total)}</b></td></tr>
+      <tr><td><b>Jatuh Tempo</b></td><td><b>${inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('id-ID') : '-'}</b></td></tr>
+      <tr><td><b>Masa Pajak PPN</b></td><td>${inv.masaPajakPPN ?? '-'}</td></tr>
+      <tr><td><b>Masa Pajak PPH</b></td><td>${inv.masaPajakPPH ?? '-'}</td></tr>
+      <tr><td><b>Status Faktur Pajak</b></td><td>${FAKTUR_LABEL[inv.statusFakturPajak] ?? inv.statusFakturPajak}</td></tr>
+      <tr><td><b>Nomor Faktur Pajak</b></td><td>${faktur}</td></tr>
+    </table>
+  `;
+}
+
+// [FUNGSI] Kirim email approval invoice AP: generate token, kirim detail, catat pengiriman.
+export async function sendApproval(invoiceId: string) {
+  const inv = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { fakturPajak: true },
+  });
+  if (!inv) throw new AppError(404, 'Invoice tidak ditemukan');
+  if (inv.jenis !== 'AP') throw new AppError(400, 'Hanya invoice AP yang bisa diajukan approval');
+
+  const konfig = await getKonfigurasi();
+  const to = konfig.approvalEmail;
+  if (!to) throw new AppError(400, 'Email approver belum diisi di Konfigurasi');
+  const cc = konfig.approvalCc || undefined;
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const base = process.env.APP_BASE_URL ?? 'http://localhost:3000';
+  const link = `${base.replace(/\/$/, '')}/approve/${token}`;
+
+  const subject = `Approval Invoice ${inv.no} - ${inv.vendorName ?? ''}`;
+  const html = `
+    <p>Dear Pak Zulfadhli,</p>
+    <p style="margin-top:16px">Berikut kami sampaikan pengajuan untuk invoice berikut:</p>
+    ${invoiceHtml(inv)}
+    <p style="margin-top:16px">Klik tautan berikut untuk menyetujui:</p>
+    <p><a href="${link}">${link}</a></p>
+    <p style="margin-top:16px">Dear Pak Tri Handoyo,</p>
+    <p>Mohon bantuannya agar dapat dibantu dijalankan pembayarannya sesuai term payment yang berlaku.</p>
+    <p style="margin-top:16px">Demikian perihal pengajuan yang kami sampaikan,</p>
+    <p>Terima kasih atas perhatian dan kerjasamanya.</p>
+    <p style="margin-top:16px">Kind Regards,</p>
+    <p style="margin: 0; padding: 0;">Finance Dept</p>
+    <p style="margin: 0; padding: 0; color: #1a5fb4;">PT Maritim Armada <span style="color: #c01c28;">Raya</span></p>
+  `;
+
+  await sendMail(to, cc, subject, html);
+
+  return prisma.invoice.update({
+    where: { id: invoiceId },
+    data: { approvalToken: token, approvalSentAt: new Date(), approvalSentTo: to },
+  });
+}
+
+// [FUNGSI] Ambil detail invoice lewat token approval (untuk halaman approve publik).
+export async function getInvoiceByToken(token: string) {
+  const inv = await prisma.invoice.findUnique({
+    where: { approvalToken: token },
+    include: { fakturPajak: true },
+  });
+  if (!inv) throw new AppError(404, 'Tautan approval tidak valid');
+  return {
+    no: inv.no,
+    jenis: inv.jenis,
+    kategori: inv.kategori,
+    tipe: inv.tipe,
+    tanggal: inv.tanggal,
+    bupot: inv.bupot,
+    vendorName: inv.vendorName,
+    vendorNpwp: inv.vendorNpwp,
+    vendorAlamat: inv.vendorAlamat,
+    bank: inv.bank,
+    bankAccountNo: inv.bankAccountNo,
+    bankAccountName: inv.bankAccountName,
+    inv: inv.inv,
+    ref: inv.ref,
+    keterangan: inv.keterangan,
+    dpp: Number(inv.dpp),
+    ppn: inv.ppn != null ? Number(inv.ppn) : null,
+    pphPasal: inv.pphPasal,
+    pph: inv.pph != null ? Number(inv.pph) : null,
+    total: Number(inv.total),
+    dueDate: inv.dueDate,
+    masaPajakPPN: inv.masaPajakPPN,
+    masaPajakPPH: inv.masaPajakPPH,
+    statusFakturPajak: inv.statusFakturPajak,
+    fakturPajak: inv.fakturPajak.map((f) => f.nomor),
+    approvalStatus: inv.approvalStatus,
+    approvedAt: inv.approvedAt,
+  };
+}
+
+// [FUNGSI] Tandai invoice sudah di-approve (dipanggil dari tautan publik).
+export async function approveInvoice(token: string) {
+  const inv = await prisma.invoice.findUnique({ where: { approvalToken: token } });
+  if (!inv) throw new AppError(404, 'Tautan approval tidak valid');
+  if (inv.approvalStatus === 'SUDAH_DIAPPROVE') {
+    return { no: inv.no, approvalStatus: 'SUDAH_DIAPPROVE' };
+  }
+  const updated = await prisma.invoice.update({
+    where: { id: inv.id },
+    data: { approvalStatus: 'SUDAH_DIAPPROVE', approvedAt: new Date(), approvalToken: null },
+  });
+  return { no: updated.no, approvalStatus: 'SUDAH_DIAPPROVE' };
 }

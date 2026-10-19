@@ -11,3 +11,7 @@ export function num(v: unknown): number {
 export function formatUang(v: unknown): string {
   return 'Rp ' + num(v).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+
+export function formatDecimal3(v: unknown): string {
+  return num(v).toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+}

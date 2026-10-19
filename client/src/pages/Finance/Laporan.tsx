@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
-import { num, formatUang } from './utils';
+import { num, formatUang, formatDecimal3 } from './utils';
 
 interface Row {
   id: string;
@@ -16,6 +16,8 @@ interface Row {
   inv: string | null;
   ref: string | null;
   keterangan: string | null;
+  cargoQuantity: number | null;
+  unitPrice: number | null;
   dpp: number;
   ppn: number | null;
   pph: number | null;
@@ -26,7 +28,7 @@ interface Row {
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
 const COLS = [
-  'No', 'Voucher', 'Tanggal', 'Counterparty', 'INV', 'REF', 'Keterangan', 'DPP', 'PPN', 'PPH', 'Bank Charge', 'Balance', 'Total',
+  'No', 'Voucher', 'Tanggal', 'Counterparty', 'INV', 'REF', 'Keterangan', 'Cargo Quantity', 'Unit Price', 'DPP', 'PPN', 'PPH', 'Bank Charge', 'Balance', 'Total',
 ];
 
 function matches(r: Row, q: string): boolean {
@@ -78,6 +80,8 @@ export default function Laporan() {
       r.inv ?? '',
       r.ref ?? '',
       r.keterangan ?? '',
+      r.cargoQuantity != null ? formatDecimal3(r.cargoQuantity) : '',
+      r.unitPrice != null ? formatDecimal3(r.unitPrice) : '',
       formatUang(r.dpp),
       r.ppn != null ? formatUang(r.ppn) : '',
       r.pph != null ? formatUang(r.pph) : '',
@@ -137,6 +141,8 @@ export default function Laporan() {
               <th className="px-3 py-2">INV</th>
               <th className="px-3 py-2">REF</th>
               <th className="px-3 py-2">Keterangan</th>
+              <th className="px-3 py-2 text-right">Cargo Quantity</th>
+              <th className="px-3 py-2 text-right">Unit Price</th>
               <th className="px-3 py-2 text-right">DPP</th>
               <th className="px-3 py-2 text-right">PPN</th>
               <th className="px-3 py-2 text-right">PPH</th>
@@ -146,8 +152,8 @@ export default function Laporan() {
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={13} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
-            {!loading && filtered.length === 0 && <tr><td colSpan={13} className="px-3 py-6 text-center text-gray-400">Tidak ada data.</td></tr>}
+            {loading && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
+            {!loading && filtered.length === 0 && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-400">Tidak ada data.</td></tr>}
             {!loading && filtered.map((r, i) => (
               <tr key={r.id} className="border-t border-gray-100">
                 <td className="px-3 py-2">{i + 1}</td>
@@ -157,6 +163,8 @@ export default function Laporan() {
                 <td className="px-3 py-2">{r.inv ?? '-'}</td>
                 <td className="px-3 py-2">{r.ref ?? '-'}</td>
                 <td className="px-3 py-2">{r.keterangan ?? '-'}</td>
+                <td className="px-3 py-2 text-right">{r.cargoQuantity != null ? formatDecimal3(r.cargoQuantity) : '-'}</td>
+                <td className="px-3 py-2 text-right">{r.unitPrice != null ? formatDecimal3(r.unitPrice) : '-'}</td>
                 <td className="px-3 py-2 text-right">{formatUang(r.dpp)}</td>
                 <td className="px-3 py-2 text-right">{r.ppn != null ? formatUang(r.ppn) : '-'}</td>
                 <td className="px-3 py-2 text-right">{r.pph != null ? formatUang(r.pph) : '-'}</td>

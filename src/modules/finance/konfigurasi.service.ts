@@ -15,6 +15,8 @@ const KEYS = {
   ttdPrepared: 'FIN_TTD_PREPARED',
   ttdVerified: 'FIN_TTD_VERIFIED',
   ttdApproved: 'FIN_TTD_APPROVED',
+  approvalEmail: 'FIN_APPROVAL_EMAIL',
+  approvalCc: 'FIN_APPROVAL_CC',
 } as const;
 
 export async function getKonfigurasi() {
@@ -31,6 +33,8 @@ export async function getKonfigurasi() {
     ttdPrepared: map[KEYS.ttdPrepared] ?? '',
     ttdVerified: map[KEYS.ttdVerified] ?? '',
     ttdApproved: map[KEYS.ttdApproved] ?? '',
+    approvalEmail: map[KEYS.approvalEmail] ?? '',
+    approvalCc: map[KEYS.approvalCc] ?? '',
   };
 }
 
@@ -44,6 +48,8 @@ export async function updateKonfigurasi(input: KonfigurasiInput) {
     [KEYS.ttdPrepared]: input.ttdPrepared ?? '',
     [KEYS.ttdVerified]: input.ttdVerified ?? '',
     [KEYS.ttdApproved]: input.ttdApproved ?? '',
+    [KEYS.approvalEmail]: input.approvalEmail ?? '',
+    [KEYS.approvalCc]: input.approvalCc ?? '',
   };
   for (const [key, value] of Object.entries(data)) {
     await prisma.pengaturan.upsert({

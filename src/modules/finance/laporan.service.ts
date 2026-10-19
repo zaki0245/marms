@@ -29,6 +29,8 @@ export async function rekap(jenis?: string) {
         dpp: Number(item.nominal),
         ppn: item.includeTax && inv.ppn != null ? Number(inv.ppn) : null,
         pph: item.includeTax && inv.pph != null ? Number(inv.pph) : null,
+        cargoQuantity: inv.cargoQuantity != null ? Number(inv.cargoQuantity) : null,
+        unitPrice: inv.unitPrice != null ? Number(inv.unitPrice) : null,
         nominal: Number(item.nominal),
         bankCharge: pv.bankCharge != null ? Number(pv.bankCharge) : null,
         balance: pv.balance != null ? Number(pv.balance) : null,

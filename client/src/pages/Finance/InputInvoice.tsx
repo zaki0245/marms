@@ -45,6 +45,8 @@ const emptyForm = {
   ppn: '',
   pphPasal: '',
   pph: '',
+  cargoQuantity: '',
+  unitPrice: '',
   dueDate: '',
   masaPajakPPN: '',
   masaPajakPPH: '',
@@ -105,6 +107,8 @@ export default function InputInvoice() {
             ppn: data.ppn != null ? String(data.ppn) : '',
             pphPasal: data.pphPasal ?? '',
             pph: data.pph != null ? String(data.pph) : '',
+            cargoQuantity: data.cargoQuantity != null ? String(data.cargoQuantity) : '',
+            unitPrice: data.unitPrice != null ? String(data.unitPrice) : '',
             dueDate: data.dueDate?.slice(0, 10) ?? '',
             masaPajakPPN: data.masaPajakPPN ?? '',
             masaPajakPPH: data.masaPajakPPH ?? '',
@@ -219,6 +223,8 @@ export default function InputInvoice() {
       ppn: money(form.ppn),
       pphPasal: form.pphPasal || null,
       pph: money(form.pph),
+      cargoQuantity: money(form.cargoQuantity),
+      unitPrice: money(form.unitPrice),
       dueDate: form.dueDate || null,
       masaPajakPPN: form.masaPajakPPN || null,
       masaPajakPPH: form.masaPajakPPH || null,
@@ -379,6 +385,18 @@ export default function InputInvoice() {
               <label className="block text-xs text-gray-500">Total (otomatis)</label>
               <div className="mt-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 font-semibold">{formatUang(total)}</div>
             </div>
+            {isAr && (
+              <div>
+                <label className="block text-xs text-gray-500">Cargo Quantity</label>
+                <input type="number" step="0.001" value={form.cargoQuantity} onChange={(e) => setField('cargoQuantity', e.target.value)} className={inputCls} />
+              </div>
+            )}
+            {isAr && (
+              <div>
+                <label className="block text-xs text-gray-500">Unit Price</label>
+                <input type="number" step="0.001" value={form.unitPrice} onChange={(e) => setField('unitPrice', e.target.value)} className={inputCls} />
+              </div>
+            )}
           </div>
         </section>
 

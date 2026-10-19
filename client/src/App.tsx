@@ -12,6 +12,7 @@ import Pengaturan from './pages/Crewing/MasterData/Pengaturan';
 import PublicHome from './pages/public/PublicHome';
 import Daftar from './pages/public/Daftar';
 import TerimaKasih from './pages/public/TerimaKasih';
+import Approve from './pages/public/Approve';
 import Login from './pages/Login';
 import Recruitment from './pages/Crewing/Recruitment';
 import Crew from './pages/Crewing/Crew';
@@ -35,6 +36,7 @@ export default function App() {
       <Route path="/" element={<PublicHome />} />
       <Route path="/daftar" element={<Daftar />} />
       <Route path="/terima-kasih" element={<TerimaKasih />} />
+      <Route path="/approve/:token" element={<Approve />} />
       <Route path="/admin/login" element={<Login />} />
 
       {/* Admin */}
