@@ -1,10 +1,10 @@
 // src/modules/leave-pay/leave-pay.service.ts
 // [FUNGSI] Logika Leave Pay: daftar kelayakan, pencairan, riwayat.
-// [ALASAN] Leave pay tiap kelipatan 180 hari masa kerja kumulatif.
+// [ALASAN] Leave pay tiap 180 hari masa kerja kumulatif setelah 180 hari pertama.
 
 import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
-import { liveMasaKerja } from '../../../shared/masaKerja';
+import { liveMasaKerja, berhakLeavePay } from '../../../shared/masaKerja';
 import type { DisburseInput } from './leave-pay.model';
 
 // [FUNGSI] Daftar kelayakan leave pay semua crew.
@@ -15,7 +15,7 @@ export async function listLeavePay() {
   });
   return crews.map((c) => {
     const masaKerja = liveMasaKerja(c);
-    const berhak = Math.floor(masaKerja / 180);
+    const berhak = berhakLeavePay(masaKerja);
     return {
       crewId: c.id,
       nama: c.applicant.namaLengkap,
@@ -38,7 +38,7 @@ export async function disburseLeavePay(crewId: string, input: DisburseInput) {
   if (!crew) throw new AppError(404, 'Crew tidak ditemukan');
 
   const masaKerja = liveMasaKerja(crew);
-  const berhak = Math.floor(masaKerja / 180);
+  const berhak = berhakLeavePay(masaKerja);
   if (crew.jumlahLeavePay >= berhak) {
     throw new AppError(400, 'Tidak ada leave pay yang bisa dicairkan');
   }

@@ -36,3 +36,9 @@ export function liveMasaKerja(crew: MasaKerjaSource): number {
   }
   return total;
 }
+
+// [FUNGSI] Hitung jumlah leave pay yang berhak: tiap 180 hari setelah 180 hari pertama.
+// [ALASAN] 180 hari pertama tidak dihitung; kelayakan dimulai pada 360 hari masa kerja.
+export function berhakLeavePay(masaKerja: number): number {
+  return Math.max(0, Math.floor(masaKerja / 180) - 1);
+}

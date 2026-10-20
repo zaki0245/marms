@@ -4,7 +4,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { liveMasaKerja } from '../src/shared/masaKerja';
+import { liveMasaKerja, berhakLeavePay } from '../src/shared/masaKerja';
 
 test('crew tanpa penempatan mengembalikan totalMasaKerja saja', () => {
   assert.equal(liveMasaKerja({ totalMasaKerja: 180 }), 180);
@@ -28,4 +28,14 @@ test('segmen terbuka (masih On Board) menambah hari live', () => {
     placements: [{ segments: [{ onBoardTanggal: new Date(), offBoardTanggal: null }] }],
   };
   assert.equal(liveMasaKerja(source), 101);
+});
+
+test('berhakLeavePay: 180 hari pertama tidak dihitung', () => {
+  assert.equal(berhakLeavePay(180), 0);
+});
+
+test('berhakLeavePay: kelayakan mulai 360 hari, bertambah tiap 180 hari', () => {
+  assert.equal(berhakLeavePay(360), 1);
+  assert.equal(berhakLeavePay(540), 2);
+  assert.equal(berhakLeavePay(100), 0);
 });

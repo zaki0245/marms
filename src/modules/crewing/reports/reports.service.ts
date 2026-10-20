@@ -4,7 +4,7 @@
 //          aturan akses tabel karena sifatnya agregasi/reporting).
 
 import { prisma } from '../../../shared/prisma';
-import { liveMasaKerja } from '../../../shared/masaKerja';
+import { liveMasaKerja, berhakLeavePay } from '../../../shared/masaKerja';
 
 export async function getDashboard() {
   const now = new Date();
@@ -20,7 +20,7 @@ export async function getDashboard() {
   ]);
   // [FUNGSI] Siap dinilai = masih ada leave pay yang belum dicairkan.
   const crewSiapLeavePay = crews.filter(
-    (c) => Math.floor(liveMasaKerja(c) / 180) > c.jumlahLeavePay,
+    (c) => berhakLeavePay(liveMasaKerja(c)) > c.jumlahLeavePay,
   ).length;
 
   const payrollsBulanIni = await prisma.payroll.findMany({

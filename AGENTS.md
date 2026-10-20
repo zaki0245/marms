@@ -49,7 +49,7 @@ npx prisma migrate reset --force      # reset database + seed ulang
 - Duplikat pelamar (email ATAU HP sama) ditolak.
 - Dokumen expired memblokir penempatan baru; admin bisa perbarui dokumen expired.
 - Masa kerja live: bertambah saat crew On Board (lihat `src/shared/masaKerja.ts`).
-- Leave pay: tiap kelipatan 180 hari.
+- Leave pay: tiap 180 hari setelah 180 hari pertama (kelayakan mulai 360 hari).
 - Finance dibagi dua entitas: **AP** (hutang ke Vendor → voucher **PV**) dan **AR** (piutang dari
   Customer → voucher **RV**). Invoice punya kolom `jenis` (AR/AP).
 - Satu voucher (PV/RV) bisa memuat banyak invoice dari satu counterparty.
