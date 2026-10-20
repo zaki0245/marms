@@ -63,8 +63,11 @@ const TAHUN = Array.from({ length: new Date().getFullYear() - TAHUN_AWAL + 2 }, 
 
 // [FUNGSI] Pecah "Januari 2026" jadi {bulan, tahun} | [ALASAN] Isi select saat edit data lama.
 function splitMasa(v: string): { bulan: string; tahun: string } {
-  const [bulan, tahun] = (v ?? '').split(' ');
-  return { bulan: bulan ?? '', tahun: tahun ?? '' };
+  const parts = (v ?? '').trim().split(/\s+/);
+  if (parts.length === 1 && parts[0]) {
+    return /^\d+$/.test(parts[0]) ? { bulan: '', tahun: parts[0] } : { bulan: parts[0], tahun: '' };
+  }
+  return { bulan: parts[0] ?? '', tahun: parts[1] ?? '' };
 }
 
 export default function InputInvoice() {
@@ -138,7 +141,7 @@ export default function InputInvoice() {
 
   // [FUNGSI] Gabung bulan+tahun jadi "Januari 2026" | [ALASAN] Format simpan tetap string lama.
   function setMasa(k: 'masaPajakPPN' | 'masaPajakPPH', bulan: string, tahun: string) {
-    setForm((f) => ({ ...f, [k]: bulan && tahun ? `${bulan} ${tahun}` : '' }));
+    setForm((f) => ({ ...f, [k]: [bulan, tahun].filter(Boolean).join(' ') }));
   }
 
   function addFaktur() {

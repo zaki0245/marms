@@ -6,7 +6,7 @@ import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
 import { getApplicantWithDocuments } from '../recruitment';
 import { liveMasaKerja } from '../../../shared/masaKerja';
-import type { AssignInput, BankInput, OffBoardInput } from './crew-placement.model';
+import type { AssignInput, BankInput, OffBoardInput, SegmentDatesInput } from './crew-placement.model';
 
 // [FUNGSI] Buat nomor kontrak otomatis: CTK-YYYY-NNNN.
 async function generateNomorKontrak(): Promise<string> {
@@ -224,5 +224,68 @@ export async function updateBank(crewId: string, input: BankInput) {
   return prisma.crew.update({
     where: { id: crewId },
     data: { namaBank: input.namaBank || null, noRekening: input.noRekening || null },
+  });
+}
+
+// [FUNGSI] Koreksi tanggal on/off board sebuah segmen, hitung ulang durasi & masa kerja.
+// [ALASAN] Tanggal salah ketik perlu diperbaiki tanpa menghapus penempatan; turunan (durasi,
+//          sea service, total masa kerja) ikut disesuaikan agar konsisten.
+export async function updateSegmentDates(crewId: string, segmentId: string, input: SegmentDatesInput) {
+  const crew = await prisma.crew.findUnique({
+    where: { id: crewId },
+    include: { placements: { include: { segments: true } } },
+  });
+  if (!crew) throw new AppError(404, 'Crew tidak ditemukan');
+
+  const segment = crew.placements.flatMap((p) => p.segments).find((s) => s.id === segmentId);
+  if (!segment) throw new AppError(404, 'Segmen tidak ditemukan');
+
+  const onBoardTanggal = new Date(input.onBoardTanggal);
+  const offBoardTanggal = input.offBoardTanggal ? new Date(input.offBoardTanggal) : null;
+  if (offBoardTanggal && offBoardTanggal < onBoardTanggal) {
+    throw new AppError(400, 'Tanggal off board tidak boleh sebelum tanggal on board');
+  }
+
+  // [FUNGSI] Hitung durasi inklusif (sama dengan off board), null bila segmen masih terbuka.
+  const durasi = offBoardTanggal
+    ? Math.round((offBoardTanggal.getTime() - onBoardTanggal.getTime()) / 86400000) + 1
+    : null;
+
+  await prisma.segmen.update({
+    where: { id: segmentId },
+    data: { onBoardTanggal, offBoardTanggal, durasi },
+  });
+
+  const placement = crew.placements.find((p) => p.segments.some((s) => s.id === segmentId));
+  if (placement) {
+    await prisma.penempatan.update({
+      where: { id: placement.id },
+      data: { tanggalMulai: onBoardTanggal, tanggalSelesai: offBoardTanggal },
+    });
+    await prisma.kontrak.update({
+      where: { id: placement.kontrakId },
+      data: { tanggalMulai: onBoardTanggal },
+    });
+  }
+
+  // [FUNGSI] Sinkronkan sea service record bila segmen sudah off board (punya record).
+  if (offBoardTanggal) {
+    await prisma.seaServiceRecord.updateMany({
+      where: { segmentId },
+      data: { onBoardTanggal, offBoardTanggal, totalHari: durasi ?? 0 },
+    });
+  }
+
+  // [FUNGSI] Hitung ulang total masa kerja kumulatif dari seluruh segmen tertutup.
+  // [ALASAN] Koreksi tanggal bisa mengubah durasi segmen mana pun, jadi jumlahkan ulang.
+  const totalMasaKerja = crew.placements
+    .flatMap((p) => p.segments)
+    .reduce((sum, s) => sum + (s.id === segmentId ? durasi ?? 0 : s.durasi ?? 0), 0);
+
+  await prisma.crew.update({ where: { id: crewId }, data: { totalMasaKerja } });
+
+  return prisma.crew.findUnique({
+    where: { id: crewId },
+    include: { applicant: true, placements: { include: { vessel: true, segments: true } } },
   });
 }

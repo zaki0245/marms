@@ -4,7 +4,7 @@
 
 import type { Request, Response } from 'express';
 import * as service from './crew-placement.service';
-import { assignSchema, bankSchema, offBoardSchema } from './crew-placement.model';
+import { assignSchema, bankSchema, offBoardSchema, segmentDatesSchema } from './crew-placement.model';
 
 export async function assignApplicant(req: Request, res: Response) {
   const input = assignSchema.parse(req.body);
@@ -40,4 +40,10 @@ export async function getCrew(req: Request, res: Response) {
 export async function updateBank(req: Request, res: Response) {
   const input = bankSchema.parse(req.body);
   res.json(await service.updateBank(req.params.id, input));
+}
+
+export async function updateSegmentDates(req: Request, res: Response) {
+  const input = segmentDatesSchema.parse(req.body);
+  const crew = await service.updateSegmentDates(req.params.id, req.params.segmentId, input);
+  res.json(crew);
 }
