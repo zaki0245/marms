@@ -27,10 +27,3 @@ export const offBoardSchema = z.object({
   offBoardPelabuhan: z.string().optional(),
 });
 export type OffBoardInput = z.infer<typeof offBoardSchema>;
-
-// [FUNGSI] Validasi koreksi tanggal on/off board sebuah segmen.
-export const segmentDatesSchema = z.object({
-  onBoardTanggal: z.string().min(1, 'Tanggal on board wajib diisi'),
-  offBoardTanggal: z.string().optional().nullable(),
-});
-export type SegmentDatesInput = z.infer<typeof segmentDatesSchema>;

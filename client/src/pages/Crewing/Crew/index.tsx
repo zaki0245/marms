@@ -110,9 +110,6 @@ export default function Crew() {
   const [bankTarget, setBankTarget] = useState<Crew | null>(null);
   const [bankForm, setBankForm] = useState({ namaBank: '', noRekening: '' });
   const [bankLoading, setBankLoading] = useState(false);
-  const [editTanggalTarget, setEditTanggalTarget] = useState<{ crewId: string; segmentId: string; nama: string; vessel: string; offBoardTanggal: string | null } | null>(null);
-  const [editTanggalForm, setEditTanggalForm] = useState({ onBoardTanggal: '', offBoardTanggal: '' });
-  const [editTanggalLoading, setEditTanggalLoading] = useState(false);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
 
@@ -280,41 +277,16 @@ export default function Crew() {
     }
   }
 
-  function openEditTanggal(c: Crew, p: Penempatan) {
-    const seg = (p.segments ?? [])[0];
-    if (!seg) return;
-    setEditTanggalForm({
-      onBoardTanggal: seg.onBoardTanggal?.slice(0, 10) ?? '',
-      offBoardTanggal: seg.offBoardTanggal?.slice(0, 10) ?? '',
-    });
-    setEditTanggalTarget({
-      crewId: c.id,
-      segmentId: seg.id,
-      nama: c.applicant.namaLengkap,
-      vessel: p.vessel?.namaUnit ?? '-',
-      offBoardTanggal: seg.offBoardTanggal ?? null,
-    });
-    setError('');
-  }
-
-  async function handleEditTanggal(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editTanggalTarget) return;
-    setEditTanggalLoading(true);
+  async function handleDelete(c: Crew) {
+    if (!window.confirm(`Hapus ${c.applicant.namaLengkap} beserta seluruh riwayat penempatannya? Kandidat akan kembali ke Pool Kandidat.`)) return;
     setError('');
     try {
-      await api.patch(`/crew/${editTanggalTarget.crewId}/tanggal/${editTanggalTarget.segmentId}`, {
-        onBoardTanggal: editTanggalForm.onBoardTanggal,
-        offBoardTanggal: editTanggalForm.offBoardTanggal || null,
-      });
-      setEditTanggalTarget(null);
-      setMsg('Tanggal on/off board diperbarui');
+      await api.delete(`/crew/${c.id}`);
+      setMsg('Crew dihapus, kandidat kembali ke Pool Kandidat');
       loadCrew();
-      if (selected) openDetail(selected);
+      loadPool();
     } catch (err: any) {
-      setError(err?.response?.data?.error ?? 'Gagal memperbarui tanggal');
-    } finally {
-      setEditTanggalLoading(false);
+      setError(err?.response?.data?.error ?? 'Gagal menghapus crew');
     }
   }
 
@@ -437,6 +409,7 @@ export default function Crew() {
                         <button onClick={() => openAssignCrew(c)} className="text-positive hover:underline">Assign</button>
                       )}
                       <button onClick={() => openDetail(c)} className="ml-3 text-navy hover:underline">Detail</button>
+                      <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:underline">Hapus</button>
                     </td>
                   </tr>
                 );
@@ -470,6 +443,7 @@ export default function Crew() {
                 <td className="px-3 py-2 text-right whitespace-nowrap">
                   <button onClick={() => openAssignCrew(c)} className="text-positive hover:underline">Assign</button>
                   <button onClick={() => openDetail(c)} className="ml-3 text-navy hover:underline">Detail</button>
+                  <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:underline">Hapus</button>
                 </td>
               </tr>
             ))}
@@ -515,12 +489,9 @@ export default function Crew() {
                     <span className="text-sm font-medium">{p.vessel?.namaUnit ?? '-'}</span>
                     <span className="ml-2 text-sm text-gray-500">{jabatanName(p.jabatanKode)}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500">
-                      {p.tanggalMulai?.slice(0, 10)} {p.tanggalSelesai ? '– ' + p.tanggalSelesai.slice(0, 10) : '– sekarang'}
-                    </span>
-                    <button onClick={() => openEditTanggal(selected, p)} className="text-xs text-navy underline">Edit Tanggal</button>
-                  </div>
+                  <span className="text-xs text-gray-500">
+                    {p.tanggalMulai?.slice(0, 10)} {p.tanggalSelesai ? '– ' + p.tanggalSelesai.slice(0, 10) : '– sekarang'}
+                  </span>
                 </div>
               ))}
             </div>
@@ -667,32 +638,6 @@ export default function Crew() {
             <div className="mt-6 flex justify-end gap-2">
               <button type="button" onClick={() => setBankTarget(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
               <button type="submit" disabled={bankLoading} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{bankLoading ? 'Menyimpan...' : 'Simpan'}</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Modal edit tanggal on/off board */}
-      {editTanggalTarget && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleEditTanggal} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Edit Tanggal On/Off Board</h3>
-            <p className="mt-1 text-sm text-gray-500">{editTanggalTarget.nama} · {editTanggalTarget.vessel}</p>
-            <div className="mt-4 space-y-3">
-              <div>
-                <label className="block text-xs text-gray-500">Tanggal On Board</label>
-                <input required type="date" value={editTanggalForm.onBoardTanggal} onChange={(e) => setEditTanggalForm({ ...editTanggalForm, onBoardTanggal: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
-              </div>
-              {editTanggalTarget.offBoardTanggal && (
-                <div>
-                  <label className="block text-xs text-gray-500">Tanggal Off Board</label>
-                  <input type="date" value={editTanggalForm.offBoardTanggal} onChange={(e) => setEditTanggalForm({ ...editTanggalForm, offBoardTanggal: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
-                </div>
-              )}
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setEditTanggalTarget(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={editTanggalLoading} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{editTanggalLoading ? 'Menyimpan...' : 'Simpan'}</button>
             </div>
           </form>
         </div>
