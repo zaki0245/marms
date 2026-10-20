@@ -56,6 +56,17 @@ const emptyForm = {
 
 const emptyBank: Bank = { accountNo: '', accountName: '', bank: '' };
 
+// [FUNGSI] Opsi bulan & tahun untuk masa pajak | [ALASAN] Ganti input bebas jadi pilihan bulan+tahun.
+const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+const TAHUN_AWAL = 2020;
+const TAHUN = Array.from({ length: new Date().getFullYear() - TAHUN_AWAL + 2 }, (_, i) => TAHUN_AWAL + i);
+
+// [FUNGSI] Pecah "Januari 2026" jadi {bulan, tahun} | [ALASAN] Isi select saat edit data lama.
+function splitMasa(v: string): { bulan: string; tahun: string } {
+  const [bulan, tahun] = (v ?? '').split(' ');
+  return { bulan: bulan ?? '', tahun: tahun ?? '' };
+}
+
 export default function InputInvoice() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -123,6 +134,11 @@ export default function InputInvoice() {
 
   function setField(k: keyof typeof emptyForm, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  // [FUNGSI] Gabung bulan+tahun jadi "Januari 2026" | [ALASAN] Format simpan tetap string lama.
+  function setMasa(k: 'masaPajakPPN' | 'masaPajakPPH', bulan: string, tahun: string) {
+    setForm((f) => ({ ...f, [k]: bulan && tahun ? `${bulan} ${tahun}` : '' }));
   }
 
   function addFaktur() {
@@ -406,11 +422,37 @@ export default function InputInvoice() {
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div>
               <label className="block text-xs text-gray-500">Masa Pajak PPN</label>
-              <input placeholder="Januari 2026" value={form.masaPajakPPN} onChange={(e) => setField('masaPajakPPN', e.target.value)} className={inputCls} />
+              <div className="mt-1 flex gap-2">
+                <select value={splitMasa(form.masaPajakPPN).bulan} onChange={(e) => setMasa('masaPajakPPN', e.target.value, splitMasa(form.masaPajakPPN).tahun)} className={inputCls}>
+                  <option value="">Bulan</option>
+                  {BULAN.map((b) => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+                <select value={splitMasa(form.masaPajakPPN).tahun} onChange={(e) => setMasa('masaPajakPPN', splitMasa(form.masaPajakPPN).bulan, e.target.value)} className={inputCls}>
+                  <option value="">Tahun</option>
+                  {TAHUN.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div>
               <label className="block text-xs text-gray-500">Masa Pajak PPH</label>
-              <input placeholder="Januari 2026" value={form.masaPajakPPH} onChange={(e) => setField('masaPajakPPH', e.target.value)} className={inputCls} />
+              <div className="mt-1 flex gap-2">
+                <select value={splitMasa(form.masaPajakPPH).bulan} onChange={(e) => setMasa('masaPajakPPH', e.target.value, splitMasa(form.masaPajakPPH).tahun)} className={inputCls}>
+                  <option value="">Bulan</option>
+                  {BULAN.map((b) => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+                <select value={splitMasa(form.masaPajakPPH).tahun} onChange={(e) => setMasa('masaPajakPPH', splitMasa(form.masaPajakPPH).bulan, e.target.value)} className={inputCls}>
+                  <option value="">Tahun</option>
+                  {TAHUN.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div>
               <label className="block text-xs text-gray-500">Status Faktur Pajak</label>
