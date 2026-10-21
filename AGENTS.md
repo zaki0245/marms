@@ -47,7 +47,7 @@ npx prisma migrate reset --force      # reset database + seed ulang
 - Pembulatan prorata: round half up ke Rupiah terdekat.
 - Nomor pendaftaran pelamar: `PLR-YYYY-NNNN`, reset tiap tahun.
 - Duplikat pelamar (email ATAU HP sama) ditolak.
-- Dokumen expired memblokir penempatan baru; admin bisa perbarui dokumen expired.
+- Dokumen expired tidak memblokir penempatan baru; perbarui dokumen expired jadi tanggung jawab crew (admin tetap bisa perbarui).
 - Masa kerja live: bertambah saat crew On Board (lihat `src/shared/masaKerja.ts`).
 - Leave pay: tiap 180 hari setelah 180 hari pertama (kelayakan mulai 360 hari).
 - Finance dibagi dua entitas: **AP** (hutang ke Vendor → voucher **PV**) dan **AR** (piutang dari

@@ -8,7 +8,6 @@ import { api, formatRupiah } from '../../api/client';
 interface DashboardData {
   pelamarBaru: number;
   crewOnBoard: number;
-  dokumenExpired30: number;
   crewSiapLeavePay: number;
   statusPayroll: { DRAFT: number; FINAL: number; DIBAYAR: number };
   totalBiaya: number;
@@ -51,7 +50,6 @@ export default function Dashboard() {
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card label="Pelamar Baru" value={data.pelamarBaru} />
         <Card label="Crew On Board" value={data.crewOnBoard} />
-        <Card label="Dokumen Akan Expired (30 hari)" value={data.dokumenExpired30} />
         <Card label="Crew Siap Dinilai Leave Pay" value={data.crewSiapLeavePay} />
         <Card
           label={`Total Biaya Crew ${BULAN[data.bulan - 1]} ${data.tahun}`}

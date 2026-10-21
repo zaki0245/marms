@@ -4,7 +4,7 @@
 
 import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
-import { getApplicantWithDocuments } from '../recruitment';
+import { getApplicant } from '../recruitment';
 import { liveMasaKerja } from '../../../shared/masaKerja';
 import type { AssignInput, BankInput, OffBoardInput } from './crew-placement.model';
 
@@ -23,19 +23,6 @@ async function generateNomorKontrak(): Promise<string> {
     if (!Number.isNaN(n)) next = n + 1;
   }
   return `${prefix}${String(next).padStart(4, '0')}`;
-}
-
-// [FUNGSI] Pastikan tidak ada dokumen expired sebelum penempatan.
-// [ALASAN] Aturan bisnis: dokumen expired memblokir penempatan baru.
-function assertNoExpiredDocuments(documents: { jenis: string; tanggalExpired: Date | null }[]) {
-  const today = new Date();
-  const expired = documents.filter((d) => d.tanggalExpired && d.tanggalExpired < today);
-  if (expired.length > 0) {
-    throw new AppError(
-      400,
-      'Penempatan ditolak: ada dokumen expired (' + expired.map((d) => d.jenis).join(', ') + ')',
-    );
-  }
 }
 
 // [FUNGSI] Buat kontrak + penempatan + segmen, lalu set status On Board.
@@ -75,10 +62,9 @@ async function placeCrewOnVessel(crewId: string, input: AssignInput) {
 // [FUNGSI] Assign kandidat (pelamar Diterima) langsung ke kapal.
 // [ALASAN] Membuat crew bila belum ada, lalu menempatkannya.
 export async function assignApplicantToVessel(applicantId: string, input: AssignInput) {
-  const pelamar = await getApplicantWithDocuments(applicantId);
+  const pelamar = await getApplicant(applicantId);
   if (!pelamar) throw new AppError(404, 'Pelamar tidak ditemukan');
   if (pelamar.status !== 'DITERIMA') throw new AppError(400, 'Pelamar belum berstatus Diterima');
-  assertNoExpiredDocuments(pelamar.documents);
 
   let crew = await prisma.crew.findUnique({ where: { applicantId } });
   if (!crew) {
@@ -109,9 +95,6 @@ export async function assignCrewToVessel(crewId: string, input: AssignInput) {
   const crew = await prisma.crew.findUnique({ where: { id: crewId } });
   if (!crew) throw new AppError(404, 'Crew tidak ditemukan');
   if (crew.status === 'ON_BOARD') throw new AppError(400, 'Crew sudah On Board');
-
-  const pelamar = await getApplicantWithDocuments(crew.applicantId);
-  assertNoExpiredDocuments(pelamar?.documents ?? []);
 
   // [FUNGSI] Perbarui info bank saat assign ulang.
   await prisma.crew.update({

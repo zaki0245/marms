@@ -151,11 +151,6 @@ export function getApplicant(id: string) {
   return prisma.pelamar.findUnique({ where: { id } });
 }
 
-// [FUNGSI] Ambil pelamar beserta dokumennya (untuk cek expired oleh modul lain).
-export function getApplicantWithDocuments(id: string) {
-  return prisma.pelamar.findUnique({ where: { id }, include: { documents: true } });
-}
-
 // [FUNGSI] Perbarui dokumen: ganti file (opsional) & perbarui tanggal expired.
 export async function updateDokumenFile(
   id: string,

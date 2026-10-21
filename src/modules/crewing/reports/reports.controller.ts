@@ -12,11 +12,3 @@ export async function dashboard(_req: Request, res: Response) {
 export async function crewPerKapal(_req: Request, res: Response) {
   res.json(await service.getCrewPerKapal());
 }
-
-export async function dokumenAkanExpired(_req: Request, res: Response) {
-  res.json(await service.getDokumenAkanExpired());
-}
-
-export async function masaKerja(_req: Request, res: Response) {
-  res.json(await service.getMasaKerja());
-}

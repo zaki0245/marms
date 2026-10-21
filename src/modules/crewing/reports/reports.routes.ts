@@ -10,7 +10,5 @@ const router = Router();
 
 router.get('/dashboard', asyncHandler(c.dashboard));
 router.get('/crew-per-kapal', asyncHandler(c.crewPerKapal));
-router.get('/dokumen-expired', asyncHandler(c.dokumenAkanExpired));
-router.get('/masa-kerja', asyncHandler(c.masaKerja));
 
 export default router;
