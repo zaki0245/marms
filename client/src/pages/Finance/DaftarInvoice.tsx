@@ -281,16 +281,18 @@ export default function DaftarInvoice() {
                 </td>
                 {jenis === 'AP' && (
                   <td className="px-3 py-2">
-                    {i.approvalStatus === 'SUDAH_DIAPPROVE' ? (
-                      <span className="rounded px-2 py-0.5 text-xs bg-positive/10 text-positive">Sudah di Approve</span>
-                    ) : (
-                      <span className="rounded px-2 py-0.5 text-xs bg-gray-100 text-gray-600">Belum di Approve</span>
+                    {i.kategori === 'FREIGHT' ? null : (
+                      i.approvalStatus === 'SUDAH_DIAPPROVE' ? (
+                        <span className="rounded px-2 py-0.5 text-xs bg-positive/10 text-positive">Sudah di Approve</span>
+                      ) : (
+                        <span className="rounded px-2 py-0.5 text-xs bg-gray-100 text-gray-600">Belum di Approve</span>
+                      )
                     )}
                   </td>
                 )}
                 <td className="px-3 py-2 text-right whitespace-nowrap">
                   <button onClick={() => navigate(`/admin/finance/invoice/input/${i.id}`)} className="text-navy hover:underline">Edit</button>
-                  {jenis === 'AP' && i.approvalStatus !== 'SUDAH_DIAPPROVE' && (
+                  {jenis === 'AP' && i.approvalStatus !== 'SUDAH_DIAPPROVE' && i.kategori !== 'FREIGHT' && (
                     <button onClick={() => sendApproval(i.id)} className="ml-3 text-navy hover:underline">
                       {i.approvalSentAt ? 'Kirim Ulang' : 'Kirim Approval'}
                     </button>

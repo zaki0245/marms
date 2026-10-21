@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import { num, formatUang } from './utils';
 import { cetakPV } from '../../utils/pvPrint';
+import SearchableSelect from '../../components/SearchableSelect';
 
 interface Bank { id?: string; accountNo: string; accountName: string; bank: string; }
 interface Vendor { id: string; nama: string; alamat?: string | null; banks: Bank[]; }
@@ -149,6 +150,10 @@ export default function Cetak() {
     if (!form) return;
     setError('');
     setMsg('');
+    if (isRv ? !form.customerId : !form.vendorId) {
+      setError(`Pilih ${isRv ? 'customer' : 'vendor'} terlebih dahulu`);
+      return;
+    }
     const payload = {
       jenis,
       pvNo: form.pvNo,
@@ -313,15 +318,21 @@ export default function Cetak() {
               <div>
                 <label className="block text-xs text-gray-500">{isRv ? 'Customer' : 'Vendor'} *</label>
                 {isRv ? (
-                  <select required value={form.customerId} onChange={(e) => { setF('customerId', e.target.value); setF('bankAccountId', ''); }} className={inputCls}>
-                    <option value="">Pilih customer</option>
-                    {customers.map((c) => <option key={c.id} value={c.id}>{c.nama}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={form.customerId}
+                    options={customers.map((c) => ({ id: c.id, label: c.nama }))}
+                    placeholder="Pilih customer"
+                    className={inputCls}
+                    onChange={(id) => { setF('customerId', id); setF('bankAccountId', ''); }}
+                  />
                 ) : (
-                  <select required value={form.vendorId} onChange={(e) => { setF('vendorId', e.target.value); setF('bankAccountId', ''); }} className={inputCls}>
-                    <option value="">Pilih vendor</option>
-                    {vendors.map((v) => <option key={v.id} value={v.id}>{v.nama}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={form.vendorId}
+                    options={vendors.map((v) => ({ id: v.id, label: v.nama }))}
+                    placeholder="Pilih vendor"
+                    className={inputCls}
+                    onChange={(id) => { setF('vendorId', id); setF('bankAccountId', ''); }}
+                  />
                 )}
               </div>
               <div>

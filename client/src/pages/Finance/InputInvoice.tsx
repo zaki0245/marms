@@ -7,6 +7,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api/client';
 import { num, formatUang } from './utils';
+import SearchableSelect from '../../components/SearchableSelect';
 
 interface Bank {
   id?: string;
@@ -225,6 +226,10 @@ export default function InputInvoice() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
+    if (isAr ? !form.customerId : !form.vendorId) {
+      setError(`Pilih ${isAr ? 'customer' : 'vendor'} terlebih dahulu`);
+      return;
+    }
     const money = (v: string) => (v === '' ? null : Number(v));
     const payload = {
       jenis: form.jenis,
@@ -313,15 +318,23 @@ export default function InputInvoice() {
               <label className="block text-xs text-gray-500">{isAr ? 'Customer' : 'Vendor'} *</label>
               <div className="flex gap-1">
                 {isAr ? (
-                  <select required value={form.customerId} onChange={(e) => { setField('customerId', e.target.value); setField('bankAccountId', ''); }} className={inputCls}>
-                    <option value="">Pilih customer</option>
-                    {customers.map((c) => <option key={c.id} value={c.id}>{c.nama}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={form.customerId}
+                    options={customers.map((c) => ({ id: c.id, label: c.nama }))}
+                    placeholder="Pilih customer"
+                    className={inputCls}
+                    wrapperClassName="flex-1"
+                    onChange={(id) => { setField('customerId', id); setField('bankAccountId', ''); }}
+                  />
                 ) : (
-                  <select required value={form.vendorId} onChange={(e) => { setField('vendorId', e.target.value); setField('bankAccountId', ''); }} className={inputCls}>
-                    <option value="">Pilih vendor</option>
-                    {vendors.map((v) => <option key={v.id} value={v.id}>{v.nama}</option>)}
-                  </select>
+                  <SearchableSelect
+                    value={form.vendorId}
+                    options={vendors.map((v) => ({ id: v.id, label: v.nama }))}
+                    placeholder="Pilih vendor"
+                    className={inputCls}
+                    wrapperClassName="flex-1"
+                    onChange={(id) => { setField('vendorId', id); setField('bankAccountId', ''); }}
+                  />
                 )}
                 <button type="button" onClick={() => setQuick(!quick)} className="whitespace-nowrap rounded border border-gray-300 px-2 text-xs text-navy">+ Baru</button>
               </div>
