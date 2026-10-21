@@ -4,6 +4,7 @@
 
 import { Router } from 'express';
 import { asyncHandler } from '../../shared/asyncHandler';
+import { requireRole } from '../../shared/authorization';
 import * as vendor from './vendor.controller';
 import * as customer from './customer.controller';
 import * as invoice from './invoice.controller';
@@ -34,6 +35,7 @@ router.get('/invoice/:id', asyncHandler(invoice.get));
 router.put('/invoice/:id', asyncHandler(invoice.update));
 router.delete('/invoice/:id', asyncHandler(invoice.remove));
 router.post('/invoice/:id/send-approval', asyncHandler(invoice.sendApproval));
+router.patch('/invoice/:id/approval', requireRole('SUPERADMIN'), asyncHandler(invoice.setApproval));
 
 // Payment Voucher (PV)
 router.get('/pv', asyncHandler(pv.list));

@@ -48,6 +48,12 @@ export default function DaftarInvoice() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  // [FUNGSI] Deteksi role SUPERADMIN untuk mengaktifkan ubah approval manual.
+  useEffect(() => {
+    api.get('/auth/me').then(({ data }) => setIsSuperAdmin(data.role === 'SUPERADMIN')).catch(() => undefined);
+  }, []);
 
   async function load() {
     setLoading(true);
@@ -84,6 +90,16 @@ export default function DaftarInvoice() {
       load();
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal mengirim email');
+    }
+  }
+
+  async function changeApproval(id: string, approvalStatus: string) {
+    setError('');
+    try {
+      await api.patch(`/finance/invoice/${id}/approval`, { approvalStatus });
+      load();
+    } catch (err: any) {
+      setError(err?.response?.data?.error ?? 'Gagal mengubah status approval');
     }
   }
 
@@ -281,7 +297,16 @@ export default function DaftarInvoice() {
                 </td>
                 {jenis === 'AP' && (
                   <td className="px-3 py-2">
-                    {i.kategori === 'FREIGHT' ? null : (
+                    {i.kategori === 'FREIGHT' ? null : isSuperAdmin ? (
+                      <select
+                        value={i.approvalStatus}
+                        onChange={(e) => changeApproval(i.id, e.target.value)}
+                        className="rounded border border-gray-300 px-2 py-0.5 text-xs"
+                      >
+                        <option value="BELUM_DIAPPROVE">Belum di Approve</option>
+                        <option value="SUDAH_DIAPPROVE">Sudah di Approve</option>
+                      </select>
+                    ) : (
                       i.approvalStatus === 'SUDAH_DIAPPROVE' ? (
                         <span className="rounded px-2 py-0.5 text-xs bg-positive/10 text-positive">Sudah di Approve</span>
                       ) : (

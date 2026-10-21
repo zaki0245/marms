@@ -37,6 +37,7 @@ export interface PvPrintData {
   issuedDate: string;
   bankCharge: number;
   balance: number;
+  bupot: string;
   invoices: PvPrintInvoice[];
 }
 
@@ -47,7 +48,7 @@ const fmt = (v: unknown) =>
   });
 
 const COLORS = {
-  navy: [15, 44, 76] as [number, number, number],
+  navy: [0, 0, 0] as [number, number, number],
   light: [240, 244, 248] as [number, number, number],
   border: [210, 218, 227] as [number, number, number],
   text: [43, 52, 65] as [number, number, number],
@@ -352,6 +353,7 @@ export async function cetakPV(d: PvPrintData) {
   // PV No dihapus dari Payment Reference.
   const referenceRows: [string, string][] = [
     ['Voucher Date', d.tanggal],
+    ['BUPOT', d.bupot],
   ];
 
   const drawInfoValue = (

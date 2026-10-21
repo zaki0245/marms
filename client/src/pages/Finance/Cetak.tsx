@@ -17,7 +17,7 @@ interface Invoice {
   vendorName: string | null; customerName: string | null;
   inv: string | null; ref: string | null;
   dpp: string; ppn: string | null; pphPasal: string | null; pph: string | null;
-  total: string; statusPembayaran: string;
+  total: string; statusPembayaran: string; bupot: string | null;
   pvItems: { nominal: string }[];
 }
 interface Pv {
@@ -216,6 +216,7 @@ export default function Cetak() {
       issuedDate: pv.issuedDate?.slice(0, 10) ?? '',
       bankCharge: num(pv.bankCharge),
       balance: num(pv.balance),
+      bupot: [...new Set(pv.items.map((it) => it.invoice.bupot).filter(Boolean))].join(', '),
       invoices: pv.items.map((it) => ({
         inv: it.invoice.inv,
         ref: it.invoice.ref,

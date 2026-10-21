@@ -351,6 +351,22 @@ export async function getInvoiceByToken(token: string) {
   };
 }
 
+// [FUNGSI] Ubah status approval invoice secara manual oleh SUPERADMIN.
+// [ALASAN] Admin bisa mengoreksi status tanpa harus lewat tautan email.
+export async function setApprovalStatus(id: string, status: string) {
+  if (status !== 'BELUM_DIAPPROVE' && status !== 'SUDAH_DIAPPROVE') {
+    throw new AppError(400, 'Status approval tidak valid');
+  }
+  const inv = await prisma.invoice.findUnique({ where: { id } });
+  if (!inv) throw new AppError(404, 'Invoice tidak ditemukan');
+  if (inv.jenis !== 'AP') throw new AppError(400, 'Hanya invoice AP yang punya approval');
+
+  const data = status === 'SUDAH_DIAPPROVE'
+    ? { approvalStatus: 'SUDAH_DIAPPROVE' as const, approvedAt: new Date(), approvalToken: null }
+    : { approvalStatus: 'BELUM_DIAPPROVE' as const, approvedAt: null };
+  return prisma.invoice.update({ where: { id }, data });
+}
+
 // [FUNGSI] Tandai invoice sudah di-approve (dipanggil dari tautan publik).
 export async function approveInvoice(token: string) {
   const inv = await prisma.invoice.findUnique({ where: { approvalToken: token } });

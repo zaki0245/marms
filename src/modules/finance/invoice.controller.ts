@@ -40,3 +40,7 @@ export async function remove(req: Request, res: Response) {
 export async function sendApproval(req: Request, res: Response) {
   res.json(await service.sendApproval(req.params.id));
 }
+
+export async function setApproval(req: Request, res: Response) {
+  res.json(await service.setApprovalStatus(req.params.id, req.body.approvalStatus));
+}
