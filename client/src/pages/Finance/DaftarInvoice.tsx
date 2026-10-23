@@ -17,6 +17,7 @@ interface Invoice {
   vendorName: string | null;
   customerName: string | null;
   inv: string | null;
+  keterangan: string | null;
   cargoQuantity: string | null;
   unitPrice: string | null;
   dpp: string;
@@ -32,7 +33,7 @@ interface Invoice {
 
 const STATUS_FAKTUR: Record<string, string> = { SUDAH_DITERIMA: 'Diterima', BELUM_DITERIMA: 'Belum diterima', TIDAK_ADA: 'Tidak ada' };
 const STATUS_BAYAR_AP: Record<string, string> = { BELUM_BAYAR: 'Belum bayar', SEBAGIAN: 'Sebagian', LUNAS: 'Lunas' };
-const STATUS_BAYAR_AR: Record<string, string> = { BELUM_BAYAR: 'Belum diterima', SEBAGIAN: 'Diterima sebagian', LUNAS: 'Lunas' };
+const STATUS_BAYAR_AR: Record<string, string> = { BELUM_BAYAR: 'Belum dibayar', SEBAGIAN: 'Dibayar sebagian', LUNAS: 'Lunas' };
 const KATEGORI: Record<string, string> = { FREIGHT: 'Freight', OPERATION: 'Operation', OTHERS: 'Others' };
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
@@ -133,8 +134,8 @@ export default function DaftarInvoice() {
 
   function doExport() {
     const columns = jenis === 'AP'
-      ? ['No Invoice', 'Tanggal', 'Vendor', 'INV', 'Kategori', 'DPP', 'PPN', 'PPH', 'Total', 'Status Faktur', 'Status Pembayaran', 'Approval']
-      : ['No Invoice', 'Tanggal', 'Customer', 'INV', 'Kategori', 'Cargo Quantity', 'Unit Price', 'DPP', 'PPN', 'PPH', 'Total', 'Status Faktur', 'Status Pembayaran'];
+      ? ['No Invoice', 'Tanggal', 'Vendor', 'INV', 'Keterangan', 'Kategori', 'DPP', 'PPN', 'PPH', 'Total', 'Status Faktur', 'Status Pembayaran', 'Approval']
+      : ['No Invoice', 'Tanggal', 'Customer', 'INV', 'Keterangan', 'Kategori', 'Cargo Quantity', 'Unit Price', 'DPP', 'PPN', 'PPH', 'Total', 'Status Faktur', 'Status Pembayaran'];
 
     const rows = filtered.map((i) => {
       const base = [
@@ -142,6 +143,7 @@ export default function DaftarInvoice() {
         i.tanggal?.slice(0, 10) ?? '',
         jenis === 'AR' ? i.customerName ?? '-' : i.vendorName ?? '-',
         i.inv ?? '',
+        i.keterangan ?? '',
         KATEGORI[i.kategori] ?? i.kategori,
       ];
       const cargo = jenis === 'AR'
@@ -200,11 +202,11 @@ export default function DaftarInvoice() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <label className="text-sm text-gray-500">{jenis === 'AR' ? 'Status terima:' : 'Status bayar:'}</label>
+        <label className="text-sm text-gray-500">Status bayar:</label>
         <select value={filter} onChange={(e) => setFilter(e.target.value)} className={inputCls}>
           <option value="SEMUA">Semua</option>
-          <option value="BELUM_BAYAR">{jenis === 'AR' ? 'Belum diterima' : 'Belum bayar'}</option>
-          <option value="SEBAGIAN">{jenis === 'AR' ? 'Diterima sebagian' : 'Sebagian'}</option>
+          <option value="BELUM_BAYAR">{jenis === 'AR' ? 'Belum dibayar' : 'Belum bayar'}</option>
+          <option value="SEBAGIAN">{jenis === 'AR' ? 'Dibayar sebagian' : 'Sebagian'}</option>
           <option value="LUNAS">Lunas</option>
         </select>
 
@@ -254,6 +256,7 @@ export default function DaftarInvoice() {
               <th className="px-3 py-2">Tanggal</th>
               <th className="px-3 py-2">{jenis === 'AR' ? 'Customer' : 'Vendor'}</th>
               <th className="px-3 py-2">INV</th>
+              <th className="px-3 py-2">Keterangan (TB/BG/voyage)</th>
               <th className="px-3 py-2">Kategori</th>
               {jenis === 'AR' && <th className="px-3 py-2 text-right">Cargo Quantity</th>}
               {jenis === 'AR' && <th className="px-3 py-2 text-right">Unit Price</th>}
@@ -268,9 +271,9 @@ export default function DaftarInvoice() {
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={jenis === 'AP' ? 13 : 14} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
+            {loading && <tr><td colSpan={jenis === 'AP' ? 14 : 15} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={jenis === 'AP' ? 13 : 14} className="px-3 py-6 text-center text-gray-400">Belum ada invoice.</td></tr>
+              <tr><td colSpan={jenis === 'AP' ? 14 : 15} className="px-3 py-6 text-center text-gray-400">Belum ada invoice.</td></tr>
             )}
             {!loading && filtered.map((i) => (
               <tr key={i.id} className="border-t border-gray-100">
@@ -281,6 +284,7 @@ export default function DaftarInvoice() {
                 <td className="px-3 py-2">{i.tanggal?.slice(0, 10)}</td>
                 <td className="px-3 py-2">{jenis === 'AR' ? i.customerName ?? '-' : i.vendorName ?? '-'}</td>
                 <td className="px-3 py-2">{i.inv ?? '-'}</td>
+                <td className="px-3 py-2">{i.keterangan ?? '-'}</td>
                 <td className="px-3 py-2">{KATEGORI[i.kategori] ?? i.kategori}</td>
                 {jenis === 'AR' && <td className="px-3 py-2 text-right">{i.cargoQuantity != null ? formatDecimal3(i.cargoQuantity) : '-'}</td>}
                 {jenis === 'AR' && <td className="px-3 py-2 text-right">{i.unitPrice != null ? formatDecimal3(i.unitPrice) : '-'}</td>}
