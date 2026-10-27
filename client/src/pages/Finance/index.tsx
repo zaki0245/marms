@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 import { formatUang } from './utils';
+import Pagination, { PAGE_SIZE } from '../../components/Pagination';
 
 interface DashboardData {
   totalHutangBulanIni: number;
@@ -28,10 +29,20 @@ function Card({ label, value }: { label: string; value: string }) {
 export default function FinanceDashboard() {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     api.get('/finance/laporan/dashboard').then(({ data }) => setData(data)).catch(() => undefined);
   }, []);
+
+  // [FUNGSI] Reset halaman saat data dashboard berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [data]);
+
+  const jatuhTempo = data?.jatuhTempoTerdekat ?? [];
+  const totalPages = Math.max(1, Math.ceil(jatuhTempo.length / PAGE_SIZE));
+  const pageRows = jatuhTempo.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div>
@@ -65,10 +76,10 @@ export default function FinanceDashboard() {
             </tr>
           </thead>
           <tbody>
-            {(data?.jatuhTempoTerdekat ?? []).length === 0 && (
+            {jatuhTempo.length === 0 && (
               <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400">Tidak ada invoice jatuh tempo.</td></tr>
             )}
-            {(data?.jatuhTempoTerdekat ?? []).map((r) => (
+            {pageRows.map((r) => (
               <tr key={r.id} className="border-t border-gray-100">
                 <td className="px-3 py-2">
                   <span className={`rounded px-2 py-0.5 text-xs ${r.jenis === 'AR' ? 'bg-positive/10 text-positive' : 'bg-amber-100 text-amber-700'}`}>{r.jenis}</span>
@@ -83,6 +94,8 @@ export default function FinanceDashboard() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 }

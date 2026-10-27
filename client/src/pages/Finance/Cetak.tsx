@@ -7,6 +7,7 @@ import { api } from '../../api/client';
 import { num, formatUang } from './utils';
 import { cetakPV } from '../../utils/pvPrint';
 import SearchableSelect from '../../components/SearchableSelect';
+import Pagination, { PAGE_SIZE } from '../../components/Pagination';
 
 interface Bank { id?: string; accountNo: string; accountName: string; bank: string; }
 interface Vendor { id: string; nama: string; alamat?: string | null; banks: Bank[]; }
@@ -56,6 +57,7 @@ export default function Cetak() {
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -85,6 +87,11 @@ export default function Cetak() {
   useEffect(() => {
     api.get('/finance/konfigurasi').then(({ data }) => setKonfigurasi(data)).catch(() => undefined);
   }, []);
+
+  // [FUNGSI] Reset halaman saat pencarian/jenis berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [search, jenis]);
 
   function openAdd() {
     setEditingId(null);
@@ -245,6 +252,9 @@ export default function Cetak() {
     return [pv.pvNo, pvCounterparty(pv), ...pv.items.map((it) => it.invoice.inv)].some((v) => v && v.toLowerCase().includes(s));
   });
 
+  const totalPages = Math.max(1, Math.ceil(filteredPvs.length / PAGE_SIZE));
+  const pagePvs = filteredPvs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   const tabCls = (active: boolean) =>
     `rounded-t px-4 py-2 text-sm font-semibold ${active ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
 
@@ -282,7 +292,7 @@ export default function Cetak() {
               </tr>
             </thead>
             <tbody>
-              {filteredPvs.map((pv) => (
+              {pagePvs.map((pv) => (
                 <tr key={pv.id} className="border-t border-gray-100">
                   <td className="px-3 py-2 font-semibold text-navy">{pv.pvNo}</td>
                   <td className="px-3 py-2">{pv.tanggal?.slice(0, 10)}</td>
@@ -302,6 +312,8 @@ export default function Cetak() {
           </table>
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
 
       {form && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">

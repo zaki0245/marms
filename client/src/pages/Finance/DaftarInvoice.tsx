@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
 import { formatUang, formatDecimal3 } from './utils';
+import Pagination, { PAGE_SIZE } from '../../components/Pagination';
 
 interface Invoice {
   id: string;
@@ -49,6 +50,7 @@ export default function DaftarInvoice() {
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -121,7 +123,7 @@ export default function DaftarInvoice() {
   const filtered = items.filter((i) => {
     if (search) {
       const s = search.toLowerCase();
-      if (![i.no, i.vendorName, i.customerName, i.inv].some((v) => v && v.toLowerCase().includes(s))) return false;
+      if (![i.no, i.vendorName, i.customerName, i.inv, i.keterangan, KATEGORI[i.kategori] ?? i.kategori, TIPE[i.tipe] ?? i.tipe].some((v) => v && v.toLowerCase().includes(s))) return false;
     }
     if (filter !== 'SEMUA' && i.statusPembayaran !== filter) return false;
     if (jenis === 'AP' && approval !== 'SEMUA' && i.approvalStatus !== approval) return false;
@@ -133,6 +135,14 @@ export default function DaftarInvoice() {
     }
     return true;
   });
+
+  // [FUNGSI] Reset halaman saat filter berubah agar tidak tertinggal di halaman terakhir.
+  useEffect(() => {
+    setPage(1);
+  }, [search, filter, approval, kategori, bulan, tahun, jenis]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   function doExport() {
     const columns = jenis === 'AP'
@@ -248,7 +258,7 @@ export default function DaftarInvoice() {
           {years.map((y) => <option key={y} value={y}>{y}</option>)}
         </select>
 
-        <input placeholder={`Cari no / ${jenis === 'AR' ? 'customer' : 'vendor'} / INV...`} value={search} onChange={(e) => setSearch(e.target.value)} className={`${inputCls} w-64`} />
+        <input placeholder={`Cari no / ${jenis === 'AR' ? 'customer' : 'vendor'} / INV / keterangan...`} value={search} onChange={(e) => setSearch(e.target.value)} className={`${inputCls} w-64`} />
       </div>
 
       <div className="mt-4 overflow-x-auto">
@@ -279,7 +289,7 @@ export default function DaftarInvoice() {
             {!loading && filtered.length === 0 && (
               <tr><td colSpan={jenis === 'AP' ? 15 : 16} className="px-3 py-6 text-center text-gray-400">Belum ada invoice.</td></tr>
             )}
-            {!loading && filtered.map((i) => (
+            {!loading && pageRows.map((i) => (
               <tr key={i.id} className="border-t border-gray-100">
                 <td className="px-3 py-2 font-semibold text-navy">
                   {i.no}
@@ -338,6 +348,8 @@ export default function DaftarInvoice() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 }

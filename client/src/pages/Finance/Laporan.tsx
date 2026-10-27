@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
 import { num, formatUang, formatDecimal3 } from './utils';
+import Pagination, { PAGE_SIZE } from '../../components/Pagination';
 
 interface Row {
   id: string;
@@ -42,6 +43,7 @@ export default function Laporan() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
 
@@ -70,6 +72,14 @@ export default function Laporan() {
     }
     return true;
   });
+
+  // [FUNGSI] Reset halaman saat filter berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [search, bulan, tahun, voucherJenis]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   function doExport() {
     const data = filtered.map((r, i) => [
@@ -154,9 +164,9 @@ export default function Laporan() {
           <tbody>
             {loading && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
             {!loading && filtered.length === 0 && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-400">Tidak ada data.</td></tr>}
-            {!loading && filtered.map((r, i) => (
+            {!loading && pageRows.map((r, i) => (
               <tr key={r.id} className="border-t border-gray-100">
-                <td className="px-3 py-2">{i + 1}</td>
+                <td className="px-3 py-2">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-3 py-2">{r.pvNo}</td>
                 <td className="px-3 py-2">{r.tanggal?.slice(0, 10)}</td>
                 <td className="px-3 py-2">{r.counterpartyName}</td>
@@ -176,6 +186,8 @@ export default function Laporan() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 }

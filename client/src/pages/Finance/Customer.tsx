@@ -4,6 +4,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
+import Pagination, { PAGE_SIZE } from '../../components/Pagination';
 
 interface Bank {
   id?: string;
@@ -33,6 +34,7 @@ export default function Customer() {
   const [items, setItems] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -53,6 +55,11 @@ export default function Customer() {
   useEffect(() => {
     load();
   }, []);
+
+  // [FUNGSI] Reset halaman saat pencarian berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   function setBank(idx: number, field: keyof Bank, value: string) {
     setForm((f) => ({
@@ -129,6 +136,15 @@ export default function Customer() {
 
   if (loading) return <p className="text-gray-500">Memuat...</p>;
 
+  const filtered = items.filter((v) => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    const bankText = v.banks.map((b) => `${b.bank} ${b.accountNo} ${b.accountName}`).join(' ');
+    return [v.nama, v.npwp, bankText].some((x) => x && x.toLowerCase().includes(s));
+  });
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-navy">Customer</h2>
@@ -156,14 +172,7 @@ export default function Customer() {
           {items.length === 0 && (
             <tr><td colSpan={4} className="px-3 py-6 text-center text-gray-400">Belum ada customer.</td></tr>
           )}
-          {items
-            .filter((v) => {
-              if (!search) return true;
-              const s = search.toLowerCase();
-              const bankText = v.banks.map((b) => `${b.bank} ${b.accountNo} ${b.accountName}`).join(' ');
-              return [v.nama, v.npwp, bankText].some((x) => x && x.toLowerCase().includes(s));
-            })
-            .map((v) => (
+          {pageRows.map((v) => (
               <tr key={v.id} className="border-t border-gray-100">
                 <td className="px-3 py-2 font-semibold text-navy">{v.nama}</td>
                 <td className="px-3 py-2">{v.npwp ?? '-'}</td>
@@ -178,6 +187,8 @@ export default function Customer() {
             ))}
         </tbody>
       </table>
+
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
