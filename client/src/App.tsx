@@ -33,14 +33,15 @@ export default function App() {
   return (
     <Routes>
       {/* Publik (tanpa login) */}
-      <Route path="/" element={<PublicHome />} />
-      <Route path="/daftar" element={<Daftar />} />
-      <Route path="/terima-kasih" element={<TerimaKasih />} />
+      <Route path="/" element={<Navigate to="/career" replace />} />
+      <Route path="/career" element={<PublicHome />} />
+      <Route path="/career/daftar" element={<Daftar />} />
+      <Route path="/career/terima-kasih" element={<TerimaKasih />} />
       <Route path="/approve/:token" element={<Approve />} />
-      <Route path="/admin/login" element={<Login />} />
+      <Route path="/login" element={<Login />} />
 
       {/* Admin */}
-      <Route path="/admin" element={<Layout />}>
+      <Route path="/dashboard" element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="master-data" element={<MasterData />}>
           <Route index element={<Navigate to="jabatan" replace />} />

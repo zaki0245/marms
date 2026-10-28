@@ -262,7 +262,7 @@ export default function InputInvoice() {
       } else {
         await api.post('/finance/invoice', payload);
       }
-      navigate('/admin/finance/invoice');
+      navigate('/dashboard/finance/invoice');
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal menyimpan');
     }
@@ -274,7 +274,7 @@ export default function InputInvoice() {
     <div>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-navy">{id ? 'Edit Invoice' : 'Input Invoice'}</h2>
-        <button onClick={() => navigate('/admin/finance/invoice')} className="text-sm text-navy underline">Kembali</button>
+        <button onClick={() => navigate('/dashboard/finance/invoice')} className="text-sm text-navy underline">Kembali</button>
       </div>
 
       {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
@@ -495,7 +495,7 @@ export default function InputInvoice() {
         </section>
 
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={() => navigate('/admin/finance/invoice')} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
+          <button type="button" onClick={() => navigate('/dashboard/finance/invoice')} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
           <button type="submit" className="rounded bg-navy px-6 py-2 text-sm font-semibold text-white">Simpan</button>
         </div>
       </form>

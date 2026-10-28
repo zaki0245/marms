@@ -7,7 +7,7 @@ import { api } from '../../api/client';
 import { num, formatUang } from './utils';
 import { cetakPV } from '../../utils/pvPrint';
 import SearchableSelect from '../../components/SearchableSelect';
-import Pagination, { PAGE_SIZE } from '../../components/Pagination';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
 
 interface Bank { id?: string; accountNo: string; accountName: string; bank: string; }
 interface Vendor { id: string; nama: string; alamat?: string | null; banks: Bank[]; }
@@ -58,6 +58,7 @@ export default function Cetak() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -252,8 +253,7 @@ export default function Cetak() {
     return [pv.pvNo, pvCounterparty(pv), ...pv.items.map((it) => it.invoice.inv)].some((v) => v && v.toLowerCase().includes(s));
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredPvs.length / PAGE_SIZE));
-  const pagePvs = filteredPvs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pagePvs = filteredPvs.slice((page - 1) * pageSize, page * pageSize);
 
   const tabCls = (active: boolean) =>
     `rounded-t px-4 py-2 text-sm font-semibold ${active ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
@@ -313,7 +313,13 @@ export default function Cetak() {
         </div>
       )}
 
-      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={filteredPvs.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
 
       {form && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">

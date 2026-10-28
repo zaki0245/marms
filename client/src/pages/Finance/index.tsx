@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 import { formatUang } from './utils';
-import Pagination, { PAGE_SIZE } from '../../components/Pagination';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
 
 interface DashboardData {
   totalHutangBulanIni: number;
@@ -30,6 +30,7 @@ export default function FinanceDashboard() {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   useEffect(() => {
     api.get('/finance/laporan/dashboard').then(({ data }) => setData(data)).catch(() => undefined);
@@ -41,17 +42,16 @@ export default function FinanceDashboard() {
   }, [data]);
 
   const jatuhTempo = data?.jatuhTempoTerdekat ?? [];
-  const totalPages = Math.max(1, Math.ceil(jatuhTempo.length / PAGE_SIZE));
-  const pageRows = jatuhTempo.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageRows = jatuhTempo.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-navy">Dashboard Finance</h2>
         <div className="flex gap-2">
-          <button onClick={() => navigate('/admin/finance/invoice/input')} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Input Invoice</button>
-          <button onClick={() => navigate('/admin/finance/cetak')} className="rounded border border-navy px-4 py-2 text-sm font-semibold text-navy">Cetak</button>
-          <button onClick={() => navigate('/admin/finance/konfigurasi')} className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-600">Konfigurasi</button>
+          <button onClick={() => navigate('/dashboard/finance/invoice/input')} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Input Invoice</button>
+          <button onClick={() => navigate('/dashboard/finance/cetak')} className="rounded border border-navy px-4 py-2 text-sm font-semibold text-navy">Cetak</button>
+          <button onClick={() => navigate('/dashboard/finance/konfigurasi')} className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-600">Konfigurasi</button>
         </div>
       </div>
 
@@ -95,7 +95,13 @@ export default function FinanceDashboard() {
         </table>
       </div>
 
-      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={jatuhTempo.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
     </div>
   );
 }

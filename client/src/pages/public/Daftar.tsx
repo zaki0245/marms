@@ -71,7 +71,7 @@ export default function Daftar() {
         if (d.expired && expiry[d.kode]) fd.append(`tanggalExpired_${d.kode}`, expiry[d.kode]);
       });
       await api.post('/recruitment/pelamar', fd);
-      navigate('/terima-kasih');
+      navigate('/career/terima-kasih');
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal mengirim pendaftaran');
     } finally {

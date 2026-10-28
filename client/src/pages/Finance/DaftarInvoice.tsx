@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
 import { formatUang, formatDecimal3 } from './utils';
-import Pagination, { PAGE_SIZE } from '../../components/Pagination';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
 
 interface Invoice {
   id: string;
@@ -51,6 +51,7 @@ export default function DaftarInvoice() {
   const [tahun, setTahun] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -141,8 +142,7 @@ export default function DaftarInvoice() {
     setPage(1);
   }, [search, filter, approval, kategori, bulan, tahun, jenis]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   function doExport() {
     const columns = jenis === 'AP'
@@ -201,7 +201,7 @@ export default function DaftarInvoice() {
         <h2 className="text-2xl font-bold text-navy">Daftar Invoice</h2>
         <div className="flex gap-2">
           <button onClick={doExport} className="rounded border border-navy px-4 py-2 text-sm font-semibold text-navy">Export Excel</button>
-          <button onClick={() => navigate('/admin/finance/invoice/input')} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">
+          <button onClick={() => navigate('/dashboard/finance/invoice/input')} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">
             + Input Invoice
           </button>
         </div>
@@ -335,7 +335,7 @@ export default function DaftarInvoice() {
                   </td>
                 )}
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => navigate(`/admin/finance/invoice/input/${i.id}`)} className="text-navy hover:underline">Edit</button>
+                  <button onClick={() => navigate(`/dashboard/finance/invoice/input/${i.id}`)} className="text-navy hover:underline">Edit</button>
                   {jenis === 'AP' && i.approvalStatus !== 'SUDAH_DIAPPROVE' && i.kategori !== 'FREIGHT' && (
                     <button onClick={() => sendApproval(i.id)} className="ml-3 text-navy hover:underline">
                       {i.approvalSentAt ? 'Kirim Ulang' : 'Kirim Approval'}
@@ -349,7 +349,13 @@ export default function DaftarInvoice() {
         </table>
       </div>
 
-      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={filtered.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
     </div>
   );
 }

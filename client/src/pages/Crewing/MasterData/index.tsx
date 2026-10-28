@@ -6,9 +6,9 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 export default function MasterData() {
   const tabs = [
-    { to: '/admin/master-data/jabatan', label: 'Jabatan' },
-    { to: '/admin/master-data/kapal', label: 'Kapal' },
-    { to: '/admin/master-data/pengaturan', label: 'Uang Makan' },
+    { to: '/dashboard/master-data/jabatan', label: 'Jabatan' },
+    { to: '/dashboard/master-data/kapal', label: 'Kapal' },
+    { to: '/dashboard/master-data/pengaturan', label: 'Uang Makan' },
   ];
 
   return (

@@ -4,6 +4,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
 
 interface Account {
   id: string;
@@ -24,6 +25,8 @@ export default function Accounts() {
   const [form, setForm] = useState({ email: '', password: '', role: 'CREWING' });
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   async function load() {
     try {
@@ -70,6 +73,8 @@ export default function Accounts() {
     }
   }
 
+  const pageRows = accounts.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-navy">Kelola Akun</h2>
@@ -111,7 +116,7 @@ export default function Accounts() {
             </tr>
           </thead>
           <tbody>
-            {accounts.map((a) => (
+            {pageRows.map((a) => (
               <tr key={a.id} className="border-t border-gray-100">
                 <td className="px-4 py-3">
                   <span className="font-medium text-navy">{a.email}</span>
@@ -142,6 +147,14 @@ export default function Accounts() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={accounts.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
     </div>
   );
 }

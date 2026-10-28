@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import { DOKUMEN_LABEL } from '../../../constants';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Dokumen {
   id: string;
@@ -78,6 +79,8 @@ export default function Recruitment() {
   const [status, setStatus] = useState('');
   const [savingStatus, setSavingStatus] = useState(false);
   const [success, setSuccess] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   async function load() {
     setLoading(true);
@@ -94,6 +97,7 @@ export default function Recruitment() {
   }
 
   useEffect(() => {
+    setPage(1);
     load();
   }, [filter]);
 
@@ -123,6 +127,8 @@ export default function Recruitment() {
     }
   }
 
+  const pageRows = items.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -142,6 +148,7 @@ export default function Recruitment() {
       {loading ? (
         <p className="mt-6 text-gray-500">Memuat...</p>
       ) : (
+        <div>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
             <tr className="bg-navy-light text-left text-navy">
@@ -160,7 +167,7 @@ export default function Recruitment() {
                 </td>
               </tr>
             )}
-            {items.map((p) => (
+            {pageRows.map((p) => (
               <tr key={p.id} className="border-t border-gray-100">
                 <td className="px-3 py-2 font-mono">{p.nomorPendaftaran}</td>
                 <td className="px-3 py-2">{p.namaLengkap}</td>
@@ -177,6 +184,14 @@ export default function Recruitment() {
             ))}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={items.length}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
+        </div>
       )}
 
       {selected && (

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
 import { num, formatUang, formatDecimal3 } from './utils';
-import Pagination, { PAGE_SIZE } from '../../components/Pagination';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
 
 interface Row {
   id: string;
@@ -44,6 +44,7 @@ export default function Laporan() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
 
@@ -78,8 +79,7 @@ export default function Laporan() {
     setPage(1);
   }, [search, bulan, tahun, voucherJenis]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   function doExport() {
     const data = filtered.map((r, i) => [
@@ -166,7 +166,7 @@ export default function Laporan() {
             {!loading && filtered.length === 0 && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-400">Tidak ada data.</td></tr>}
             {!loading && pageRows.map((r, i) => (
               <tr key={r.id} className="border-t border-gray-100">
-                <td className="px-3 py-2">{(page - 1) * PAGE_SIZE + i + 1}</td>
+                <td className="px-3 py-2">{(page - 1) * pageSize + i + 1}</td>
                 <td className="px-3 py-2">{r.pvNo}</td>
                 <td className="px-3 py-2">{r.tanggal?.slice(0, 10)}</td>
                 <td className="px-3 py-2">{r.counterpartyName}</td>
@@ -187,7 +187,13 @@ export default function Laporan() {
         </table>
       </div>
 
-      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={filtered.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
     </div>
   );
 }

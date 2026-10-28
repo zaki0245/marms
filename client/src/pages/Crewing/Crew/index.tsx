@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import { DOKUMEN_LABEL } from '../../../constants';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Dokumen {
   id: string;
@@ -112,6 +113,8 @@ export default function Crew() {
   const [bankLoading, setBankLoading] = useState(false);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   async function loadPool() {
     try {
@@ -296,6 +299,15 @@ export default function Crew() {
     : activeCrew;
   const offBoardCrew = crew.filter((c) => c.status === 'OFF_BOARD');
 
+  // [FUNGSI] Reset halaman saat tab/filter kapal berganti.
+  useEffect(() => {
+    setPage(1);
+  }, [tab, vesselFilter]);
+
+  const poolRows = pool.slice((page - 1) * pageSize, page * pageSize);
+  const crewRows = filteredCrew.slice((page - 1) * pageSize, page * pageSize);
+  const offBoardRows = offBoardCrew.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-navy">Crew & Penempatan</h2>
@@ -325,6 +337,7 @@ export default function Crew() {
       {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
 
       {tab === 'pool' && (
+        <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
             <tr className="bg-navy-light text-left text-navy">
@@ -343,7 +356,7 @@ export default function Crew() {
                 </td>
               </tr>
             )}
-            {pool.map((p) => (
+            {poolRows.map((p) => (
               <tr key={p.id} className="border-t border-gray-100">
                 <td className="px-3 py-2 font-mono">{p.nomorPendaftaran}</td>
                 <td className="px-3 py-2">{p.namaLengkap}</td>
@@ -358,6 +371,14 @@ export default function Crew() {
             ))}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={pool.length}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
+        </>
       )}
 
       {tab === 'crew' && (
@@ -393,7 +414,7 @@ export default function Crew() {
                   <td colSpan={6} className="px-3 py-6 text-center text-gray-400">Belum ada crew.</td>
                 </tr>
               )}
-              {filteredCrew.map((c) => {
+              {crewRows.map((c) => {
                 const active = activePlacement(c);
                 return (
                   <tr key={c.id} className="border-t border-gray-100">
@@ -416,10 +437,18 @@ export default function Crew() {
               })}
             </tbody>
           </table>
+          <Pagination
+            page={page}
+            pageSize={pageSize}
+            total={filteredCrew.length}
+            onPageChange={setPage}
+            onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+          />
         </div>
       )}
 
       {tab === 'offboard' && (
+        <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
             <tr className="bg-navy-light text-left text-navy">
@@ -435,7 +464,7 @@ export default function Crew() {
                 <td colSpan={4} className="px-3 py-6 text-center text-gray-400">Tidak ada crew off board.</td>
               </tr>
             )}
-            {offBoardCrew.map((c) => (
+            {offBoardRows.map((c) => (
               <tr key={c.id} className="border-t border-gray-100">
                 <td className="px-3 py-2">{c.applicant.namaLengkap}</td>
                 <td className="px-3 py-2">{c.applicant.posisiDilamar}</td>
@@ -449,6 +478,14 @@ export default function Crew() {
             ))}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={offBoardCrew.length}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
+        </>
       )}
 
       {/* Modal detail */}

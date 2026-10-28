@@ -4,6 +4,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api, formatRupiah } from '../../../api/client';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Jabatan {
   kode: string;
@@ -19,6 +20,8 @@ export default function Jabatan() {
   const [form, setForm] = useState({ kode: '', nama: '', gajiPokok: '' });
   const [editing, setEditing] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ nama: '', gajiPokok: '' });
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   // [FUNGSI] Muat daftar jabatan dari backend.
   async function load() {
@@ -91,6 +94,8 @@ export default function Jabatan() {
 
   if (loading) return <p className="text-gray-500">Memuat...</p>;
 
+  const pageRows = items.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div>
       {error && (
@@ -144,7 +149,7 @@ export default function Jabatan() {
           </tr>
         </thead>
         <tbody>
-          {items.map((j) => (
+          {pageRows.map((j) => (
             <tr key={j.kode} className="border-t border-gray-100">
               <td className="px-3 py-2 font-mono">{j.kode}</td>
               {editing === j.kode ? (
@@ -191,6 +196,14 @@ export default function Jabatan() {
           ))}
         </tbody>
       </table>
+
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={items.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { api, formatRupiah } from '../../../api/client';
 import { exportExcel, exportPdf } from '../../../utils/export';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Vessel {
   id: string;
@@ -69,6 +70,8 @@ export default function Payroll() {
   const [selected, setSelected] = useState<Payroll | null>(null);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   async function load() {
     try {
@@ -85,6 +88,11 @@ export default function Payroll() {
     load();
     api.get<Vessel[]>('/master-data/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
   }, []);
+
+  // [FUNGSI] Reset halaman saat tab Gaji/Uang Makan berganti.
+  useEffect(() => {
+    setPage(1);
+  }, [jenis]);
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
@@ -156,6 +164,7 @@ export default function Payroll() {
   }
 
   const filtered = items.filter((p) => p.jenis === jenis);
+  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
   const totalKeseluruhan = (selected?.details ?? []).reduce((s, d) => s + d.total, 0);
 
   // [FUNGSI] Susun data untuk export Excel/PDF.
@@ -214,6 +223,7 @@ export default function Payroll() {
       {loading ? (
         <p className="mt-6 text-gray-500">Memuat...</p>
       ) : (
+        <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
             <tr className="bg-navy-light text-left text-navy">
@@ -229,7 +239,7 @@ export default function Payroll() {
             {filtered.length === 0 && (
               <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400">Belum ada data.</td></tr>
             )}
-            {filtered.map((p) => (
+            {pageRows.map((p) => (
               <tr key={p.id} className="border-t border-gray-100">
                 <td className="px-3 py-2">{p.vessel?.namaUnit ?? '-'}</td>
                 <td className="px-3 py-2">{BULAN[p.bulan - 1]} {p.tahun}</td>
@@ -252,6 +262,14 @@ export default function Payroll() {
             ))}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={filtered.length}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
+        </>
       )}
 
       {/* Modal generate */}

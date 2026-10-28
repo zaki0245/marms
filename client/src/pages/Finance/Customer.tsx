@@ -4,7 +4,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
-import Pagination, { PAGE_SIZE } from '../../components/Pagination';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
 
 interface Bank {
   id?: string;
@@ -35,6 +35,7 @@ export default function Customer() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -142,8 +143,7 @@ export default function Customer() {
     const bankText = v.banks.map((b) => `${b.bank} ${b.accountNo} ${b.accountName}`).join(' ');
     return [v.nama, v.npwp, bankText].some((x) => x && x.toLowerCase().includes(s));
   });
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -188,7 +188,13 @@ export default function Customer() {
         </tbody>
       </table>
 
-      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={filtered.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">

@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { api, formatRupiah } from '../../../api/client';
 import { DOKUMEN_LABEL } from '../../../constants';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Dokumen {
   id: string;
@@ -119,6 +120,8 @@ export default function Reports() {
   const [riwayat, setRiwayat] = useState<RiwayatItem[]>([]);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   async function loadLeavePay() {
     api.get<LeavePayItem[]>('/leave-pay').then(({ data }) => setLeavePay(data)).catch(() => undefined);
@@ -158,6 +161,13 @@ export default function Reports() {
 
   const tabCls = (t: typeof tab) =>
     `rounded-t px-4 py-2 text-sm font-semibold ${tab === t ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
+
+  // [FUNGSI] Reset halaman saat tab berganti.
+  useEffect(() => {
+    setPage(1);
+  }, [tab]);
+
+  const leavePayRows = leavePay.slice((page - 1) * pageSize, page * pageSize);
 
   function openCairkan(item: LeavePayItem) {
     setCairkanTarget(item);
@@ -325,6 +335,7 @@ export default function Reports() {
       )}
 
       {tab === 'leavepay' && (
+        <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
             <tr className="bg-navy-light text-left text-navy">
@@ -340,7 +351,7 @@ export default function Reports() {
             {leavePay.length === 0 && (
               <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400">Belum ada crew.</td></tr>
             )}
-            {leavePay.map((c) => (
+            {leavePayRows.map((c) => (
               <tr key={c.crewId} className="border-t border-gray-100">
                 <td className="px-3 py-2">{c.nama}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{c.masaKerja} hari</td>
@@ -357,6 +368,14 @@ export default function Reports() {
             ))}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={leavePay.length}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+        />
+        </>
       )}
 
       {/* Modal detail crew */}

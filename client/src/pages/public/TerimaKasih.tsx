@@ -27,7 +27,7 @@ export default function TerimaKasih() {
             Pendaftaran Anda telah kami terima. Tim kami akan menghubungi Anda untuk proses selanjutnya.
           </p>
           <Link
-            to="/"
+            to="/career"
             className="mt-8 inline-block rounded-lg bg-navy px-8 py-2.5 text-sm font-semibold text-white hover:bg-navy/90"
           >
             Kembali ke Beranda

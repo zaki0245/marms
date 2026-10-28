@@ -12,23 +12,23 @@ type Role = 'SUPERADMIN' | 'CREWING' | 'FINANCE';
 
 // [FUNGSI] Menu modul Crewing.
 const CREWING_MENU = [
-  { to: '/admin', label: 'Dashboard', exact: true },
-  { to: '/admin/master-data', label: 'Master Data' },
-  { to: '/admin/recruitment', label: 'Rekrutmen' },
-  { to: '/admin/crew', label: 'Crew & Penempatan' },
-  { to: '/admin/payroll', label: 'Payroll & Uang Makan' },
-  { to: '/admin/reports', label: 'Laporan' },
+  { to: '/dashboard', label: 'Dashboard', exact: true },
+  { to: '/dashboard/master-data', label: 'Master Data' },
+  { to: '/dashboard/recruitment', label: 'Rekrutmen' },
+  { to: '/dashboard/crew', label: 'Crew & Penempatan' },
+  { to: '/dashboard/payroll', label: 'Payroll & Uang Makan' },
+  { to: '/dashboard/reports', label: 'Laporan' },
 ];
 
 // [FUNGSI] Menu modul Finance (urutan tetap sesuai spesifikasi).
 const FINANCE_MENU = [
-  { to: '/admin/finance', label: 'Dashboard', exact: true },
-  { to: '/admin/finance/invoice/input', label: 'Input Invoice', exact: false },
-  { to: '/admin/finance/invoice', label: 'Daftar Invoice', exact: false },
-  { to: '/admin/finance/cetak', label: 'Cetak', exact: false },
-  { to: '/admin/finance/vendor', label: 'Vendor', exact: false },
-  { to: '/admin/finance/customer', label: 'Customer', exact: false },
-  { to: '/admin/finance/laporan', label: 'Laporan', exact: false },
+  { to: '/dashboard/finance', label: 'Dashboard', exact: true },
+  { to: '/dashboard/finance/invoice/input', label: 'Input Invoice', exact: false },
+  { to: '/dashboard/finance/invoice', label: 'Daftar Invoice', exact: false },
+  { to: '/dashboard/finance/cetak', label: 'Cetak', exact: false },
+  { to: '/dashboard/finance/vendor', label: 'Vendor', exact: false },
+  { to: '/dashboard/finance/customer', label: 'Customer', exact: false },
+  { to: '/dashboard/finance/laporan', label: 'Laporan', exact: false },
 ];
 
 interface Admin {
@@ -49,12 +49,12 @@ export default function Layout() {
   const [pwError, setPwError] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
 
-  // [FUNGSI] Cek status login; arahkan ke /admin/login bila belum login.
+  // [FUNGSI] Cek status login; arahkan ke /login bila belum login.
   useEffect(() => {
     api
       .get('/auth/me')
       .then(({ data }) => setAdmin(data))
-      .catch(() => navigate('/admin/login'))
+      .catch(() => navigate('/login'))
       .finally(() => setChecking(false));
   }, []);
 
@@ -67,8 +67,8 @@ export default function Layout() {
 
   // [FUNGSI] User FINANCE diarahkan ke halaman Finance (bukan Dashboard crew).
   useEffect(() => {
-    if (admin && admin.role === 'FINANCE' && location.pathname === '/admin') {
-      navigate('/admin/finance', { replace: true });
+    if (admin && admin.role === 'FINANCE' && location.pathname === '/dashboard') {
+      navigate('/dashboard/finance', { replace: true });
     }
   }, [admin, location.pathname, navigate]);
 
@@ -78,7 +78,7 @@ export default function Layout() {
     } catch {
       // ignore
     }
-    navigate('/admin/login');
+    navigate('/login');
   }
 
   async function handleChangePassword(e: FormEvent) {
@@ -186,7 +186,7 @@ export default function Layout() {
           <div className="mt-2 border-t border-white/10 pt-1">
             {admin.role === 'SUPERADMIN' && (
               <NavLink
-                to="/admin/accounts"
+                to="/dashboard/accounts"
                 className={({ isActive }) =>
                   `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
                     isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'
@@ -197,7 +197,7 @@ export default function Layout() {
               </NavLink>
             )}
             <NavLink
-              to="/admin/settings"
+              to="/dashboard/settings"
               className={({ isActive }) =>
                 `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
                   isActive ? 'bg-white/15 font-semibold' : 'hover:bg-white/10'

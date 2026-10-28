@@ -31,7 +31,7 @@ export default function PublicHome() {
             Bergabunglah sebagai crew PT. Maritim Armada Raya dan mulai karier maritim Anda bersama kami.
           </p>
           <Link
-            to="/daftar"
+            to="/career/daftar"
             className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-base font-semibold text-navy hover:bg-gray-100"
           >
             Daftar Sekarang

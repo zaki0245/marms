@@ -4,6 +4,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../../api/client';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Kapal {
   id: string;
@@ -58,6 +59,8 @@ export default function Kapal() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<KapalForm>(emptyForm);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   async function load() {
     try {
@@ -151,6 +154,8 @@ export default function Kapal() {
 
   if (loading) return <p className="text-gray-500">Memuat...</p>;
 
+  const pageRows = items.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div>
       {error && (
@@ -182,7 +187,7 @@ export default function Kapal() {
               </td>
             </tr>
           )}
-          {items.map((k) => (
+          {pageRows.map((k) => (
             <tr key={k.id} className="border-t border-gray-100">
               <td className="px-3 py-2 font-semibold text-navy">{k.namaUnit}</td>
               <td className="px-3 py-2">
@@ -200,6 +205,14 @@ export default function Kapal() {
           ))}
         </tbody>
       </table>
+
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={items.length}
+        onPageChange={setPage}
+        onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+      />
 
       {/* Modal form tambah/edit */}
       {showForm && (

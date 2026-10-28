@@ -19,7 +19,7 @@ export default function Login() {
     setError('');
     try {
       await api.post('/auth/login', form);
-      navigate('/admin');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal login');
     } finally {
