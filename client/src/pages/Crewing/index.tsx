@@ -19,9 +19,9 @@ const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', '
 
 function Card({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg bg-white p-5 shadow-sm">
+    <div className="card p-5">
       <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-navy">{value}</p>
+      <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
     </div>
   );
 }
@@ -45,7 +45,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Dashboard</h2>
+      <h1 className="page-title">Dashboard</h1>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card label="Pelamar Baru" value={data.pelamarBaru} />
@@ -55,12 +55,12 @@ export default function Dashboard() {
           label={`Total Biaya Crew ${BULAN[data.bulan - 1]} ${data.tahun}`}
           value={formatRupiah(data.totalBiaya)}
         />
-        <div className="rounded-lg bg-white p-5 shadow-sm">
+        <div className="card p-5">
           <p className="text-sm text-gray-500">Payroll Bulan Ini</p>
           <div className="mt-2 space-y-1 text-sm">
-            <div className="flex justify-between"><span className="text-gray-500">Draft</span><span className="font-semibold text-navy">{sp.DRAFT}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Final</span><span className="font-semibold text-navy">{sp.FINAL}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Dibayar</span><span className="font-semibold text-positive">{sp.DIBAYAR}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Draft</span><span className="font-medium text-gray-900">{sp.DRAFT}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Final</span><span className="font-medium text-gray-900">{sp.FINAL}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Dibayar</span><span className="font-medium text-positive">{sp.DIBAYAR}</span></div>
           </div>
         </div>
       </div>

@@ -310,37 +310,37 @@ export default function Crew() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Crew & Penempatan</h2>
+      <h1 className="page-title">Crew & Penempatan</h1>
 
-      <div className="mt-4 flex gap-1 border-b border-gray-200">
+      <div className="mt-4 flex border-b border-gray-200">
         <button
           onClick={() => setTab('pool')}
-          className={`rounded-t px-4 py-2 text-sm font-semibold ${tab === 'pool' ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`}
+          className={`px-4 py-2 text-sm font-medium ${tab === 'pool' ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`}
         >
           Pool Kandidat
         </button>
         <button
           onClick={() => setTab('crew')}
-          className={`rounded-t px-4 py-2 text-sm font-semibold ${tab === 'crew' ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`}
+          className={`px-4 py-2 text-sm font-medium ${tab === 'crew' ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`}
         >
           Crew
         </button>
         <button
           onClick={() => setTab('offboard')}
-          className={`rounded-t px-4 py-2 text-sm font-semibold ${tab === 'offboard' ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`}
+          className={`px-4 py-2 text-sm font-medium ${tab === 'offboard' ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`}
         >
           Off Board
         </button>
       </div>
 
-      {msg && <div className="mt-3 rounded bg-positive/10 p-3 text-sm text-positive">{msg}</div>}
-      {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+      {msg && <div className="mt-3 alert-success">{msg}</div>}
+      {error && <div className="mt-3 alert-error">{error}</div>}
 
       {tab === 'pool' && (
         <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
-            <tr className="bg-navy-light text-left text-navy">
+            <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">No. Pendaftaran</th>
               <th className="px-3 py-2">Nama</th>
               <th className="px-3 py-2">Posisi</th>
@@ -351,7 +351,7 @@ export default function Crew() {
           <tbody>
             {pool.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-3 py-6 text-center text-gray-400">
+                <td colSpan={5} className="px-3 py-6 text-center text-gray-500">
                   Tidak ada kandidat. Ubah status pelamar jadi "Diterima" dulu di menu Rekrutmen.
                 </td>
               </tr>
@@ -363,7 +363,7 @@ export default function Crew() {
                 <td className="px-3 py-2">{p.posisiDilamar}</td>
                 <td className="px-3 py-2">{p.noHp}</td>
                 <td className="px-3 py-2 text-right">
-                  <button onClick={() => openAssignApplicant(p)} className="rounded bg-navy px-3 py-1 text-xs font-semibold text-white">
+                  <button onClick={() => openAssignApplicant(p)} className="rounded-md bg-navy px-3 py-1 text-xs font-medium text-white">
                     Assign ke Kapal
                   </button>
                 </td>
@@ -388,7 +388,7 @@ export default function Crew() {
             <select
               value={vesselFilter}
               onChange={(e) => setVesselFilter(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 text-sm"
+              className="input"
             >
               <option value="">Semua Kapal</option>
               {kapal.map((k) => (
@@ -399,7 +399,7 @@ export default function Crew() {
 
           <table className="mt-4 w-full border-collapse bg-white text-sm">
             <thead>
-              <tr className="bg-navy-light text-left text-navy">
+              <tr className="text-left text-xs text-gray-500">
                 <th className="px-3 py-2">Nama</th>
                 <th className="px-3 py-2">Jabatan</th>
                 <th className="px-3 py-2">Kapal</th>
@@ -411,7 +411,7 @@ export default function Crew() {
             <tbody>
               {filteredCrew.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-3 py-6 text-center text-gray-400">Belum ada crew.</td>
+                  <td colSpan={6} className="px-3 py-6 text-center text-gray-500">Belum ada crew.</td>
                 </tr>
               )}
               {crewRows.map((c) => {
@@ -425,12 +425,12 @@ export default function Crew() {
                     <td className="px-3 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                     <td className="px-3 py-2 text-right whitespace-nowrap">
                       {c.status === 'ON_BOARD' ? (
-                        <button onClick={() => openOffBoard(c)} className="text-negative hover:underline">Off Board</button>
+                        <button onClick={() => openOffBoard(c)} className="text-negative hover:text-negative/70">Off Board</button>
                       ) : (
-                        <button onClick={() => openAssignCrew(c)} className="text-positive hover:underline">Assign</button>
+                        <button onClick={() => openAssignCrew(c)} className="text-positive hover:text-positive/70">Assign</button>
                       )}
-                      <button onClick={() => openDetail(c)} className="ml-3 text-navy hover:underline">Detail</button>
-                      <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:underline">Hapus</button>
+                      <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-navy">Detail</button>
+                      <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                     </td>
                   </tr>
                 );
@@ -451,7 +451,7 @@ export default function Crew() {
         <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
-            <tr className="bg-navy-light text-left text-navy">
+            <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">Nama</th>
               <th className="px-3 py-2">Posisi</th>
               <th className="px-3 py-2 text-right">Masa Kerja</th>
@@ -461,7 +461,7 @@ export default function Crew() {
           <tbody>
             {offBoardCrew.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-3 py-6 text-center text-gray-400">Tidak ada crew off board.</td>
+                <td colSpan={4} className="px-3 py-6 text-center text-gray-500">Tidak ada crew off board.</td>
               </tr>
             )}
             {offBoardRows.map((c) => (
@@ -470,9 +470,9 @@ export default function Crew() {
                 <td className="px-3 py-2">{c.applicant.posisiDilamar}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => openAssignCrew(c)} className="text-positive hover:underline">Assign</button>
-                  <button onClick={() => openDetail(c)} className="ml-3 text-navy hover:underline">Detail</button>
-                  <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:underline">Hapus</button>
+                  <button onClick={() => openAssignCrew(c)} className="text-positive hover:text-positive/70">Assign</button>
+                  <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-navy">Detail</button>
+                  <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                 </td>
               </tr>
             ))}
@@ -494,7 +494,7 @@ export default function Crew() {
           <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-navy">{selected.applicant.namaLengkap}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{selected.applicant.namaLengkap}</h3>
                 <p className="text-sm text-gray-500">{selected.applicant.nomorPendaftaran} · {selected.applicant.posisiDilamar}</p>
               </div>
               <button onClick={() => setSelected(null)} className="rounded px-3 py-1 text-sm text-gray-500 hover:bg-gray-100">Tutup</button>
@@ -514,12 +514,12 @@ export default function Crew() {
                 <div><span className="text-gray-500">Nama Bank:</span> {selected.namaBank ?? '-'}</div>
                 <div><span className="text-gray-500">No Rekening:</span> {selected.noRekening ?? '-'}</div>
               </div>
-              <button onClick={() => openBankEdit(selected)} className="text-sm text-navy underline">Edit</button>
+              <button onClick={() => openBankEdit(selected)} className="text-sm text-gray-700 underline hover:text-navy">Edit</button>
             </div>
 
-            <h4 className="mt-5 font-semibold text-navy">Riwayat Penempatan</h4>
+            <h4 className="mt-5 font-semibold text-gray-900">Riwayat Penempatan</h4>
             <div className="mt-2 space-y-2">
-              {(selected.placements ?? []).length === 0 && <p className="text-sm text-gray-400">Belum ada penempatan.</p>}
+              {(selected.placements ?? []).length === 0 && <p className="text-sm text-gray-500">Belum ada penempatan.</p>}
               {(selected.placements ?? []).map((p) => (
                 <div key={p.id} className="flex items-center justify-between rounded border border-gray-200 px-3 py-2">
                   <div>
@@ -533,7 +533,7 @@ export default function Crew() {
               ))}
             </div>
 
-            <h4 className="mt-5 font-semibold text-navy">Dokumen</h4>
+            <h4 className="mt-5 font-semibold text-gray-900">Dokumen</h4>
             <div className="mt-2 space-y-2">
               {(selected.applicant.documents ?? []).map((d) => {
                 const expired = d.tanggalExpired ? new Date(d.tanggalExpired) < new Date() : false;
@@ -548,13 +548,13 @@ export default function Crew() {
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-navy underline">Lihat file</a>
-                      <button onClick={() => openUpdate(d)} className="text-sm text-navy underline">Perbarui</button>
+                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-navy">Lihat file</a>
+                      <button onClick={() => openUpdate(d)} className="text-sm text-gray-700 underline hover:text-navy">Perbarui</button>
                     </div>
                   </div>
                 );
               })}
-              {(selected.applicant.documents ?? []).length === 0 && <p className="text-sm text-gray-400">Belum ada dokumen.</p>}
+              {(selected.applicant.documents ?? []).length === 0 && <p className="text-sm text-gray-500">Belum ada dokumen.</p>}
             </div>
           </div>
         </div>
@@ -564,41 +564,41 @@ export default function Crew() {
       {assignTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleAssign} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Assign ke Kapal</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Assign ke Kapal</h3>
             <p className="mt-1 text-sm text-gray-500">{assignTarget.nama} · {assignTarget.posisi}</p>
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500">Jabatan</label>
-                <select required value={assignForm.jabatanKode} onChange={(e) => setAssignForm({ ...assignForm, jabatanKode: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2">
+                <label className="label">Jabatan</label>
+                <select required value={assignForm.jabatanKode} onChange={(e) => setAssignForm({ ...assignForm, jabatanKode: e.target.value })} className="input mt-1 w-full">
                   <option value="">Pilih jabatan</option>
                   {jabatan.map((j) => <option key={j.kode} value={j.kode}>{j.nama}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Kapal</label>
-                <select required value={assignForm.vesselId} onChange={(e) => setAssignForm({ ...assignForm, vesselId: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2">
+                <label className="label">Kapal</label>
+                <select required value={assignForm.vesselId} onChange={(e) => setAssignForm({ ...assignForm, vesselId: e.target.value })} className="input mt-1 w-full">
                   <option value="">Pilih kapal</option>
                   {kapal.map((k) => <option key={k.id} value={k.id}>{k.namaUnit}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tanggal Mulai On Board</label>
-                <input required type="date" value={assignForm.tanggalMulai} onChange={(e) => setAssignForm({ ...assignForm, tanggalMulai: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Tanggal Mulai On Board</label>
+                <input required type="date" value={assignForm.tanggalMulai} onChange={(e) => setAssignForm({ ...assignForm, tanggalMulai: e.target.value })} className="input mt-1 w-full" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Nama Bank</label>
-                <input value={assignForm.namaBank} onChange={(e) => setAssignForm({ ...assignForm, namaBank: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" placeholder="Contoh: BCA" />
+                <label className="label">Nama Bank</label>
+                <input value={assignForm.namaBank} onChange={(e) => setAssignForm({ ...assignForm, namaBank: e.target.value })} className="input mt-1 w-full" placeholder="Contoh: BCA" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Nomor Rekening</label>
-                <input value={assignForm.noRekening} onChange={(e) => setAssignForm({ ...assignForm, noRekening: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" placeholder="Contoh: 1234567890" />
+                <label className="label">Nomor Rekening</label>
+                <input value={assignForm.noRekening} onChange={(e) => setAssignForm({ ...assignForm, noRekening: e.target.value })} className="input mt-1 w-full" placeholder="Contoh: 1234567890" />
               </div>
             </div>
 
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setAssignTarget(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={assigning} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{assigning ? 'Menyimpan...' : 'Simpan'}</button>
+              <button type="button" onClick={() => setAssignTarget(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={assigning} className="btn-primary">{assigning ? 'Menyimpan...' : 'Simpan'}</button>
             </div>
           </form>
         </div>
@@ -608,25 +608,25 @@ export default function Crew() {
       {offBoardTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleOffBoard} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Off Board</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Off Board</h3>
             <p className="mt-1 text-sm text-gray-500">{offBoardTarget.applicant.namaLengkap}</p>
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500">Alasan</label>
-                <select value={offBoardForm.alasan} onChange={(e) => setOffBoardForm({ ...offBoardForm, alasan: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2">
+                <label className="label">Alasan</label>
+                <select value={offBoardForm.alasan} onChange={(e) => setOffBoardForm({ ...offBoardForm, alasan: e.target.value })} className="input mt-1 w-full">
                   {Object.entries(ALASAN).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tanggal Off Board</label>
-                <input required type="date" value={offBoardForm.tanggal} onChange={(e) => setOffBoardForm({ ...offBoardForm, tanggal: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Tanggal Off Board</label>
+                <input required type="date" value={offBoardForm.tanggal} onChange={(e) => setOffBoardForm({ ...offBoardForm, tanggal: e.target.value })} className="input mt-1 w-full" />
               </div>
             </div>
 
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setOffBoardTarget(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={offBoarding} className="rounded bg-negative px-4 py-2 text-sm font-semibold text-white">{offBoarding ? 'Menyimpan...' : 'Off Board'}</button>
+              <button type="button" onClick={() => setOffBoardTarget(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={offBoarding} className="btn-danger">{offBoarding ? 'Menyimpan...' : 'Off Board'}</button>
             </div>
           </form>
         </div>
@@ -636,21 +636,21 @@ export default function Crew() {
       {updateDoc && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleUpdate} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Perbarui Dokumen</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Perbarui Dokumen</h3>
             <p className="mt-1 text-sm text-gray-500">{DOKUMEN_LABEL[updateDoc.jenis] ?? updateDoc.jenis}</p>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500">Dokumen Terbaru (PDF/JPG/PNG)</label>
+                <label className="label">Dokumen Terbaru (PDF/JPG/PNG)</label>
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setUpdateFile(e.target.files?.[0] ?? null)} className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tanggal Expired Baru</label>
-                <input type="date" value={updateExpired} onChange={(e) => setUpdateExpired(e.target.value)} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Tanggal Expired Baru</label>
+                <input type="date" value={updateExpired} onChange={(e) => setUpdateExpired(e.target.value)} className="input mt-1 w-full" />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setUpdateDoc(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={updateLoading} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{updateLoading ? 'Menyimpan...' : 'Simpan'}</button>
+              <button type="button" onClick={() => setUpdateDoc(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={updateLoading} className="btn-primary">{updateLoading ? 'Menyimpan...' : 'Simpan'}</button>
             </div>
           </form>
         </div>
@@ -660,21 +660,21 @@ export default function Crew() {
       {bankTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleBankSave} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Edit Informasi Bank</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Edit Informasi Bank</h3>
             <p className="mt-1 text-sm text-gray-500">{bankTarget.applicant.namaLengkap}</p>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500">Nama Bank</label>
-                <input value={bankForm.namaBank} onChange={(e) => setBankForm({ ...bankForm, namaBank: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Nama Bank</label>
+                <input value={bankForm.namaBank} onChange={(e) => setBankForm({ ...bankForm, namaBank: e.target.value })} className="input mt-1 w-full" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Nomor Rekening</label>
-                <input value={bankForm.noRekening} onChange={(e) => setBankForm({ ...bankForm, noRekening: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Nomor Rekening</label>
+                <input value={bankForm.noRekening} onChange={(e) => setBankForm({ ...bankForm, noRekening: e.target.value })} className="input mt-1 w-full" />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setBankTarget(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={bankLoading} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{bankLoading ? 'Menyimpan...' : 'Simpan'}</button>
+              <button type="button" onClick={() => setBankTarget(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={bankLoading} className="btn-primary">{bankLoading ? 'Menyimpan...' : 'Simpan'}</button>
             </div>
           </form>
         </div>

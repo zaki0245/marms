@@ -28,25 +28,25 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy px-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-lg bg-white p-8 shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-surface px-4">
+      <form onSubmit={handleSubmit} className="card w-full max-w-sm p-8">
         <div className="flex justify-center">
           <Logo className="h-12 w-12" />
         </div>
-        <h1 className="mt-2 text-center text-xl font-bold text-navy">MARMS</h1>
+        <h1 className="mt-2 text-center text-xl font-semibold text-gray-900">MARMS</h1>
         <p className="mt-1 text-center text-sm text-gray-500">Masuk Admin</p>
-        {error && <div className="mt-4 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+        {error && <div className="alert-error mt-4">{error}</div>}
         <div className="mt-4 space-y-3">
           <div>
-            <label className="block text-xs text-gray-500">Email</label>
-            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+            <label className="label">Email</label>
+            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input mt-1 w-full" />
           </div>
           <div>
-            <label className="block text-xs text-gray-500">Password</label>
-            <input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+            <label className="label">Password</label>
+            <input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="input mt-1 w-full" />
           </div>
         </div>
-        <button type="submit" disabled={loading} className="mt-6 w-full rounded bg-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+        <button type="submit" disabled={loading} className="btn-primary mt-6 w-full disabled:opacity-50">
           {loading ? 'Masuk...' : 'Masuk'}
         </button>
       </form>

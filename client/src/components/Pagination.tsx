@@ -31,7 +31,7 @@ export default function Pagination({ page, pageSize, total, onPageChange, onPage
           <select
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="rounded border border-gray-300 px-2 py-1 text-navy"
+            className="rounded-md border border-gray-300 px-2 py-1 text-gray-700"
           >
             {PAGE_SIZES.map((s) => (
               <option key={s} value={s}>
@@ -45,7 +45,7 @@ export default function Pagination({ page, pageSize, total, onPageChange, onPage
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="rounded border border-gray-300 px-3 py-1.5 text-navy disabled:opacity-40"
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 disabled:opacity-40"
         >
           &lsaquo; Sebelumnya
         </button>
@@ -55,7 +55,7 @@ export default function Pagination({ page, pageSize, total, onPageChange, onPage
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="rounded border border-gray-300 px-3 py-1.5 text-navy disabled:opacity-40"
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 disabled:opacity-40"
         >
           Berikutnya &rsaquo;
         </button>

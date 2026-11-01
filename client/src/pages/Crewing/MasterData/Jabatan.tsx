@@ -99,49 +99,49 @@ export default function Jabatan() {
   return (
     <div>
       {error && (
-        <div className="mb-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>
+        <div className="alert-error mb-3">{error}</div>
       )}
       {success && (
-        <div className="mb-3 rounded bg-positive/10 p-3 text-sm text-positive">{success}</div>
+        <div className="alert-success mb-3">{success}</div>
       )}
 
       <form onSubmit={handleAdd} className="mb-6 flex flex-wrap items-end gap-2">
         <div>
-          <label className="block text-xs text-gray-500">Kode</label>
+          <label className="label">Kode</label>
           <input
             value={form.kode}
             onChange={(e) => setForm({ ...form, kode: e.target.value })}
-            className="rounded border border-gray-300 px-2 py-1.5"
+            className="input px-2 py-1.5"
             placeholder="MSTR"
           />
         </div>
         <div>
-          <label className="block text-xs text-gray-500">Nama</label>
+          <label className="label">Nama</label>
           <input
             value={form.nama}
             onChange={(e) => setForm({ ...form, nama: e.target.value })}
-            className="rounded border border-gray-300 px-2 py-1.5"
+            className="input px-2 py-1.5"
             placeholder="Master"
           />
         </div>
         <div>
-          <label className="block text-xs text-gray-500">Gaji Pokok</label>
+          <label className="label">Gaji Pokok</label>
           <input
             type="number"
             value={form.gajiPokok}
             onChange={(e) => setForm({ ...form, gajiPokok: e.target.value })}
-            className="rounded border border-gray-300 px-2 py-1.5"
+            className="input px-2 py-1.5"
             placeholder="10500000"
           />
         </div>
-        <button className="rounded bg-navy px-4 py-1.5 text-sm font-semibold text-white">
+        <button className="btn-primary py-1.5">
           Tambah
         </button>
       </form>
 
       <table className="w-full border-collapse bg-white text-sm">
         <thead>
-          <tr className="bg-navy-light text-left text-navy">
+          <tr className="text-left text-xs text-gray-500">
             <th className="px-3 py-2">Kode</th>
             <th className="px-3 py-2">Nama</th>
             <th className="px-3 py-2 text-right">Gaji Pokok</th>
@@ -155,38 +155,38 @@ export default function Jabatan() {
               {editing === j.kode ? (
                 <>
                   <td className="px-3 py-2">
-                    <input
-                      value={editForm.nama}
-                      onChange={(e) => setEditForm({ ...editForm, nama: e.target.value })}
-                      className="rounded border border-gray-300 px-2 py-1"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <input
-                      type="number"
-                      value={editForm.gajiPokok}
-                      onChange={(e) => setEditForm({ ...editForm, gajiPokok: e.target.value })}
-                      className="rounded border border-gray-300 px-2 py-1 text-right"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <button onClick={handleSaveEdit} className="rounded bg-positive px-3 py-1 text-xs text-white">
-                      Simpan
-                    </button>
-                    <button onClick={() => setEditing(null)} className="ml-1 rounded px-3 py-1 text-xs text-gray-500">
-                      Batal
-                    </button>
-                  </td>
+                      <input
+                        value={editForm.nama}
+                        onChange={(e) => setEditForm({ ...editForm, nama: e.target.value })}
+                        className="input px-2 py-1"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <input
+                        type="number"
+                        value={editForm.gajiPokok}
+                        onChange={(e) => setEditForm({ ...editForm, gajiPokok: e.target.value })}
+                        className="input px-2 py-1 text-right"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <button onClick={handleSaveEdit} className="rounded-md bg-navy px-3 py-1 text-xs font-medium text-white">
+                        Simpan
+                      </button>
+                      <button onClick={() => setEditing(null)} className="ml-1 rounded-md px-3 py-1 text-xs text-gray-600 hover:bg-gray-100">
+                        Batal
+                      </button>
+                    </td>
                 </>
               ) : (
                 <>
                   <td className="px-3 py-2">{j.nama}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{formatRupiah(j.gajiPokok)}</td>
                   <td className="px-3 py-2 text-right">
-                    <button onClick={() => startEdit(j)} className="text-navy hover:underline">
+                    <button onClick={() => startEdit(j)} className="text-gray-700 hover:text-navy">
                       Edit
                     </button>
-                    <button onClick={() => handleDelete(j.kode)} className="ml-3 text-negative hover:underline">
+                    <button onClick={() => handleDelete(j.kode)} className="ml-3 text-negative hover:text-negative/70">
                       Hapus
                     </button>
                   </td>

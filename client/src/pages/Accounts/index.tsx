@@ -77,37 +77,37 @@ export default function Accounts() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Kelola Akun</h2>
+      <h1 className="page-title">Kelola Akun</h1>
 
-      {msg && <div className="mt-4 rounded bg-positive/10 p-3 text-sm text-positive">{msg}</div>}
-      {error && <div className="mt-4 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+      {msg && <div className="mt-4 alert-success">{msg}</div>}
+      {error && <div className="mt-4 alert-error">{error}</div>}
 
-      <div className="mt-4 max-w-md rounded-lg bg-white p-5 shadow-sm">
-        <h3 className="font-semibold text-navy">Buat Akun Baru</h3>
+      <div className="mt-4 max-w-md card p-5">
+        <h3 className="font-semibold text-gray-900">Buat Akun Baru</h3>
         <form onSubmit={handleCreate} className="mt-3 space-y-3">
           <div>
-            <label className="block text-xs text-gray-500">Email</label>
-            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+            <label className="label">Email</label>
+            <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input mt-1 w-full" />
           </div>
           <div>
-            <label className="block text-xs text-gray-500">Password (min 6 karakter)</label>
-            <input type="password" required minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+            <label className="label">Password (min 6 karakter)</label>
+            <input type="password" required minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="input mt-1 w-full" />
           </div>
           <div>
-            <label className="block text-xs text-gray-500">Role</label>
-            <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2">
+            <label className="label">Role</label>
+            <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="input mt-1 w-full">
               <option value="CREWING">Crewing</option>
               <option value="FINANCE">Finance</option>
               <option value="SUPERADMIN">Super Admin</option>
             </select>
           </div>
-          <button type="submit" className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Buat Akun</button>
+          <button type="submit" className="btn-primary">Buat Akun</button>
         </form>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-lg bg-white shadow-sm">
+      <div className="mt-4 card overflow-hidden">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+          <thead className="text-xs text-gray-500">
             <tr>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Role</th>
@@ -119,11 +119,11 @@ export default function Accounts() {
             {pageRows.map((a) => (
               <tr key={a.id} className="border-t border-gray-100">
                 <td className="px-4 py-3">
-                  <span className="font-medium text-navy">{a.email}</span>
+                  <span className="font-medium text-gray-900">{a.email}</span>
                   {a.mustChangePassword && <span className="ml-2 text-xs text-amber-600">(wajib ganti password)</span>}
                 </td>
                 <td className="px-4 py-3">
-                  <select value={a.role} onChange={(e) => handleRole(a, e.target.value)} className="rounded border border-gray-300 px-2 py-1">
+                  <select value={a.role} onChange={(e) => handleRole(a, e.target.value)} className="rounded-md border border-gray-300 px-2 py-1">
                     <option value="CREWING">Crewing</option>
                     <option value="FINANCE">Finance</option>
                     <option value="SUPERADMIN">Super Admin</option>
@@ -133,7 +133,7 @@ export default function Accounts() {
                   <span className={a.active ? 'text-positive' : 'text-negative'}>{a.active ? 'Aktif' : 'Nonaktif'}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <button onClick={() => handleToggle(a)} className="text-sm text-navy underline hover:opacity-70">
+                  <button onClick={() => handleToggle(a)} className="text-sm text-gray-700 hover:text-navy">
                     {a.active ? 'Nonaktifkan' : 'Aktifkan'}
                   </button>
                 </td>
@@ -141,7 +141,7 @@ export default function Accounts() {
             ))}
             {accounts.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-gray-400">Belum ada akun.</td>
+                <td colSpan={4} className="px-4 py-6 text-center text-gray-500">Belum ada akun.</td>
               </tr>
             )}
           </tbody>

@@ -160,7 +160,7 @@ export default function Reports() {
   }, {} as Record<string, { vessel?: Vessel; crews: Crew[] }>);
 
   const tabCls = (t: typeof tab) =>
-    `rounded-t px-4 py-2 text-sm font-semibold ${tab === t ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
+    `px-4 py-2 text-sm font-medium ${tab === t ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
 
   // [FUNGSI] Reset halaman saat tab berganti.
   useEffect(() => {
@@ -267,15 +267,15 @@ export default function Reports() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Laporan</h2>
+      <h1 className="page-title">Laporan</h1>
 
-      <div className="mt-4 flex gap-1 border-b border-gray-200">
+      <div className="mt-4 flex border-b border-gray-200">
         <button onClick={() => setTab('kapal')} className={tabCls('kapal')}>Crew per Kapal</button>
         <button onClick={() => setTab('leavepay')} className={tabCls('leavepay')}>Leave Pay</button>
       </div>
 
-      {msg && <div className="mt-3 rounded bg-positive/10 p-3 text-sm text-positive">{msg}</div>}
-      {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+      {msg && <div className="mt-3 alert-success">{msg}</div>}
+      {error && <div className="mt-3 alert-error">{error}</div>}
 
       {tab === 'kapal' && (
         <div>
@@ -284,7 +284,7 @@ export default function Reports() {
             <select
               value={vesselFilter}
               onChange={(e) => setVesselFilter(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 text-sm"
+              className="input"
             >
               <option value="">Semua Kapal</option>
               {kapal.map((k) => (
@@ -296,11 +296,11 @@ export default function Reports() {
 
           <div className="mt-4 space-y-4">
             {Object.values(grouped).length === 0 && (
-              <p className="text-sm text-gray-400">Tidak ada crew.</p>
+              <p className="text-sm text-gray-500">Tidak ada crew.</p>
             )}
             {Object.values(grouped).map((g) => (
-              <div key={g.vessel?.id ?? 'unknown'} className="overflow-hidden rounded-lg bg-white shadow-sm">
-                <div className="border-b border-gray-100 px-4 py-3 font-semibold text-navy">{g.vessel?.namaUnit ?? 'Tanpa Kapal'}</div>
+              <div key={g.vessel?.id ?? 'unknown'} className="overflow-hidden card">
+                <div className="border-b border-gray-100 px-4 py-3 font-semibold text-gray-900">{g.vessel?.namaUnit ?? 'Tanpa Kapal'}</div>
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-gray-500">
@@ -321,7 +321,7 @@ export default function Reports() {
                           <td className="px-4 py-2">{active?.tanggalMulai?.slice(0, 10) ?? '-'}</td>
                           <td className="px-4 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                           <td className="px-4 py-2 text-right">
-                            <button onClick={() => openDetail(c)} className="text-navy hover:underline">Detail</button>
+                            <button onClick={() => openDetail(c)} className="text-gray-700 hover:text-navy">Detail</button>
                           </td>
                         </tr>
                       );
@@ -338,7 +338,7 @@ export default function Reports() {
         <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
-            <tr className="bg-navy-light text-left text-navy">
+            <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">Nama</th>
               <th className="px-3 py-2 text-right">Masa Kerja</th>
               <th className="px-3 py-2 text-right">Berhak</th>
@@ -349,7 +349,7 @@ export default function Reports() {
           </thead>
           <tbody>
             {leavePay.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400">Belum ada crew.</td></tr>
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-500">Belum ada crew.</td></tr>
             )}
             {leavePayRows.map((c) => (
               <tr key={c.crewId} className="border-t border-gray-100">
@@ -360,9 +360,9 @@ export default function Reports() {
                 <td className="px-3 py-2 text-right tabular-nums">{c.sisa > 0 ? c.sisa : '-'}</td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
                   {c.sisa > 0 && (
-                    <button onClick={() => openCairkan(c)} className="text-positive hover:underline">Cairkan</button>
+                    <button onClick={() => openCairkan(c)} className="text-positive hover:text-positive/70">Cairkan</button>
                   )}
-                  <button onClick={() => openRiwayat(c)} className="ml-3 text-navy hover:underline">Riwayat</button>
+                  <button onClick={() => openRiwayat(c)} className="ml-3 text-gray-700 hover:text-navy">Riwayat</button>
                 </td>
               </tr>
             ))}
@@ -384,7 +384,7 @@ export default function Reports() {
           <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-navy">{selected.applicant.namaLengkap}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{selected.applicant.namaLengkap}</h3>
                 <p className="text-sm text-gray-500">{selected.applicant.nomorPendaftaran} · {selected.applicant.posisiDilamar}</p>
               </div>
               <button onClick={() => setSelected(null)} className="rounded px-3 py-1 text-sm text-gray-500 hover:bg-gray-100">Tutup</button>
@@ -404,12 +404,12 @@ export default function Reports() {
                 <div><span className="text-gray-500">Nama Bank:</span> {selected.namaBank ?? '-'}</div>
                 <div><span className="text-gray-500">No Rekening:</span> {selected.noRekening ?? '-'}</div>
               </div>
-              <button onClick={() => openBankEdit(selected)} className="text-sm text-navy underline">Edit</button>
+              <button onClick={() => openBankEdit(selected)} className="text-sm text-gray-700 underline hover:text-navy">Edit</button>
             </div>
 
-            <h4 className="mt-5 font-semibold text-navy">Riwayat Penempatan</h4>
+            <h4 className="mt-5 font-semibold text-gray-900">Riwayat Penempatan</h4>
             <div className="mt-2 space-y-2">
-              {(selected.placements ?? []).length === 0 && <p className="text-sm text-gray-400">Belum ada penempatan.</p>}
+              {(selected.placements ?? []).length === 0 && <p className="text-sm text-gray-500">Belum ada penempatan.</p>}
               {(selected.placements ?? []).map((p) => (
                 <div key={p.id} className="flex items-center justify-between rounded border border-gray-200 px-3 py-2">
                   <div>
@@ -423,7 +423,7 @@ export default function Reports() {
               ))}
             </div>
 
-            <h4 className="mt-5 font-semibold text-navy">Dokumen</h4>
+            <h4 className="mt-5 font-semibold text-gray-900">Dokumen</h4>
             <div className="mt-2 space-y-2">
               {(selected.applicant.documents ?? []).map((d) => {
                 const expired = d.tanggalExpired ? new Date(d.tanggalExpired) < new Date() : false;
@@ -438,13 +438,13 @@ export default function Reports() {
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-navy underline">Lihat file</a>
-                      <button onClick={() => openUpdate(d)} className="text-sm text-navy underline">Perbarui</button>
+                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-navy">Lihat file</a>
+                      <button onClick={() => openUpdate(d)} className="text-sm text-gray-700 underline hover:text-navy">Perbarui</button>
                     </div>
                   </div>
                 );
               })}
-              {(selected.applicant.documents ?? []).length === 0 && <p className="text-sm text-gray-400">Belum ada dokumen.</p>}
+              {(selected.applicant.documents ?? []).length === 0 && <p className="text-sm text-gray-500">Belum ada dokumen.</p>}
             </div>
           </div>
         </div>
@@ -454,21 +454,21 @@ export default function Reports() {
       {updateDoc && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleUpdate} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Perbarui Dokumen</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Perbarui Dokumen</h3>
             <p className="mt-1 text-sm text-gray-500">{DOKUMEN_LABEL[updateDoc.jenis] ?? updateDoc.jenis}</p>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500">Dokumen Terbaru (PDF/JPG/PNG)</label>
+                <label className="label">Dokumen Terbaru (PDF/JPG/PNG)</label>
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setUpdateFile(e.target.files?.[0] ?? null)} className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tanggal Expired Baru</label>
-                <input type="date" value={updateExpired} onChange={(e) => setUpdateExpired(e.target.value)} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Tanggal Expired Baru</label>
+                <input type="date" value={updateExpired} onChange={(e) => setUpdateExpired(e.target.value)} className="input mt-1 w-full" />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setUpdateDoc(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={updateLoading} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{updateLoading ? 'Menyimpan...' : 'Simpan'}</button>
+              <button type="button" onClick={() => setUpdateDoc(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={updateLoading} className="btn-primary">{updateLoading ? 'Menyimpan...' : 'Simpan'}</button>
             </div>
           </form>
         </div>
@@ -478,21 +478,21 @@ export default function Reports() {
       {bankTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleBankSave} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Edit Informasi Bank</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Edit Informasi Bank</h3>
             <p className="mt-1 text-sm text-gray-500">{bankTarget.applicant.namaLengkap}</p>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500">Nama Bank</label>
-                <input value={bankForm.namaBank} onChange={(e) => setBankForm({ ...bankForm, namaBank: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Nama Bank</label>
+                <input value={bankForm.namaBank} onChange={(e) => setBankForm({ ...bankForm, namaBank: e.target.value })} className="input mt-1 w-full" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Nomor Rekening</label>
-                <input value={bankForm.noRekening} onChange={(e) => setBankForm({ ...bankForm, noRekening: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Nomor Rekening</label>
+                <input value={bankForm.noRekening} onChange={(e) => setBankForm({ ...bankForm, noRekening: e.target.value })} className="input mt-1 w-full" />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setBankTarget(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={bankLoading} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{bankLoading ? 'Menyimpan...' : 'Simpan'}</button>
+              <button type="button" onClick={() => setBankTarget(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={bankLoading} className="btn-primary">{bankLoading ? 'Menyimpan...' : 'Simpan'}</button>
             </div>
           </form>
         </div>
@@ -502,22 +502,22 @@ export default function Reports() {
       {cairkanTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleCairkan} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Cairkan Leave Pay</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Cairkan Leave Pay</h3>
             <p className="mt-1 text-sm text-gray-500">{cairkanTarget.nama} · masa kerja {cairkanTarget.masaKerja} hari</p>
-            {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+            {error && <div className="mt-3 alert-error">{error}</div>}
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500">Nominal (Rp)</label>
-                <input type="number" required value={nominal} onChange={(e) => setNominal(e.target.value)} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Nominal (Rp)</label>
+                <input type="number" required value={nominal} onChange={(e) => setNominal(e.target.value)} className="input mt-1 w-full" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tanggal Dibayarkan</label>
-                <input type="date" required value={tanggalCair} onChange={(e) => setTanggalCair(e.target.value)} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Tanggal Dibayarkan</label>
+                <input type="date" required value={tanggalCair} onChange={(e) => setTanggalCair(e.target.value)} className="input mt-1 w-full" />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setCairkanTarget(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={cairkanLoading} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{cairkanLoading ? 'Menyimpan...' : 'Cairkan'}</button>
+              <button type="button" onClick={() => setCairkanTarget(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={cairkanLoading} className="btn-primary">{cairkanLoading ? 'Menyimpan...' : 'Cairkan'}</button>
             </div>
           </form>
         </div>
@@ -528,12 +528,12 @@ export default function Reports() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
-              <h3 className="text-lg font-bold text-navy">Riwayat Leave Pay — {riwayatTarget.nama}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Riwayat Leave Pay — {riwayatTarget.nama}</h3>
               <button onClick={() => setRiwayatTarget(null)} className="rounded px-3 py-1 text-sm text-gray-500 hover:bg-gray-100">Tutup</button>
             </div>
             <table className="mt-3 w-full border-collapse text-sm">
               <thead>
-                <tr className="bg-navy-light text-left text-navy">
+                <tr className="text-left text-xs text-gray-500">
                   <th className="px-3 py-2">Ke</th>
                   <th className="px-3 py-2">Tanggal Dibayarkan</th>
                   <th className="px-3 py-2 text-right">Nominal</th>
@@ -541,7 +541,7 @@ export default function Reports() {
               </thead>
               <tbody>
                 {riwayat.length === 0 && (
-                  <tr><td colSpan={3} className="px-3 py-6 text-center text-gray-400">Belum ada pencairan.</td></tr>
+                  <tr><td colSpan={3} className="px-3 py-6 text-center text-gray-500">Belum ada pencairan.</td></tr>
                 )}
                 {riwayat.map((r) => (
                   <tr key={r.id} className="border-t border-gray-100">

@@ -268,30 +268,30 @@ export default function InputInvoice() {
     }
   }
 
-  const inputCls = 'mt-1 w-full rounded border border-gray-300 px-3 py-2';
+  const inputCls = 'input mt-1 w-full';
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-navy">{id ? 'Edit Invoice' : 'Input Invoice'}</h2>
-        <button onClick={() => navigate('/dashboard/finance/invoice')} className="text-sm text-navy underline">Kembali</button>
+        <h1 className="page-title">{id ? 'Edit Invoice' : 'Input Invoice'}</h1>
+        <button onClick={() => navigate('/dashboard/finance/invoice')} className="text-sm text-gray-700 underline hover:text-navy">Kembali</button>
       </div>
 
       {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
 
       <form onSubmit={handleSubmit} className="mt-4 space-y-5">
         {/* Header */}
-        <section className="rounded-lg bg-white p-5 shadow-sm">
+        <section className="card p-5">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div>
-              <label className="block text-xs text-gray-500">Jenis (AR/AP)</label>
+              <label className="label">Jenis (AR/AP)</label>
               <select value={form.jenis} onChange={(e) => { setField('jenis', e.target.value); setField('vendorId', ''); setField('customerId', ''); setField('bankAccountId', ''); }} className={inputCls}>
                 <option value="AP">AP (Hutang - Vendor)</option>
                 <option value="AR">AR (Piutang - Customer)</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Kategori</label>
+              <label className="label">Kategori</label>
               <select value={form.kategori} onChange={(e) => setField('kategori', e.target.value)} className={inputCls}>
                 <option value="FREIGHT">Freight</option>
                 <option value="OPERATION">Operation</option>
@@ -299,7 +299,7 @@ export default function InputInvoice() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Tipe</label>
+              <label className="label">Tipe</label>
               <select value={form.tipe} onChange={(e) => setField('tipe', e.target.value)} className={inputCls}>
                 <option value="REGULAR">Regular</option>
                 <option value="DP">DP</option>
@@ -307,15 +307,15 @@ export default function InputInvoice() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Tanggal Invoice *</label>
+              <label className="label">Tanggal Invoice *</label>
               <input required type="date" value={form.tanggal} onChange={(e) => setField('tanggal', e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Bupot</label>
+              <label className="label">Bupot</label>
               <input value={form.bupot} onChange={(e) => setField('bupot', e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">{isAr ? 'Customer' : 'Vendor'} *</label>
+              <label className="label">{isAr ? 'Customer' : 'Vendor'} *</label>
               <div className="flex gap-1">
                 {isAr ? (
                   <SearchableSelect
@@ -336,23 +336,23 @@ export default function InputInvoice() {
                     onChange={(id) => { setField('vendorId', id); setField('bankAccountId', ''); }}
                   />
                 )}
-                <button type="button" onClick={() => setQuick(!quick)} className="whitespace-nowrap rounded border border-gray-300 px-2 text-xs text-navy">+ Baru</button>
+                <button type="button" onClick={() => setQuick(!quick)} className="whitespace-nowrap rounded-md border border-gray-300 px-2 text-xs text-gray-700">+ Baru</button>
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500">INV (nomor invoice)</label>
+              <label className="label">INV (nomor invoice)</label>
               <input value={form.inv} onChange={(e) => setField('inv', e.target.value)} placeholder="Opsional" className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">REF</label>
+              <label className="label">REF</label>
               <input value={form.ref} onChange={(e) => setField('ref', e.target.value)} className={inputCls} />
             </div>
             <div className="col-span-2">
-              <label className="block text-xs text-gray-500">Keterangan (TB/BG/voyage)</label>
+              <label className="label">Keterangan (TB/BG/voyage)</label>
               <input value={form.keterangan} onChange={(e) => setField('keterangan', e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Rekening Bank</label>
+              <label className="label">Rekening Bank</label>
               <select value={form.bankAccountId} onChange={(e) => setField('bankAccountId', e.target.value)} className={inputCls}>
                 <option value="">Pilih rekening</option>
                 {selectedBanks.map((b) => <option key={b.id} value={b.id}>{b.bank} - {b.accountNo}</option>)}
@@ -360,7 +360,7 @@ export default function InputInvoice() {
             </div>
             {(form.tipe === 'DP' || form.tipe === 'PELUNASAN') && (
               <div>
-                <label className="block text-xs text-gray-500">Invoice Induk</label>
+                <label className="label">Invoice Induk</label>
                 <select value={form.parentInvoiceId} onChange={(e) => setField('parentInvoiceId', e.target.value)} className={inputCls}>
                   <option value="">Pilih invoice induk</option>
                   {parents.filter((p) => p.jenis === form.jenis).map((p) => <option key={p.id} value={p.id}>{p.no} ({p.inv})</option>)}
@@ -372,60 +372,60 @@ export default function InputInvoice() {
           {quick && (
             <div className="mt-3 space-y-2 rounded bg-gray-50 p-3">
               <div className="flex gap-2">
-                <input placeholder={`Nama ${isAr ? 'customer' : 'vendor'} *`} value={quickForm.nama} onChange={(e) => setQuickForm({ ...quickForm, nama: e.target.value })} className="w-full rounded border border-gray-300 px-3 py-2" />
-                <input placeholder="NPWP" value={quickForm.npwp} onChange={(e) => setQuickForm({ ...quickForm, npwp: e.target.value })} className="w-full rounded border border-gray-300 px-3 py-2" />
+                <input placeholder={`Nama ${isAr ? 'customer' : 'vendor'} *`} value={quickForm.nama} onChange={(e) => setQuickForm({ ...quickForm, nama: e.target.value })} className="w-full input" />
+                <input placeholder="NPWP" value={quickForm.npwp} onChange={(e) => setQuickForm({ ...quickForm, npwp: e.target.value })} className="w-full input" />
               </div>
-              <input placeholder="Alamat" value={quickForm.alamat} onChange={(e) => setQuickForm({ ...quickForm, alamat: e.target.value })} className="w-full rounded border border-gray-300 px-3 py-2" />
+              <input placeholder="Alamat" value={quickForm.alamat} onChange={(e) => setQuickForm({ ...quickForm, alamat: e.target.value })} className="w-full input" />
               <p className="text-xs font-semibold text-gray-500">Rekening Bank</p>
               {quickForm.banks.map((b, i) => (
                 <div key={i} className="flex gap-2">
-                  <input placeholder="Account No" value={b.accountNo} onChange={(e) => setQuickBank(i, 'accountNo', e.target.value)} className="w-full rounded border border-gray-300 px-3 py-2" />
-                  <input placeholder="Account Name" value={b.accountName} onChange={(e) => setQuickBank(i, 'accountName', e.target.value)} className="w-full rounded border border-gray-300 px-3 py-2" />
-                  <input placeholder="Bank" value={b.bank} onChange={(e) => setQuickBank(i, 'bank', e.target.value)} className="w-full rounded border border-gray-300 px-3 py-2" />
-                  <button type="button" onClick={() => removeQuickBank(i)} className="text-negative hover:underline">Hapus</button>
+                  <input placeholder="Account No" value={b.accountNo} onChange={(e) => setQuickBank(i, 'accountNo', e.target.value)} className="w-full input" />
+                  <input placeholder="Account Name" value={b.accountName} onChange={(e) => setQuickBank(i, 'accountName', e.target.value)} className="w-full input" />
+                  <input placeholder="Bank" value={b.bank} onChange={(e) => setQuickBank(i, 'bank', e.target.value)} className="w-full input" />
+                  <button type="button" onClick={() => removeQuickBank(i)} className="text-negative hover:text-negative/70">Hapus</button>
                 </div>
               ))}
               <div className="flex gap-2">
-                <button type="button" onClick={addQuickBank} className="text-sm text-navy underline">+ Tambah rekening</button>
-                <button type="button" onClick={handleQuickAdd} className="rounded bg-navy px-3 py-2 text-sm text-white">Simpan {isAr ? 'Customer' : 'Vendor'}</button>
+                <button type="button" onClick={addQuickBank} className="text-sm text-gray-700 underline hover:text-navy">+ Tambah rekening</button>
+                <button type="button" onClick={handleQuickAdd} className="btn-primary px-3 py-2">Simpan {isAr ? 'Customer' : 'Vendor'}</button>
               </div>
             </div>
           )}
         </section>
 
         {/* Nominal */}
-        <section className="rounded-lg bg-white p-5 shadow-sm">
-          <h3 className="font-semibold text-navy">Nominal</h3>
+        <section className="card p-5">
+          <h3 className="font-semibold text-gray-900">Nominal</h3>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div>
-              <label className="block text-xs text-gray-500">DPP *</label>
+              <label className="label">DPP *</label>
               <input required type="number" step="0.01" value={form.dpp} onChange={(e) => setField('dpp', e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">PPN {isDp ? '(tidak ada untuk DP)' : ''}</label>
+              <label className="label">PPN {isDp ? '(tidak ada untuk DP)' : ''}</label>
               <input type="number" step="0.01" disabled={isDp} value={isDp ? '' : form.ppn} onChange={(e) => setField('ppn', e.target.value)} className={`${inputCls} disabled:bg-gray-100`} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">PPH Pasal</label>
+              <label className="label">PPH Pasal</label>
               <input placeholder="23 / 4(2) / 21" disabled={isDp} value={isDp ? '' : form.pphPasal} onChange={(e) => setField('pphPasal', e.target.value)} className={`${inputCls} disabled:bg-gray-100`} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">PPH {isDp ? '(tidak ada untuk DP)' : ''}</label>
+              <label className="label">PPH {isDp ? '(tidak ada untuk DP)' : ''}</label>
               <input type="number" step="0.01" disabled={isDp} value={isDp ? '' : form.pph} onChange={(e) => setField('pph', e.target.value)} className={`${inputCls} disabled:bg-gray-100`} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Total (otomatis)</label>
-              <div className="mt-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 font-semibold">{formatUang(total)}</div>
+              <label className="label">Total (otomatis)</label>
+              <div className="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 font-semibold">{formatUang(total)}</div>
             </div>
             {isAr && (
               <div>
-                <label className="block text-xs text-gray-500">Cargo Quantity</label>
+                <label className="label">Cargo Quantity</label>
                 <input type="number" step="0.001" value={form.cargoQuantity} onChange={(e) => setField('cargoQuantity', e.target.value)} className={inputCls} />
               </div>
             )}
             {isAr && (
               <div>
-                <label className="block text-xs text-gray-500">Unit Price</label>
+                <label className="label">Unit Price</label>
                 <input type="number" step="0.001" value={form.unitPrice} onChange={(e) => setField('unitPrice', e.target.value)} className={inputCls} />
               </div>
             )}
@@ -433,11 +433,11 @@ export default function InputInvoice() {
         </section>
 
         {/* Pajak & tanggal */}
-        <section className="rounded-lg bg-white p-5 shadow-sm">
-          <h3 className="font-semibold text-navy">Pajak & Tanggal</h3>
+        <section className="card p-5">
+          <h3 className="font-semibold text-gray-900">Pajak & Tanggal</h3>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div>
-              <label className="block text-xs text-gray-500">Masa Pajak PPN</label>
+              <label className="label">Masa Pajak PPN</label>
               <div className="mt-1 flex gap-2">
                 <select value={splitMasa(form.masaPajakPPN).bulan} onChange={(e) => setMasa('masaPajakPPN', e.target.value, splitMasa(form.masaPajakPPN).tahun)} className={inputCls}>
                   <option value="">Bulan</option>
@@ -454,7 +454,7 @@ export default function InputInvoice() {
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Masa Pajak PPH</label>
+              <label className="label">Masa Pajak PPH</label>
               <div className="mt-1 flex gap-2">
                 <select value={splitMasa(form.masaPajakPPH).bulan} onChange={(e) => setMasa('masaPajakPPH', e.target.value, splitMasa(form.masaPajakPPH).tahun)} className={inputCls}>
                   <option value="">Bulan</option>
@@ -471,7 +471,7 @@ export default function InputInvoice() {
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Status Faktur Pajak</label>
+              <label className="label">Status Faktur Pajak</label>
               <select value={form.statusFakturPajak} onChange={(e) => setField('statusFakturPajak', e.target.value)} className={inputCls}>
                 <option value="SUDAH_DITERIMA">Sudah diterima</option>
                 <option value="BELUM_DITERIMA">Belum diterima</option>
@@ -479,24 +479,24 @@ export default function InputInvoice() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500">Tanggal Jatuh Tempo</label>
+              <label className="label">Tanggal Jatuh Tempo</label>
               <input type="date" value={form.dueDate} onChange={(e) => setField('dueDate', e.target.value)} className={inputCls} />
             </div>
           </div>
 
-          <h4 className="mt-4 font-semibold text-navy">Nomor Faktur Pajak</h4>
+          <h4 className="mt-4 font-semibold text-gray-900">Nomor Faktur Pajak</h4>
           {faktur.map((f, i) => (
             <div key={i} className="mt-2 flex gap-2">
-              <input value={f} onChange={(e) => setFakturIdx(i, e.target.value)} placeholder="Nomor faktur pajak" className="w-full max-w-sm rounded border border-gray-300 px-3 py-2" />
-              <button type="button" onClick={() => removeFaktur(i)} className="text-negative hover:underline">Hapus</button>
+              <input value={f} onChange={(e) => setFakturIdx(i, e.target.value)} placeholder="Nomor faktur pajak" className="w-full max-w-sm input" />
+              <button type="button" onClick={() => removeFaktur(i)} className="text-negative hover:text-negative/70">Hapus</button>
             </div>
           ))}
-          <button type="button" onClick={addFaktur} className="mt-2 text-sm text-navy underline">+ Tambah faktur pajak</button>
+          <button type="button" onClick={addFaktur} className="mt-2 text-sm text-gray-700 underline hover:text-navy">+ Tambah faktur pajak</button>
         </section>
 
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={() => navigate('/dashboard/finance/invoice')} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-          <button type="submit" className="rounded bg-navy px-6 py-2 text-sm font-semibold text-white">Simpan</button>
+          <button type="button" onClick={() => navigate('/dashboard/finance/invoice')} className="btn-ghost">Batal</button>
+          <button type="submit" className="btn-primary px-6">Simpan</button>
         </div>
       </form>
     </div>

@@ -245,7 +245,7 @@ export default function Cetak() {
 
   const pvCounterparty = (pv: Pv) => (pv.jenis === 'RV' ? pv.customerName ?? '-' : pv.vendorName ?? '-');
 
-  const inputCls = 'mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm';
+  const inputCls = 'input mt-1 w-full px-2 py-1.5';
 
   const filteredPvs = pvs.filter((pv) => {
     if (!search) return true;
@@ -256,11 +256,11 @@ export default function Cetak() {
   const pagePvs = filteredPvs.slice((page - 1) * pageSize, page * pageSize);
 
   const tabCls = (active: boolean) =>
-    `rounded-t px-4 py-2 text-sm font-semibold ${active ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
+    `px-4 py-2 text-sm font-medium ${active ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Cetak</h2>
+      <h1 className="page-title">Cetak</h1>
       <p className="mt-1 text-sm text-gray-500">Kelola voucher (bisa membayar/menerima banyak invoice) lalu cetak PDF.</p>
 
       <div className="mt-4 flex border-b border-gray-200">
@@ -269,20 +269,20 @@ export default function Cetak() {
       </div>
 
       <div className="mt-3 flex items-center gap-3">
-        <button onClick={openAdd} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">+ Tambah {isRv ? 'RV' : 'PV'}</button>
-        <input placeholder={`Cari ${isRv ? 'RV' : 'PV'} / ${isRv ? 'customer' : 'vendor'} / INV...`} value={search} onChange={(e) => setSearch(e.target.value)} className="w-72 rounded border border-gray-300 px-3 py-2 text-sm" />
+        <button onClick={openAdd} className="btn-primary">+ Tambah {isRv ? 'RV' : 'PV'}</button>
+        <input placeholder={`Cari ${isRv ? 'RV' : 'PV'} / ${isRv ? 'customer' : 'vendor'} / INV...`} value={search} onChange={(e) => setSearch(e.target.value)} className="input w-72" />
       </div>
 
-      {msg && <div className="mt-3 rounded bg-positive/10 p-3 text-sm text-positive">{msg}</div>}
-      {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+      {msg && <div className="mt-3 alert-success">{msg}</div>}
+      {error && <div className="mt-3 alert-error">{error}</div>}
 
       {loading && <p className="mt-4 text-gray-500">Memuat...</p>}
-      {!loading && filteredPvs.length === 0 && <p className="mt-4 text-gray-400">Belum ada {isRv ? 'RV' : 'PV'}.</p>}
+      {!loading && filteredPvs.length === 0 && <p className="mt-4 text-gray-500">Belum ada {isRv ? 'RV' : 'PV'}.</p>}
 
       {!loading && filteredPvs.length > 0 && (
-        <div className="mt-4 overflow-x-auto rounded-lg bg-white shadow-sm">
+        <div className="mt-4 overflow-x-auto card">
           <table className="w-full text-left text-sm">
-            <thead className="bg-navy-light text-navy">
+            <thead className="text-xs text-gray-500">
               <tr>
                 <th className="px-3 py-2">{isRv ? 'RV No' : 'PV No'}</th>
                 <th className="px-3 py-2">Tanggal</th>
@@ -294,7 +294,7 @@ export default function Cetak() {
             <tbody>
               {pagePvs.map((pv) => (
                 <tr key={pv.id} className="border-t border-gray-100">
-                  <td className="px-3 py-2 font-semibold text-navy">{pv.pvNo}</td>
+                  <td className="px-3 py-2 font-semibold text-gray-900">{pv.pvNo}</td>
                   <td className="px-3 py-2">{pv.tanggal?.slice(0, 10)}</td>
                   <td className="px-3 py-2">
                     <div>{pvCounterparty(pv)}</div>
@@ -302,9 +302,9 @@ export default function Cetak() {
                   </td>
                   <td className="px-3 py-2 text-right font-semibold">{formatUang(pvTotal(pv))}</td>
                   <td className="px-3 py-2 text-right whitespace-nowrap">
-                    <button onClick={() => handleCetak(pv)} className="text-navy hover:underline">Cetak</button>
-                    <button onClick={() => openEdit(pv)} className="ml-3 text-navy hover:underline">Edit</button>
-                    <button onClick={() => deletePv(pv.id)} className="ml-3 text-negative hover:underline">Hapus</button>
+                    <button onClick={() => handleCetak(pv)} className="text-gray-700 hover:text-navy">Cetak</button>
+                    <button onClick={() => openEdit(pv)} className="ml-3 text-gray-700 hover:text-navy">Edit</button>
+                    <button onClick={() => deletePv(pv.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                   </td>
                 </tr>
               ))}
@@ -324,18 +324,18 @@ export default function Cetak() {
       {form && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={submitForm} className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">{editingId ? 'Edit Voucher' : `Tambah ${isRv ? 'RV' : 'PV'}`}</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{editingId ? 'Edit Voucher' : `Tambah ${isRv ? 'RV' : 'PV'}`}</h3>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500">Nomor {isRv ? 'RV' : 'PV'} *</label>
+                <label className="label">Nomor {isRv ? 'RV' : 'PV'} *</label>
                 <input required value={form.pvNo} onChange={(e) => setF('pvNo', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tanggal *</label>
+                <label className="label">Tanggal *</label>
                 <input required type="date" value={form.tanggal} onChange={(e) => setF('tanggal', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">{isRv ? 'Customer' : 'Vendor'} *</label>
+                <label className="label">{isRv ? 'Customer' : 'Vendor'} *</label>
                 {isRv ? (
                   <SearchableSelect
                     value={form.customerId}
@@ -355,31 +355,31 @@ export default function Cetak() {
                 )}
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Rekening Bank</label>
+                <label className="label">Rekening Bank</label>
                 <select value={form.bankAccountId} onChange={(e) => setF('bankAccountId', e.target.value)} className={inputCls}>
                   <option value="">Pilih rekening</option>
                   {selectedBanks.map((b) => <option key={b.id} value={b.id}>{b.bank} - {b.accountNo}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Bank Charge</label>
+                <label className="label">Bank Charge</label>
                 <input type="number" step="0.01" value={form.bankCharge} onChange={(e) => setF('bankCharge', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Balance</label>
+                <label className="label">Balance</label>
                 <input type="number" step="0.01" value={form.balance} onChange={(e) => setF('balance', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Issued Date</label>
+                <label className="label">Issued Date</label>
                 <input type="date" value={form.issuedDate} onChange={(e) => setF('issuedDate', e.target.value)} className={inputCls} />
               </div>
               <div className="col-span-2">
-                <label className="block text-xs text-gray-500">Keterangan</label>
+                <label className="label">Keterangan</label>
                 <input value={form.keterangan} onChange={(e) => setF('keterangan', e.target.value)} className={inputCls} />
               </div>
             </div>
 
-            <h4 className="mt-5 font-semibold text-navy">Invoice yang {isRv ? 'diterima' : 'dibayar'}</h4>
+            <h4 className="mt-5 font-semibold text-gray-900">Invoice yang {isRv ? 'diterima' : 'dibayar'}</h4>
             {form.items.map((item, idx) => {
               const cpId = isRv ? form.customerId : form.vendorId;
               const options = invoices.filter((i) =>
@@ -388,7 +388,7 @@ export default function Cetak() {
               );
               const selectedInvoice = invoices.find((i) => i.id === item.invoiceId);
               return (
-                <div key={idx} className="mt-2 rounded border border-gray-100 bg-gray-50 p-2">
+                <div key={idx} className="mt-2 rounded-md border border-gray-200 bg-gray-50 p-2">
                   <div className="flex items-center gap-2">
                     <select value={item.invoiceId} onChange={(e) => setItem(idx, 'invoiceId', e.target.value)} className={`${inputCls} flex-1`}>
                       <option value="">Pilih invoice</option>
@@ -401,7 +401,7 @@ export default function Cetak() {
                       <input type="checkbox" checked={item.includeTax} onChange={() => toggleIncludeTax(idx)} />
                       {isRv ? 'Terima PPN/PPH' : 'Bayar PPN/PPH'}
                     </label>
-                    <button type="button" onClick={() => removeItem(idx)} className="text-negative hover:underline">Hapus</button>
+                    <button type="button" onClick={() => removeItem(idx)} className="text-negative hover:text-negative/70">Hapus</button>
                   </div>
                   {selectedInvoice && (
                     <div className="mt-2 text-xs text-gray-500">
@@ -411,11 +411,11 @@ export default function Cetak() {
                 </div>
               );
             })}
-            <button type="button" onClick={addItem} className="mt-2 text-sm text-navy underline">+ Tambah invoice</button>
+            <button type="button" onClick={addItem} className="mt-2 text-sm text-gray-700 underline hover:text-navy">+ Tambah invoice</button>
 
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setForm(null)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Simpan</button>
+              <button type="button" onClick={() => setForm(null)} className="btn-ghost">Batal</button>
+              <button type="submit" className="btn-primary">Simpan</button>
             </div>
           </form>
         </div>

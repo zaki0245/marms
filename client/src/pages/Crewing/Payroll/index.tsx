@@ -200,25 +200,25 @@ export default function Payroll() {
   }
 
   const tabCls = (t: 'GAJI' | 'UANG_MAKAN') =>
-    `rounded-t px-4 py-2 text-sm font-semibold ${jenis === t ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
+    `px-4 py-2 text-sm font-medium ${jenis === t ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Payroll & Uang Makan</h2>
+      <h1 className="page-title">Payroll & Uang Makan</h1>
 
-      <div className="mt-4 flex gap-1 border-b border-gray-200">
+      <div className="mt-4 flex border-b border-gray-200">
         <button onClick={() => setJenis('GAJI')} className={tabCls('GAJI')}>Payroll</button>
         <button onClick={() => setJenis('UANG_MAKAN')} className={tabCls('UANG_MAKAN')}>Uang Makan</button>
       </div>
 
       <div className="mt-4 flex justify-end">
-        <button onClick={() => { setGenForm({ vesselId: '', bulan: 1, tahun: new Date().getFullYear() }); setError(''); setShowGen(true); }} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">
+        <button onClick={() => { setGenForm({ vesselId: '', bulan: 1, tahun: new Date().getFullYear() }); setError(''); setShowGen(true); }} className="btn-primary">
           + Buat {isGaji ? 'Gaji' : 'Uang Makan'}
         </button>
       </div>
 
-      {msg && <div className="mt-3 rounded bg-positive/10 p-3 text-sm text-positive">{msg}</div>}
-      {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+      {msg && <div className="mt-3 alert-success">{msg}</div>}
+      {error && <div className="mt-3 alert-error">{error}</div>}
 
       {loading ? (
         <p className="mt-6 text-gray-500">Memuat...</p>
@@ -226,7 +226,7 @@ export default function Payroll() {
         <>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
-            <tr className="bg-navy-light text-left text-navy">
+            <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">Kapal</th>
               <th className="px-3 py-2">Periode</th>
               <th className="px-3 py-2 text-right">Hari</th>
@@ -237,7 +237,7 @@ export default function Payroll() {
           </thead>
           <tbody>
             {filtered.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400">Belum ada data.</td></tr>
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-500">Belum ada data.</td></tr>
             )}
             {pageRows.map((p) => (
               <tr key={p.id} className="border-t border-gray-100">
@@ -247,15 +247,15 @@ export default function Payroll() {
                 <td className="px-3 py-2 text-right tabular-nums">{p._count?.details ?? 0}</td>
                 <td className="px-3 py-2"><span className={statusBadge(p.status)}>{STATUS_LABEL[p.status]}</span></td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => openDetail(p)} className="text-navy hover:underline">Detail</button>
+                  <button onClick={() => openDetail(p)} className="text-gray-700 hover:text-navy">Detail</button>
                   {p.status === 'DRAFT' && (
                     <>
-                      <button onClick={() => finalize(p.id)} className="ml-3 text-positive hover:underline">Final</button>
-                      <button onClick={() => remove(p.id)} className="ml-3 text-negative hover:underline">Hapus</button>
+                      <button onClick={() => finalize(p.id)} className="ml-3 text-positive hover:text-positive/70">Final</button>
+                      <button onClick={() => remove(p.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                     </>
                   )}
                   {p.status === 'FINAL' && (
-                    <button onClick={() => markPaid(p.id)} className="ml-3 text-positive hover:underline">Tandai Dibayar</button>
+                    <button onClick={() => markPaid(p.id)} className="ml-3 text-positive hover:text-positive/70">Tandai Dibayar</button>
                   )}
                 </td>
               </tr>
@@ -276,31 +276,31 @@ export default function Payroll() {
       {showGen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleGenerate} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">Buat {isGaji ? 'Gaji' : 'Uang Makan'}</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Buat {isGaji ? 'Gaji' : 'Uang Makan'}</h3>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500">Kapal</label>
-                <select required value={genForm.vesselId} onChange={(e) => setGenForm({ ...genForm, vesselId: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2">
+                <label className="label">Kapal</label>
+                <select required value={genForm.vesselId} onChange={(e) => setGenForm({ ...genForm, vesselId: e.target.value })} className="input mt-1 w-full">
                   <option value="">Pilih kapal</option>
                   {kapal.map((k) => <option key={k.id} value={k.id}>{k.namaUnit}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-gray-500">Bulan</label>
-                  <select value={genForm.bulan} onChange={(e) => setGenForm({ ...genForm, bulan: Number(e.target.value) })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2">
+                  <label className="label">Bulan</label>
+                  <select value={genForm.bulan} onChange={(e) => setGenForm({ ...genForm, bulan: Number(e.target.value) })} className="input mt-1 w-full">
                     {BULAN.map((b, i) => <option key={b} value={i + 1}>{b}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500">Tahun</label>
-                  <input type="number" value={genForm.tahun} onChange={(e) => setGenForm({ ...genForm, tahun: Number(e.target.value) })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                  <label className="label">Tahun</label>
+                  <input type="number" value={genForm.tahun} onChange={(e) => setGenForm({ ...genForm, tahun: Number(e.target.value) })} className="input mt-1 w-full" />
                 </div>
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setShowGen(false)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" disabled={generating} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">{generating ? 'Membuat...' : 'Buat'}</button>
+              <button type="button" onClick={() => setShowGen(false)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={generating} className="btn-primary">{generating ? 'Membuat...' : 'Buat'}</button>
             </div>
           </form>
         </div>
@@ -312,7 +312,7 @@ export default function Payroll() {
           <div className="w-full max-w-4xl rounded-lg bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-navy">{selected.vessel?.namaUnit} — {BULAN[selected.bulan - 1]} {selected.tahun}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{selected.vessel?.namaUnit} — {BULAN[selected.bulan - 1]} {selected.tahun}</h3>
                 <p className="text-sm text-gray-500">{selected.jumlahHari} hari · <span className={statusBadge(selected.status)}>{STATUS_LABEL[selected.status]}</span></p>
               </div>
               <button onClick={() => setSelected(null)} className="rounded px-3 py-1 text-sm text-gray-500 hover:bg-gray-100">Tutup</button>
@@ -320,7 +320,7 @@ export default function Payroll() {
 
             <table className="mt-4 w-full border-collapse text-sm">
               <thead>
-                <tr className="bg-navy-light text-left text-navy">
+                <tr className="text-left text-xs text-gray-500">
                   <th className="px-3 py-2">Nama</th>
                   <th className="px-3 py-2">Jabatan</th>
                   <th className="px-3 py-2">Nama Bank</th>
@@ -343,7 +343,7 @@ export default function Payroll() {
               </thead>
               <tbody>
                 {(selected.details ?? []).length === 0 && (
-                  <tr><td colSpan={9} className="px-3 py-6 text-center text-gray-400">Tidak ada crew aktif bulan ini.</td></tr>
+                  <tr><td colSpan={9} className="px-3 py-6 text-center text-gray-500">Tidak ada crew aktif bulan ini.</td></tr>
                 )}
                 {(selected.details ?? []).map((d) => (
                   <tr key={d.id} className="border-t border-gray-100">
@@ -370,7 +370,7 @@ export default function Payroll() {
               </tbody>
               {selected.details && selected.details.length > 0 && (
                 <tfoot>
-                  <tr className="border-t-2 border-navy bg-navy-light font-bold text-navy">
+                  <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-gray-900">
                     <td colSpan={8} className="px-3 py-2 text-right">Total Keseluruhan</td>
                     <td className="px-3 py-2 text-right tabular-nums">{formatRupiah(totalKeseluruhan)}</td>
                   </tr>
@@ -379,8 +379,8 @@ export default function Payroll() {
             </table>
 
             <div className="mt-4 flex justify-end gap-2">
-              <button onClick={handleExportExcel} className="rounded border border-navy px-4 py-2 text-sm font-semibold text-navy">Export Excel</button>
-              <button onClick={handleExportPdf} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Export PDF</button>
+              <button onClick={handleExportExcel} className="btn-secondary">Export Excel</button>
+              <button onClick={handleExportPdf} className="btn-primary">Export PDF</button>
             </div>
           </div>
         </div>

@@ -19,9 +19,9 @@ interface DashboardData {
 
 function Card({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-white p-5 shadow-sm">
+    <div className="card p-5">
       <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-2 text-2xl font-bold text-navy">{value}</p>
+      <p className="mt-2 text-2xl font-semibold text-gray-900">{value}</p>
     </div>
   );
 }
@@ -47,11 +47,11 @@ export default function FinanceDashboard() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-navy">Dashboard Finance</h2>
+        <h1 className="page-title">Dashboard Finance</h1>
         <div className="flex gap-2">
-          <button onClick={() => navigate('/dashboard/finance/invoice/input')} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Input Invoice</button>
-          <button onClick={() => navigate('/dashboard/finance/cetak')} className="rounded border border-navy px-4 py-2 text-sm font-semibold text-navy">Cetak</button>
-          <button onClick={() => navigate('/dashboard/finance/konfigurasi')} className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-600">Konfigurasi</button>
+          <button onClick={() => navigate('/dashboard/finance/invoice/input')} className="btn-primary">Input Invoice</button>
+          <button onClick={() => navigate('/dashboard/finance/cetak')} className="btn-secondary">Cetak</button>
+          <button onClick={() => navigate('/dashboard/finance/konfigurasi')} className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">Konfigurasi</button>
         </div>
       </div>
 
@@ -62,10 +62,10 @@ export default function FinanceDashboard() {
         <Card label="Invoice Belum Diterima (AR)" value={String(data?.invoiceBelumDiterima ?? 0)} />
       </div>
 
-      <div className="mt-6 rounded-lg bg-white p-5 shadow-sm">
-        <h3 className="font-semibold text-navy">Invoice Jatuh Tempo Terdekat</h3>
+      <div className="card mt-6 p-5">
+        <h3 className="font-semibold text-gray-900">Invoice Jatuh Tempo Terdekat</h3>
         <table className="mt-3 w-full text-left text-sm">
-          <thead className="bg-navy-light text-navy">
+          <thead className="text-xs text-gray-500">
             <tr>
               <th className="px-3 py-2">Jenis</th>
               <th className="px-3 py-2">Tanggal</th>
@@ -77,7 +77,7 @@ export default function FinanceDashboard() {
           </thead>
           <tbody>
             {jatuhTempo.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400">Tidak ada invoice jatuh tempo.</td></tr>
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-500">Tidak ada invoice jatuh tempo.</td></tr>
             )}
             {pageRows.map((r) => (
               <tr key={r.id} className="border-t border-gray-100">

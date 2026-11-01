@@ -36,24 +36,24 @@ export default function Pengaturan() {
   return (
     <div className="max-w-md">
       {error && (
-        <div className="mb-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>
+        <div className="mb-3 alert-error">{error}</div>
       )}
       {success && (
-        <div className="mb-3 rounded bg-positive/10 p-3 text-sm text-positive">{success}</div>
+        <div className="mb-3 alert-success">{success}</div>
       )}
 
-      <form onSubmit={handleSave} className="rounded-lg bg-white p-5 shadow-sm">
+      <form onSubmit={handleSave} className="card p-5">
         <label className="block text-sm font-medium text-gray-700">Uang Makan per Bulan</label>
         <input
           type="number"
           value={uangMakan}
           onChange={(e) => setUangMakan(e.target.value)}
-          className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+          className="input mt-1 w-full"
         />
         <p className="mt-2 text-sm text-gray-500">
           Nilai saat ini: {formatRupiah(Number(uangMakan) || 0)}
         </p>
-        <button className="mt-4 rounded bg-navy px-4 py-2 text-sm font-semibold text-white">
+        <button className="btn-primary mt-4">
           Simpan
         </button>
       </form>

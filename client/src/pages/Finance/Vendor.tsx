@@ -147,21 +147,21 @@ export default function Vendor() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Vendor</h2>
+      <h1 className="page-title">Vendor</h1>
 
-      {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
-      {success && <div className="mt-3 rounded bg-positive/10 p-3 text-sm text-positive">{success}</div>}
+      {error && <div className="mt-3 alert-error">{error}</div>}
+      {success && <div className="mt-3 alert-success">{success}</div>}
 
       <div className="mt-4 flex items-center gap-3">
-        <button onClick={openAdd} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">
+        <button onClick={openAdd} className="btn-primary">
           + Tambah Vendor
         </button>
-        <input placeholder="Cari nama / NPWP / bank..." value={search} onChange={(e) => setSearch(e.target.value)} className="rounded border border-gray-300 px-3 py-2 text-sm" />
+        <input placeholder="Cari nama / NPWP / bank..." value={search} onChange={(e) => setSearch(e.target.value)} className="input" />
       </div>
 
       <table className="mt-4 w-full border-collapse bg-white text-sm">
         <thead>
-          <tr className="bg-navy-light text-left text-navy">
+          <tr className="text-left text-xs text-gray-500">
             <th className="px-3 py-2">Nama</th>
             <th className="px-3 py-2">NPWP</th>
             <th className="px-3 py-2">Rekening</th>
@@ -170,18 +170,18 @@ export default function Vendor() {
         </thead>
         <tbody>
           {items.length === 0 && (
-            <tr><td colSpan={4} className="px-3 py-6 text-center text-gray-400">Belum ada vendor.</td></tr>
+            <tr><td colSpan={4} className="px-3 py-6 text-center text-gray-500">Belum ada vendor.</td></tr>
           )}
           {pageRows.map((v) => (
               <tr key={v.id} className="border-t border-gray-100">
-                <td className="px-3 py-2 font-semibold text-navy">{v.nama}</td>
+                <td className="px-3 py-2 font-semibold text-gray-900">{v.nama}</td>
                 <td className="px-3 py-2">{v.npwp ?? '-'}</td>
                 <td className="px-3 py-2 text-xs text-gray-600">
                   {v.banks.map((b) => `${b.bank} - ${b.accountNo} (${b.accountName})`).join('; ') || '-'}
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <button onClick={() => openEdit(v)} className="text-navy hover:underline">Edit</button>
-                  <button onClick={() => handleDelete(v.id)} className="ml-3 text-negative hover:underline">Hapus</button>
+                  <button onClick={() => openEdit(v)} className="text-gray-700 hover:text-navy">Edit</button>
+                  <button onClick={() => handleDelete(v.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                 </td>
               </tr>
             ))}
@@ -199,45 +199,45 @@ export default function Vendor() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
           <form onSubmit={handleSubmit} className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-navy">{editingId ? 'Edit Vendor' : 'Tambah Vendor'}</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{editingId ? 'Edit Vendor' : 'Tambah Vendor'}</h3>
 
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500">Nama *</label>
-                <input required value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Nama *</label>
+                <input required value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} className="input mt-1 w-full" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">NPWP</label>
-                <input value={form.npwp} onChange={(e) => setForm({ ...form, npwp: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">NPWP</label>
+                <input value={form.npwp} onChange={(e) => setForm({ ...form, npwp: e.target.value })} className="input mt-1 w-full" />
               </div>
               <div className="col-span-2">
-                <label className="block text-xs text-gray-500">Alamat</label>
-                <input value={form.alamat} onChange={(e) => setForm({ ...form, alamat: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                <label className="label">Alamat</label>
+                <input value={form.alamat} onChange={(e) => setForm({ ...form, alamat: e.target.value })} className="input mt-1 w-full" />
               </div>
             </div>
 
-            <h4 className="mt-5 font-semibold text-navy">Rekening Bank</h4>
+            <h4 className="mt-5 font-semibold text-gray-900">Rekening Bank</h4>
             {form.banks.map((b, idx) => (
               <div key={idx} className="mt-2 grid grid-cols-12 gap-2">
                 <div className="col-span-3">
-                  <input placeholder="Account No" value={b.accountNo} onChange={(e) => setBank(idx, 'accountNo', e.target.value)} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                  <input placeholder="Account No" value={b.accountNo} onChange={(e) => setBank(idx, 'accountNo', e.target.value)} className="input mt-1 w-full" />
                 </div>
                 <div className="col-span-3">
-                  <input placeholder="Account Name" value={b.accountName} onChange={(e) => setBank(idx, 'accountName', e.target.value)} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                  <input placeholder="Account Name" value={b.accountName} onChange={(e) => setBank(idx, 'accountName', e.target.value)} className="input mt-1 w-full" />
                 </div>
                 <div className="col-span-4">
-                  <input placeholder="Bank" value={b.bank} onChange={(e) => setBank(idx, 'bank', e.target.value)} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+                  <input placeholder="Bank" value={b.bank} onChange={(e) => setBank(idx, 'bank', e.target.value)} className="input mt-1 w-full" />
                 </div>
                 <div className="col-span-2 flex items-end">
-                  <button type="button" onClick={() => removeBank(idx)} className="text-negative hover:underline">Hapus</button>
+                  <button type="button" onClick={() => removeBank(idx)} className="text-negative hover:text-negative/70">Hapus</button>
                 </div>
               </div>
             ))}
-            <button type="button" onClick={addBank} className="mt-2 text-sm text-navy underline">+ Tambah rekening</button>
+            <button type="button" onClick={addBank} className="mt-2 text-sm text-gray-700 underline hover:text-navy">+ Tambah rekening</button>
 
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setShowForm(false)} className="rounded px-4 py-2 text-sm text-gray-500">Batal</button>
-              <button type="submit" className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Simpan</button>
+              <button type="button" onClick={() => setShowForm(false)} className="btn-ghost">Batal</button>
+              <button type="submit" className="btn-primary">Simpan</button>
             </div>
           </form>
         </div>

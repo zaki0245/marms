@@ -97,11 +97,11 @@ export default function Approve() {
       </header>
 
       <main className="mx-auto w-full max-w-2xl px-4 py-10">
-        <div className="rounded-xl bg-white p-6 shadow-sm">
-          <h1 className="text-2xl font-bold text-navy">Approval Invoice</h1>
+        <div className="card p-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Approval Invoice</h1>
 
           {loading && <p className="mt-4 text-gray-500">Memuat...</p>}
-          {error && <div className="mt-4 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+          {error && <div className="alert-error mt-4">{error}</div>}
 
           {!loading && info && (
             <>
@@ -138,7 +138,7 @@ export default function Approve() {
               </div>
 
               {done && (
-                <div className="mt-4 rounded bg-positive/10 p-3 text-sm text-positive">
+                <div className="alert-success mt-4">
                   Invoice {info.no} berhasil disetujui. Terima kasih.
                 </div>
               )}
@@ -146,7 +146,7 @@ export default function Approve() {
               {!alreadyApproved && !done && (
                 <button
                   onClick={handleApprove}
-                  className="mt-6 w-full rounded bg-navy px-4 py-3 text-sm font-semibold text-white hover:opacity-95"
+                  className="btn-primary mt-6 w-full py-3"
                 >
                   Setujui (Approve)
                 </button>

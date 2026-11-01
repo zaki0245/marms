@@ -186,9 +186,9 @@ export default function DaftarInvoice() {
   }
 
   const tabCls = (active: boolean) =>
-    `rounded-t px-4 py-2 text-sm font-semibold ${active ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
+    `px-4 py-2 text-sm font-medium ${active ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
 
-  const inputCls = 'rounded border border-gray-300 px-3 py-2 text-sm';
+  const inputCls = 'input';
 
   const changeJenis = (j: 'AP' | 'AR') => {
     setJenis(j);
@@ -198,16 +198,16 @@ export default function DaftarInvoice() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-navy">Daftar Invoice</h2>
+        <h1 className="page-title">Daftar Invoice</h1>
         <div className="flex gap-2">
-          <button onClick={doExport} className="rounded border border-navy px-4 py-2 text-sm font-semibold text-navy">Export Excel</button>
-          <button onClick={() => navigate('/dashboard/finance/invoice/input')} className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">
+          <button onClick={doExport} className="btn-secondary">Export Excel</button>
+          <button onClick={() => navigate('/dashboard/finance/invoice/input')} className="btn-primary">
             + Input Invoice
           </button>
         </div>
       </div>
 
-      {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+      {error && <div className="mt-3 alert-error">{error}</div>}
 
       <div className="mt-4 flex border-b border-gray-200">
         <button onClick={() => changeJenis('AP')} className={tabCls(jenis === 'AP')}>AP (Hutang)</button>
@@ -264,7 +264,7 @@ export default function DaftarInvoice() {
       <div className="mt-4 overflow-x-auto">
         <table className="w-full border-collapse bg-white text-sm">
           <thead>
-            <tr className="bg-navy-light text-left text-navy">
+            <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">No</th>
               <th className="px-3 py-2">Tanggal</th>
               <th className="px-3 py-2">{jenis === 'AR' ? 'Customer' : 'Vendor'}</th>
@@ -285,13 +285,13 @@ export default function DaftarInvoice() {
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={jenis === 'AP' ? 15 : 16} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
+            {loading && <tr><td colSpan={jenis === 'AP' ? 15 : 16} className="px-3 py-6 text-center text-gray-500">Memuat...</td></tr>}
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={jenis === 'AP' ? 15 : 16} className="px-3 py-6 text-center text-gray-400">Belum ada invoice.</td></tr>
+              <tr><td colSpan={jenis === 'AP' ? 15 : 16} className="px-3 py-6 text-center text-gray-500">Belum ada invoice.</td></tr>
             )}
             {!loading && pageRows.map((i) => (
               <tr key={i.id} className="border-t border-gray-100">
-                <td className="px-3 py-2 font-semibold text-navy">
+                <td className="px-3 py-2 font-semibold text-gray-900">
                   {i.no}
                   {i.incomplete && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-700">belum lengkap</span>}
                 </td>
@@ -320,7 +320,7 @@ export default function DaftarInvoice() {
                       <select
                         value={i.approvalStatus}
                         onChange={(e) => changeApproval(i.id, e.target.value)}
-                        className="rounded border border-gray-300 px-2 py-0.5 text-xs"
+                        className="rounded-md border border-gray-300 px-2 py-0.5 text-xs"
                       >
                         <option value="BELUM_DIAPPROVE">Belum di Approve</option>
                         <option value="SUDAH_DIAPPROVE">Sudah di Approve</option>
@@ -335,13 +335,13 @@ export default function DaftarInvoice() {
                   </td>
                 )}
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => navigate(`/dashboard/finance/invoice/input/${i.id}`)} className="text-navy hover:underline">Edit</button>
+                  <button onClick={() => navigate(`/dashboard/finance/invoice/input/${i.id}`)} className="text-gray-700 hover:text-navy">Edit</button>
                   {jenis === 'AP' && i.approvalStatus !== 'SUDAH_DIAPPROVE' && i.kategori !== 'FREIGHT' && (
-                    <button onClick={() => sendApproval(i.id)} className="ml-3 text-navy hover:underline">
+                    <button onClick={() => sendApproval(i.id)} className="ml-3 text-gray-700 hover:text-navy">
                       {i.approvalSentAt ? 'Kirim Ulang' : 'Kirim Approval'}
                     </button>
                   )}
-                  <button onClick={() => handleDelete(i.id)} className="ml-3 text-negative hover:underline">Hapus</button>
+                  <button onClick={() => handleDelete(i.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                 </td>
               </tr>
             ))}

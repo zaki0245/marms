@@ -102,16 +102,16 @@ export default function Laporan() {
     exportExcel({ title: jenis === 'AR' ? 'Rekap AR' : 'Rekap AP', subtitle: 'Finance', filename: jenis === 'AR' ? 'rekap-ar' : 'rekap-ap', columns: COLS, rows: data, totalLabel: '', totalValue: '' });
   }
 
-  const inputCls = 'rounded border border-gray-300 px-3 py-2 text-sm';
+  const inputCls = 'input';
 
   const tabCls = (active: boolean) =>
-    `rounded-t px-4 py-2 text-sm font-semibold ${active ? 'bg-white text-navy border-b-2 border-navy' : 'text-gray-500 hover:text-navy'}`;
+    `px-4 py-2 text-sm font-medium ${active ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-navy">Rekap</h2>
-        <button onClick={doExport} className="rounded border border-navy px-4 py-2 text-sm text-navy">Export Excel</button>
+        <h1 className="page-title">Rekap</h1>
+        <button onClick={doExport} className="btn-secondary">Export Excel</button>
       </div>
 
       <div className="mt-4 flex border-b border-gray-200">
@@ -121,18 +121,18 @@ export default function Laporan() {
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
         <div>
-          <label className="block text-xs text-gray-500">Search</label>
+          <label className="label">Search</label>
           <input placeholder={`Cari ${voucherJenis}, counterparty, INV, REF, keterangan...`} value={search} onChange={(e) => setSearch(e.target.value)} className={`${inputCls} w-72`} />
         </div>
         <div>
-          <label className="block text-xs text-gray-500">Bulan</label>
+          <label className="label">Bulan</label>
           <select value={bulan} onChange={(e) => setBulan(e.target.value)} className={inputCls}>
             <option value="">Semua</option>
             {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-xs text-gray-500">Tahun</label>
+          <label className="label">Tahun</label>
           <select value={tahun} onChange={(e) => setTahun(e.target.value)} className={inputCls}>
             <option value="">Semua</option>
             {years.map((y) => <option key={y} value={y}>{y}</option>)}
@@ -140,9 +140,9 @@ export default function Laporan() {
         </div>
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-lg bg-white shadow-sm">
+      <div className="mt-4 overflow-x-auto card">
         <table className="w-full text-left text-sm">
-          <thead className="bg-navy-light text-navy">
+          <thead className="text-xs text-gray-500">
             <tr>
               <th className="px-3 py-2">No</th>
               <th className="px-3 py-2">Voucher</th>
@@ -162,8 +162,8 @@ export default function Laporan() {
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-400">Memuat...</td></tr>}
-            {!loading && filtered.length === 0 && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-400">Tidak ada data.</td></tr>}
+            {loading && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-500">Memuat...</td></tr>}
+            {!loading && filtered.length === 0 && <tr><td colSpan={15} className="px-3 py-6 text-center text-gray-500">Tidak ada data.</td></tr>}
             {!loading && pageRows.map((r, i) => (
               <tr key={r.id} className="border-t border-gray-100">
                 <td className="px-3 py-2">{(page - 1) * pageSize + i + 1}</td>

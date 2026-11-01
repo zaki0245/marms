@@ -30,32 +30,32 @@ export default function Settings() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy">Pengaturan</h2>
+      <h1 className="page-title">Pengaturan</h1>
 
-      <div className="mt-4 max-w-md rounded-lg bg-white p-5 shadow-sm">
+      <div className="mt-4 max-w-md card p-5">
         <p className="text-sm text-gray-500">Akun admin</p>
-        <p className="mt-1 font-semibold text-navy">{email}</p>
+        <p className="mt-1 font-semibold text-gray-900">{email}</p>
       </div>
 
-      <div className="mt-4 max-w-md rounded-lg bg-white p-5 shadow-sm">
-        <h3 className="font-semibold text-navy">Ganti Password</h3>
-        {msg && <div className="mt-3 rounded bg-positive/10 p-3 text-sm text-positive">{msg}</div>}
-        {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
+      <div className="mt-4 max-w-md card p-5">
+        <h3 className="font-semibold text-gray-900">Ganti Password</h3>
+        {msg && <div className="mt-3 alert-success">{msg}</div>}
+        {error && <div className="mt-3 alert-error">{error}</div>}
         <form onSubmit={handleSubmit} className="mt-3 space-y-3">
           <div>
-            <label className="block text-xs text-gray-500">Password Lama</label>
-            <input type="password" required value={form.passwordLama} onChange={(e) => setForm({ ...form, passwordLama: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+            <label className="label">Password Lama</label>
+            <input type="password" required value={form.passwordLama} onChange={(e) => setForm({ ...form, passwordLama: e.target.value })} className="input mt-1 w-full" />
           </div>
           <div>
-            <label className="block text-xs text-gray-500">Password Baru</label>
-            <input type="password" required minLength={6} value={form.passwordBaru} onChange={(e) => setForm({ ...form, passwordBaru: e.target.value })} className="mt-1 w-full rounded border border-gray-300 px-3 py-2" />
+            <label className="label">Password Baru</label>
+            <input type="password" required minLength={6} value={form.passwordBaru} onChange={(e) => setForm({ ...form, passwordBaru: e.target.value })} className="input mt-1 w-full" />
           </div>
-          <button type="submit" className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white">Simpan</button>
+          <button type="submit" className="btn-primary">Simpan</button>
         </form>
       </div>
 
-      <div className="mt-4 max-w-md rounded-lg bg-white p-5 text-sm shadow-sm">
-        <h3 className="font-semibold text-navy">Lupa Password?</h3>
+      <div className="mt-4 max-w-md card p-5 text-sm">
+        <h3 className="font-semibold text-gray-900">Lupa Password?</h3>
         <p className="mt-2 text-gray-500">
           Reset dilakukan manual lewat database: hash password baru dengan bcrypt, lalu update
           kolom <code>passwordHash</code> di tabel <code>Admin</code>.

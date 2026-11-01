@@ -1,6 +1,6 @@
 // client/tailwind.config.js
-// [FUNGSI] Konfigurasi Tailwind, termasuk warna design system MARMS.
-// [ALASAN] Warna ini dipakai konsisten di seluruh halaman (lihat DESIGN_SYSTEM.md).
+// [FUNGSI] Konfigurasi Tailwind: palet warna + tipografi design system MARMS.
+// [ALASAN] Satu sumber kebenaran warna/font agar semua halaman seragam.
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -10,9 +10,13 @@ export default {
       colors: {
         navy: '#0F2C4C',
         'navy-light': '#EAF0F7',
-        surface: '#F5F6F8',
-        positive: '#1E7A46',
-        negative: '#B3261E',
+        surface: '#F8F8F8',
+        positive: '#2E7D32',
+        negative: '#C4242A',
+      },
+      fontFamily: {
+        sans: ['Geist', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
     },
   },

@@ -79,7 +79,7 @@ export default function Daftar() {
     }
   }
 
-  const inputCls = 'mt-1 w-full rounded border border-gray-300 px-3 py-2';
+  const inputCls = 'input mt-1 w-full';
 
   return (
     <div className="min-h-screen bg-surface pb-16">
@@ -95,54 +95,54 @@ export default function Daftar() {
 
       <main className="mx-auto max-w-3xl px-6 py-8">
         {error && (
-          <div className="mb-4 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>
+          <div className="mb-4 alert-error">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Data Pribadi */}
-          <section className="rounded-lg bg-white p-5 shadow-sm">
-            <h2 className="font-semibold text-navy">Data Pribadi</h2>
+          <section className="card p-5">
+            <h2 className="font-semibold text-gray-900">Data Pribadi</h2>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="block text-xs text-gray-500">Nama Lengkap *</label>
+                <label className="label">Nama Lengkap *</label>
                 <input required value={form.namaLengkap} onChange={(e) => setField('namaLengkap', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tempat Lahir *</label>
+                <label className="label">Tempat Lahir *</label>
                 <input required value={form.tempatLahir} onChange={(e) => setField('tempatLahir', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Tanggal Lahir *</label>
+                <label className="label">Tanggal Lahir *</label>
                 <input required type="date" value={form.tanggalLahir} onChange={(e) => setField('tanggalLahir', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Jenis Kelamin</label>
+                <label className="label">Jenis Kelamin</label>
                 <select value={form.jenisKelamin} onChange={(e) => setField('jenisKelamin', e.target.value)} className={inputCls}>
                   <option value="LAKI_LAKI">Laki-laki</option>
                   <option value="PEREMPUAN">Perempuan</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">No HP/WA *</label>
+                <label className="label">No HP/WA *</label>
                 <input required value={form.noHp} onChange={(e) => setField('noHp', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Email</label>
+                <label className="label">Email</label>
                 <input type="email" value={form.email} onChange={(e) => setField('email', e.target.value)} className={inputCls} />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-xs text-gray-500">Alamat *</label>
+                <label className="label">Alamat *</label>
                 <input required value={form.alamat} onChange={(e) => setField('alamat', e.target.value)} className={inputCls} />
               </div>
             </div>
           </section>
 
           {/* Data Pengalaman */}
-          <section className="rounded-lg bg-white p-5 shadow-sm">
-            <h2 className="font-semibold text-navy">Data Pengalaman</h2>
+          <section className="card p-5">
+            <h2 className="font-semibold text-gray-900">Data Pengalaman</h2>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-xs text-gray-500">Posisi Dilamar *</label>
+                <label className="label">Posisi Dilamar *</label>
                 <select required value={form.posisiDilamar} onChange={(e) => setField('posisiDilamar', e.target.value)} className={inputCls}>
                   <option value="">Pilih posisi</option>
                   {jabatan.map((j) => (
@@ -151,7 +151,7 @@ export default function Daftar() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Pengalaman</label>
+                <label className="label">Pengalaman</label>
                 <select value={form.pengalamanTahun} onChange={(e) => setField('pengalamanTahun', e.target.value)} className={inputCls}>
                   <option value="">Pilih pengalaman</option>
                   <option value="0">Kurang dari 1 Tahun</option>
@@ -161,38 +161,38 @@ export default function Daftar() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Kapal Terakhir</label>
+                <label className="label">Kapal Terakhir</label>
                 <input value={form.kapalTerakhir} onChange={(e) => setField('kapalTerakhir', e.target.value)} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500">Jabatan Terakhir</label>
+                <label className="label">Jabatan Terakhir</label>
                 <input value={form.jabatanTerakhir} onChange={(e) => setField('jabatanTerakhir', e.target.value)} className={inputCls} />
               </div>
             </div>
           </section>
 
           {/* Dokumen */}
-          <section className="rounded-lg bg-white p-5 shadow-sm">
-            <h2 className="font-semibold text-navy">Dokumen (Unggah dokumen atau data pendukung yang Anda miliki)</h2>
+          <section className="card p-5">
+            <h2 className="font-semibold text-gray-900">Dokumen (Unggah dokumen atau data pendukung yang Anda miliki)</h2>
             <p className="text-xs text-gray-500">PDF/JPG/PNG, maksimal 5 MB per file. Boleh diunggah sebagian.</p>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {DOKUMEN.map((d) => (
                 <div key={d.kode}>
-                  <label className="block text-xs text-gray-500">
+                  <label className="label">
                     {d.label}{d.expired ? ' (berlaku s/d tanggal)' : ''}
                   </label>
                   <input
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(e) => setFiles({ ...files, [d.kode]: e.target.files?.[0] ?? null })}
-                    className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+                    className="input mt-1 w-full px-2 py-1.5"
                   />
                   {d.expired && (
                     <input
                       type="date"
                       value={expiry[d.kode] ?? ''}
                       onChange={(e) => setExpiry({ ...expiry, [d.kode]: e.target.value })}
-                      className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+                      className="input mt-1 w-full px-2 py-1.5"
                     />
                   )}
                 </div>
@@ -203,7 +203,7 @@ export default function Daftar() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded bg-navy px-6 py-3 text-lg font-semibold text-white disabled:opacity-50"
+            className="w-full rounded-md bg-navy px-6 py-3 text-base font-medium text-white hover:bg-navy/90 disabled:opacity-50"
           >
             {submitting ? 'Mengirim...' : 'Kirim Pendaftaran'}
           </button>

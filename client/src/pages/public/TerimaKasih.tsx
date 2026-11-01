@@ -16,19 +16,19 @@ export default function TerimaKasih() {
       </header>
 
       <main className="flex flex-1 items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md rounded-2xl bg-white p-10 text-center shadow-sm">
+        <div className="card w-full max-w-md p-10 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-positive/10">
             <svg className="h-8 w-8 text-positive" viewBox="0 0 24 24" fill="none">
               <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <h1 className="mt-6 text-2xl font-bold text-navy">Terima Kasih</h1>
+          <h1 className="mt-6 text-2xl font-semibold text-gray-900">Terima Kasih</h1>
           <p className="mt-3 text-gray-600">
             Pendaftaran Anda telah kami terima. Tim kami akan menghubungi Anda untuk proses selanjutnya.
           </p>
           <Link
             to="/career"
-            className="mt-8 inline-block rounded-lg bg-navy px-8 py-2.5 text-sm font-semibold text-white hover:bg-navy/90"
+            className="mt-8 inline-block rounded-md bg-navy px-8 py-2.5 text-sm font-medium text-white hover:bg-navy/90"
           >
             Kembali ke Beranda
           </Link>

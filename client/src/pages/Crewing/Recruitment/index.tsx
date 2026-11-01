@@ -57,14 +57,14 @@ function DokumenRow({ doc }: { doc: Dokumen }) {
   return (
     <div className="flex items-center justify-between rounded border border-gray-200 p-3">
       <div>
-        <span className="font-medium text-navy">{DOKUMEN_LABEL[doc.jenis] ?? doc.jenis}</span>
+        <span className="font-medium text-gray-900">{DOKUMEN_LABEL[doc.jenis] ?? doc.jenis}</span>
         {doc.tanggalExpired && (
           <p className="mt-0.5 text-xs text-gray-500">
             Expired: {doc.tanggalExpired.slice(0, 10)}
           </p>
         )}
       </div>
-      <a href={doc.filePath} target="_blank" rel="noreferrer" className="text-sm text-navy underline">
+      <a href={doc.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-navy">
         Lihat file
       </a>
     </div>
@@ -132,11 +132,11 @@ export default function Recruitment() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-navy">Rekrutmen</h2>
+        <h1 className="page-title">Rekrutmen</h1>
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
+          className="input"
         >
           <option value="">Semua Status</option>
           {STATUS.map((s) => (
@@ -151,7 +151,7 @@ export default function Recruitment() {
         <div>
         <table className="mt-4 w-full border-collapse bg-white text-sm">
           <thead>
-            <tr className="bg-navy-light text-left text-navy">
+            <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">No. Pendaftaran</th>
               <th className="px-3 py-2">Nama</th>
               <th className="px-3 py-2">Posisi</th>
@@ -162,7 +162,7 @@ export default function Recruitment() {
           <tbody>
             {items.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-3 py-6 text-center text-gray-400">
+                <td colSpan={5} className="px-3 py-6 text-center text-gray-500">
                   Belum ada pelamar.
                 </td>
               </tr>
@@ -176,7 +176,7 @@ export default function Recruitment() {
                   <span className={statusBadge(p.status)}>{STATUS_LABEL[p.status]}</span>
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <button onClick={() => openDetail(p)} className="text-navy hover:underline">
+                  <button onClick={() => openDetail(p)} className="text-gray-700 hover:text-navy">
                     Detail
                   </button>
                 </td>
@@ -199,7 +199,7 @@ export default function Recruitment() {
           <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-navy">{selected.namaLengkap}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{selected.namaLengkap}</h3>
                 <p className="text-sm text-gray-500">
                   {selected.nomorPendaftaran} · {selected.posisiDilamar}
                 </p>
@@ -213,16 +213,16 @@ export default function Recruitment() {
             </div>
 
             {success && (
-              <div className="mt-4 rounded bg-positive/10 p-3 text-sm text-positive">{success}</div>
+              <div className="mt-4 alert-success">{success}</div>
             )}
 
             <div className="mt-4 flex items-end gap-2 rounded border border-gray-200 p-3">
               <div>
-                <label className="block text-xs text-gray-500">Status Seleksi</label>
+                <label className="label">Status Seleksi</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  className="input"
                 >
                   {STATUS.map((s) => (
                     <option key={s} value={s}>{STATUS_LABEL[s]}</option>
@@ -232,7 +232,7 @@ export default function Recruitment() {
               <button
                 onClick={saveStatus}
                 disabled={savingStatus}
-                className="rounded bg-navy px-4 py-2 text-sm font-semibold text-white"
+                className="btn-primary"
               >
                 {savingStatus ? 'Menyimpan...' : 'Simpan Status'}
               </button>
@@ -249,14 +249,14 @@ export default function Recruitment() {
               <div><span className="text-gray-500">Kapal terakhir:</span> {selected.kapalTerakhir ?? '-'}</div>
             </div>
 
-            <h4 className="mt-5 font-semibold text-navy">Dokumen</h4>
+            <h4 className="mt-5 font-semibold text-gray-900">Dokumen</h4>
             <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {selected.documents.map((d) => (
                 <DokumenRow key={d.id} doc={d} />
               ))}
             </div>
             {selected.documents.length === 0 && (
-              <p className="mt-2 text-sm text-gray-400">Belum ada dokumen diunggah.</p>
+              <p className="mt-2 text-sm text-gray-500">Belum ada dokumen diunggah.</p>
             )}
           </div>
         </div>
