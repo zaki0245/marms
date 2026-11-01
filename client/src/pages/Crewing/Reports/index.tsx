@@ -321,7 +321,7 @@ export default function Reports() {
                           <td className="px-4 py-2">{active?.tanggalMulai?.slice(0, 10) ?? '-'}</td>
                           <td className="px-4 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                           <td className="px-4 py-2 text-right">
-                            <button onClick={() => openDetail(c)} className="text-gray-700 hover:text-navy">Detail</button>
+                            <button onClick={() => openDetail(c)} className="text-gray-700 hover:text-gray-900">Detail</button>
                           </td>
                         </tr>
                       );
@@ -336,7 +336,7 @@ export default function Reports() {
 
       {tab === 'leavepay' && (
         <>
-        <table className="mt-4 w-full border-collapse bg-white text-sm">
+        <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">Nama</th>
@@ -362,7 +362,7 @@ export default function Reports() {
                   {c.sisa > 0 && (
                     <button onClick={() => openCairkan(c)} className="text-positive hover:text-positive/70">Cairkan</button>
                   )}
-                  <button onClick={() => openRiwayat(c)} className="ml-3 text-gray-700 hover:text-navy">Riwayat</button>
+                  <button onClick={() => openRiwayat(c)} className="ml-3 text-gray-700 hover:text-gray-900">Riwayat</button>
                 </td>
               </tr>
             ))}
@@ -381,7 +381,7 @@ export default function Reports() {
       {/* Modal detail crew */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
+          <div className="w-full max-w-2xl rounded-lg bg-card p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{selected.applicant.namaLengkap}</h3>
@@ -404,7 +404,7 @@ export default function Reports() {
                 <div><span className="text-gray-500">Nama Bank:</span> {selected.namaBank ?? '-'}</div>
                 <div><span className="text-gray-500">No Rekening:</span> {selected.noRekening ?? '-'}</div>
               </div>
-              <button onClick={() => openBankEdit(selected)} className="text-sm text-gray-700 underline hover:text-navy">Edit</button>
+              <button onClick={() => openBankEdit(selected)} className="text-sm text-gray-700 underline hover:text-gray-900">Edit</button>
             </div>
 
             <h4 className="mt-5 font-semibold text-gray-900">Riwayat Penempatan</h4>
@@ -438,8 +438,8 @@ export default function Reports() {
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-navy">Lihat file</a>
-                      <button onClick={() => openUpdate(d)} className="text-sm text-gray-700 underline hover:text-navy">Perbarui</button>
+                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-gray-900">Lihat file</a>
+                      <button onClick={() => openUpdate(d)} className="text-sm text-gray-700 underline hover:text-gray-900">Perbarui</button>
                     </div>
                   </div>
                 );
@@ -453,7 +453,7 @@ export default function Reports() {
       {/* Modal perbarui dokumen */}
       {updateDoc && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleUpdate} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleUpdate} className="w-full max-w-sm rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Perbarui Dokumen</h3>
             <p className="mt-1 text-sm text-gray-500">{DOKUMEN_LABEL[updateDoc.jenis] ?? updateDoc.jenis}</p>
             <div className="mt-4 space-y-3">
@@ -477,7 +477,7 @@ export default function Reports() {
       {/* Modal edit bank */}
       {bankTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleBankSave} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleBankSave} className="w-full max-w-sm rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Edit Informasi Bank</h3>
             <p className="mt-1 text-sm text-gray-500">{bankTarget.applicant.namaLengkap}</p>
             <div className="mt-4 space-y-3">
@@ -501,7 +501,7 @@ export default function Reports() {
       {/* Modal cairkan leave pay */}
       {cairkanTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleCairkan} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleCairkan} className="w-full max-w-sm rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Cairkan Leave Pay</h3>
             <p className="mt-1 text-sm text-gray-500">{cairkanTarget.nama} · masa kerja {cairkanTarget.masaKerja} hari</p>
             {error && <div className="mt-3 alert-error">{error}</div>}
@@ -526,7 +526,7 @@ export default function Reports() {
       {/* Modal riwayat leave pay */}
       {riwayatTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-lg bg-card p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Riwayat Leave Pay — {riwayatTarget.nama}</h3>
               <button onClick={() => setRiwayatTarget(null)} className="rounded px-3 py-1 text-sm text-gray-500 hover:bg-gray-100">Tutup</button>

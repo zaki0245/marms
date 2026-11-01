@@ -48,8 +48,8 @@ function statusBadge(s: string) {
   const base = 'rounded px-2 py-0.5 text-xs font-medium';
   if (s === 'DITERIMA') return `${base} bg-positive/10 text-positive`;
   if (s === 'DITOLAK') return `${base} bg-negative/10 text-negative`;
-  if (s === 'BARU') return `${base} bg-navy/10 text-navy`;
-  return `${base} bg-amber-100 text-amber-700`;
+  if (s === 'BARU') return `${base} badge-info`;
+  return `${base} badge-warning`;
 }
 
 // [FUNGSI] Satu baris dokumen: label, tanggal expired, dan link lihat file.
@@ -64,7 +64,7 @@ function DokumenRow({ doc }: { doc: Dokumen }) {
           </p>
         )}
       </div>
-      <a href={doc.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-navy">
+      <a href={doc.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-gray-900">
         Lihat file
       </a>
     </div>
@@ -149,7 +149,7 @@ export default function Recruitment() {
         <p className="mt-6 text-gray-500">Memuat...</p>
       ) : (
         <div>
-        <table className="mt-4 w-full border-collapse bg-white text-sm">
+        <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">No. Pendaftaran</th>
@@ -176,7 +176,7 @@ export default function Recruitment() {
                   <span className={statusBadge(p.status)}>{STATUS_LABEL[p.status]}</span>
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <button onClick={() => openDetail(p)} className="text-gray-700 hover:text-navy">
+                  <button onClick={() => openDetail(p)} className="text-gray-700 hover:text-gray-900">
                     Detail
                   </button>
                 </td>
@@ -196,7 +196,7 @@ export default function Recruitment() {
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-xl">
+          <div className="w-full max-w-3xl rounded-lg bg-card p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{selected.namaLengkap}</h3>

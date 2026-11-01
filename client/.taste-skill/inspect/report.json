@@ -1,6 +1,6 @@
 {
- "url": "http://localhost:4173/career",
- "at": "2026-11-01T15:52:24.797Z",
+ "url": "http://localhost:4173/login?theme=dark",
+ "at": "2026-11-01T16:15:14.738Z",
  "allow": [],
  "viewports": [
   {
@@ -9,7 +9,7 @@
    "load": "load",
    "screens": 1,
    "filled": [
-    0.49
+    0.12
    ],
    "motion": {
     "elements": 0,
@@ -27,12 +27,12 @@
     "page": {
      "height": 900,
      "screens": 1,
-     "words": 50,
+     "words": 6,
      "img": 1,
      "video": 0,
      "canvas": 0,
      "svg": 0,
-     "sections": 2,
+     "sections": 0,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
@@ -48,58 +48,36 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
-     "chars": 14,
+     "text": "MARMS",
+     "words": 1,
+     "chars": 5,
      "lines": 1,
-     "size": 36,
-     "vw": 2.5,
+     "size": 20,
+     "vw": 1.4,
      "font": "Geist",
-     "weight": 700,
+     "weight": 600,
      "tracking": 0,
-     "leading": 1.11,
-     "top": 124,
+     "leading": 1.4,
+     "top": 350,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
     },
     "h1": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
+     "text": "MARMS",
+     "words": 1,
      "lines": 1,
-     "size": 36,
+     "size": 20,
      "font": "Geist"
     },
-    "headings": [
-     {
-      "text": "Rekrutmen Crew",
-      "words": 2,
-      "chars": 14,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Geist",
-      "weight": 700,
-      "tracking": 0,
-      "leading": 1.11,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "center",
-      "position": "center",
-      "widthRatio": 0.47,
-      "top": 124,
-      "tag": "h1",
-      "kind": "heading"
-     }
-    ],
+    "headings": [],
     "headingSummary": {
-     "count": 1,
-     "maxLines": 1,
+     "count": 0,
+     "maxLines": 0,
      "over2Lines": 0,
      "statements": 0,
-     "centered": 1,
+     "centered": 0,
      "medianWords": null,
      "mixedFontHeadings": 0
     },
@@ -115,26 +93,17 @@
      "sizes": [
       12,
       14,
-      16,
-      18,
-      36
+      20
      ],
-     "sizeCount": 5,
+     "sizeCount": 3,
      "notLoaded": [],
-     "body": {
-      "font": "Geist",
-      "size": 16,
-      "leading": 1.5,
-      "weight": 400,
-      "tracking": 0,
-      "contrast": 14.1
-     },
-     "measureChars": 84,
+     "body": null,
+     "measureChars": null,
      "max": {
-      "size": 36,
-      "vw": 2.5,
+      "size": 20,
+      "vw": 1.4,
       "font": "Geist",
-      "text": "Rekrutmen Crew"
+      "text": "MARMS"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -143,80 +112,71 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.02,
-     "centerShare": 0.46,
-     "smallText": 1
+     "upperShare": 0.15,
+     "centerShare": 0.62,
+     "smallText": 0
     },
     "eyebrows": [],
     "numbered": [],
     "color": {
-     "bodyBg": "#f8f8f8",
+     "bodyBg": "#0a0a0a",
      "bodyBgHsl": {
       "h": 0,
       "s": 0,
-      "l": 0.97
+      "l": 0.04
      },
-     "dark": false,
+     "dark": true,
      "sectionBgs": [
       {
-       "color": "#f8f8f8",
+       "color": "#0a0a0a",
        "top": 0,
        "hsl": {
         "h": 0,
         "s": 0,
-        "l": 0.97
-       }
-      },
-      {
-       "color": "#0f2c4c",
-       "top": 68,
-       "hsl": {
-        "h": 211,
-        "s": 0.67,
-        "l": 0.18
+        "l": 0.04
        }
       }
      ],
      "textColors": [
       {
-       "color": "#6b7280",
-       "share": 0.43
+       "color": "#b4b4b4",
+       "share": 0.38
+      },
+      {
+       "color": "#9a9a9a",
+       "share": 0.32
+      },
+      {
+       "color": "#f5f5f5",
+       "share": 0.15
       },
       {
        "color": "#ffffff",
-       "share": 0.39
-      },
-      {
-       "color": "#111827",
-       "share": 0.13
-      },
-      {
-       "color": "#0f2c4c",
-       "share": 0.05
+       "share": 0.15
       }
      ],
      "button": {
-      "bg": "#ffffff",
+      "bg": "#1d4a75",
       "hsl": {
-       "h": 0,
-       "s": 0,
-       "l": 1
+       "h": 209,
+       "s": 0.6,
+       "l": 0.29
       },
-      "fg": "#0f2c4c"
+      "fg": "#ffffff"
      },
      "lowContrast": []
     },
     "buttons": {
      "count": 1,
      "inHero": 1,
-     "radius": 8,
-     "height": 48,
+     "radius": 6,
+     "height": 36,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "Daftar Sekarang"
+      "Masuk"
      ]
     },
     "surfaces": {
@@ -227,36 +187,21 @@
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 1,
-     "hairlineSamples": [
-      "footer.border-t.border-gray-200 1440px"
-     ],
-     "outlinedBoxes": 3,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 1,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 3,
+     "roundedBoxes": 1,
      "boxRadius": 8,
      "squareMedia": 0,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
-     "cardRows": [
-      {
-       "count": 3,
-       "iconTopped": false,
-       "rounded": true,
-       "top": 412
-      }
-     ]
+     "cardRows": []
     },
     "heroMedia": [],
-    "nav": {
-     "links": 0,
-     "fixed": false,
-     "height": 68,
-     "floatingPill": false,
-     "blur": false
-    },
+    "nav": null,
     "fontsLoaded": [
      "geist"
     ]
@@ -268,92 +213,32 @@
     },
     "pageH": 900,
     "margins": {
-     "left": 256,
-     "right": 208
+     "left": 561,
+     "right": 561
     },
-    "sections": [
-     {
-      "sel": "section.bg-navy.px-6",
-      "tag": "section",
-      "top": 68,
-      "height": 304,
-      "words": 19,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "Rekrutmen Crew",
-       "size": 36,
-       "tag": "h1"
-      },
-      "left": 415,
-      "right": 415,
-      "textLeft": 415,
-      "textRight": 415,
-      "fullBleed": false,
-      "footer": false,
-      "hero": true,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.mx-auto.w-full",
-      "tag": "section",
-      "top": 372,
-      "height": 198,
-      "words": 22,
-      "media": 0,
-      "middle": 89,
-      "heading": {
-       "text": "Isi Formulir",
-       "size": 16,
-       "tag": "h3"
-      },
-      "left": 257,
-      "right": 299,
-      "textLeft": 257,
-      "textRight": 299,
-      "fullBleed": false,
-      "footer": true,
-      "hero": true,
-      "continues": false,
-      "pinned": false
-     }
-    ],
+    "sections": [],
     "gaps": [],
     "h1s": [
      {
-      "text": "Rekrutmen Crew",
-      "size": 36,
-      "top": 124,
+      "text": "MARMS",
+      "size": 20,
+      "top": 350,
       "firstScreen": true
      }
     ],
     "edgeText": [],
-    "edges": [
-     {
-      "x": 257,
-      "n": 1
-     },
-     {
-      "x": 588,
-      "n": 1
-     },
-     {
-      "x": 918,
-      "n": 1
-     }
-    ],
-    "leftBlocks": 3,
+    "edges": [],
+    "leftBlocks": 0,
     "bodySize": 16,
     "stage": false,
     "explains": false,
     "slivers": [],
-    "voidShare": 0.27,
+    "voidShare": 0.33,
     "voidBox": {
      "x": 0,
-     "y": 660,
-     "w": 1440,
-     "h": 240
+     "y": 120,
+     "w": 540,
+     "h": 780
     }
    },
    "app": {
@@ -361,28 +246,26 @@
      "w": 1440,
      "h": 900
     },
-    "dark": false,
-    "ground": "#f8f8f8",
+    "dark": true,
+    "ground": "#0a0a0a",
     "sidebar": null,
-    "topbar": {
-     "h": 68
-    },
+    "topbar": null,
     "canvas": {
-     "left": 208,
-     "right": 208
+     "left": 561,
+     "right": 561
     },
     "hero": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
-     "chars": 14,
+     "text": "MARMS",
+     "words": 1,
+     "chars": 5,
      "lines": 1,
-     "size": 36,
-     "vw": 2.5,
+     "size": 20,
+     "vw": 1.4,
      "font": "Geist",
-     "weight": 700,
+     "weight": 600,
      "tracking": 0,
-     "leading": 1.11,
-     "top": 124,
+     "leading": 1.4,
+     "top": 350,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
@@ -390,18 +273,18 @@
     },
     "charts": 0,
     "layout": {
-     "panels": 3,
-     "firstScreen": 3,
+     "panels": 1,
+     "firstScreen": 1,
      "ragged": [],
      "voids": []
     },
     "tiles": 1,
     "panels": {
-     "count": 3,
+     "count": 1,
      "radii": [
       [
        8,
-       3
+       1
       ]
      ],
      "heavyBorders": 0,
@@ -427,21 +310,19 @@
     "chartHues": 0,
     "placeholders": [],
     "type": {
-     "under13": 0.08,
+     "under13": 0.38,
      "tiny": 0,
      "tinySamples": [],
      "sizes": [
       12,
       14,
-      16,
-      18,
-      36
+      20
      ]
     },
     "title": {
-     "text": "Rekrutmen Crew",
-     "size": 36,
-     "top": 124
+     "text": "MARMS",
+     "size": 20,
+     "top": 350
     },
     "colourShare": 0.009
    },
@@ -453,7 +334,7 @@
    "load": "load",
    "screens": 1,
    "filled": [
-    0.46
+    0.17
    ],
    "motion": {
     "elements": 0,
@@ -471,12 +352,12 @@
     "page": {
      "height": 1024,
      "screens": 1,
-     "words": 50,
+     "words": 6,
      "img": 1,
      "video": 0,
      "canvas": 0,
      "svg": 0,
-     "sections": 2,
+     "sections": 0,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
@@ -492,58 +373,36 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
-     "chars": 14,
+     "text": "MARMS",
+     "words": 1,
+     "chars": 5,
      "lines": 1,
-     "size": 36,
-     "vw": 4.7,
+     "size": 20,
+     "vw": 2.6,
      "font": "Geist",
-     "weight": 700,
+     "weight": 600,
      "tracking": 0,
-     "leading": 1.11,
-     "top": 124,
+     "leading": 1.4,
+     "top": 412,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
     },
     "h1": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
+     "text": "MARMS",
+     "words": 1,
      "lines": 1,
-     "size": 36,
+     "size": 20,
      "font": "Geist"
     },
-    "headings": [
-     {
-      "text": "Rekrutmen Crew",
-      "words": 2,
-      "chars": 14,
-      "lines": 1,
-      "size": 36,
-      "vw": 4.7,
-      "font": "Geist",
-      "weight": 700,
-      "tracking": 0,
-      "leading": 1.11,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "center",
-      "position": "center",
-      "widthRatio": 0.88,
-      "top": 124,
-      "tag": "h1",
-      "kind": "heading"
-     }
-    ],
+    "headings": [],
     "headingSummary": {
-     "count": 1,
-     "maxLines": 1,
+     "count": 0,
+     "maxLines": 0,
      "over2Lines": 0,
      "statements": 0,
-     "centered": 1,
+     "centered": 0,
      "medianWords": null,
      "mixedFontHeadings": 0
     },
@@ -559,26 +418,17 @@
      "sizes": [
       12,
       14,
-      16,
-      18,
-      36
+      20
      ],
-     "sizeCount": 5,
+     "sizeCount": 3,
      "notLoaded": [],
-     "body": {
-      "font": "Geist",
-      "size": 16,
-      "leading": 1.5,
-      "weight": 400,
-      "tracking": 0,
-      "contrast": 14.1
-     },
-     "measureChars": 84,
+     "body": null,
+     "measureChars": null,
      "max": {
-      "size": 36,
-      "vw": 4.7,
+      "size": 20,
+      "vw": 2.6,
       "font": "Geist",
-      "text": "Rekrutmen Crew"
+      "text": "MARMS"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -587,71 +437,71 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.02,
-     "centerShare": 0.46,
-     "smallText": 1
+     "upperShare": 0.15,
+     "centerShare": 0.62,
+     "smallText": 0
     },
     "eyebrows": [],
     "numbered": [],
     "color": {
-     "bodyBg": "#f8f8f8",
+     "bodyBg": "#0a0a0a",
      "bodyBgHsl": {
       "h": 0,
       "s": 0,
-      "l": 0.97
+      "l": 0.04
      },
-     "dark": false,
+     "dark": true,
      "sectionBgs": [
       {
-       "color": "#f8f8f8",
+       "color": "#0a0a0a",
        "top": 0,
        "hsl": {
         "h": 0,
         "s": 0,
-        "l": 0.97
+        "l": 0.04
        }
       }
      ],
      "textColors": [
       {
-       "color": "#6b7280",
-       "share": 0.43
+       "color": "#b4b4b4",
+       "share": 0.38
+      },
+      {
+       "color": "#9a9a9a",
+       "share": 0.32
+      },
+      {
+       "color": "#f5f5f5",
+       "share": 0.15
       },
       {
        "color": "#ffffff",
-       "share": 0.39
-      },
-      {
-       "color": "#111827",
-       "share": 0.13
-      },
-      {
-       "color": "#0f2c4c",
-       "share": 0.05
+       "share": 0.15
       }
      ],
      "button": {
-      "bg": "#ffffff",
+      "bg": "#1d4a75",
       "hsl": {
-       "h": 0,
-       "s": 0,
-       "l": 1
+       "h": 209,
+       "s": 0.6,
+       "l": 0.29
       },
-      "fg": "#0f2c4c"
+      "fg": "#ffffff"
      },
      "lowContrast": []
     },
     "buttons": {
      "count": 1,
      "inHero": 1,
-     "radius": 8,
-     "height": 48,
+     "radius": 6,
+     "height": 36,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "Daftar Sekarang"
+      "Masuk"
      ]
     },
     "surfaces": {
@@ -662,36 +512,21 @@
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 1,
-     "hairlineSamples": [
-      "footer.border-t.border-gray-200 768px"
-     ],
-     "outlinedBoxes": 3,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 1,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 3,
+     "roundedBoxes": 1,
      "boxRadius": 8,
      "squareMedia": 0,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
-     "cardRows": [
-      {
-       "count": 3,
-       "iconTopped": false,
-       "rounded": true,
-       "top": 412
-      }
-     ]
+     "cardRows": []
     },
     "heroMedia": [],
-    "nav": {
-     "links": 0,
-     "fixed": false,
-     "height": 68,
-     "floatingPill": false,
-     "blur": false
-    },
+    "nav": null,
     "fontsLoaded": [
      "geist"
     ]
@@ -703,82 +538,22 @@
     },
     "pageH": 1024,
     "margins": {
-     "left": 49,
-     "right": 24
+     "left": 225,
+     "right": 225
     },
-    "sections": [
-     {
-      "sel": "section.bg-navy.px-6",
-      "tag": "section",
-      "top": 68,
-      "height": 304,
-      "words": 19,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "Rekrutmen Crew",
-       "size": 36,
-       "tag": "h1"
-      },
-      "left": 79,
-      "right": 79,
-      "textLeft": 79,
-      "textRight": 79,
-      "fullBleed": false,
-      "footer": false,
-      "hero": true,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.mx-auto.w-full",
-      "tag": "section",
-      "top": 372,
-      "height": 198,
-      "words": 22,
-      "media": 0,
-      "middle": 84,
-      "heading": {
-       "text": "Isi Formulir",
-       "size": 16,
-       "tag": "h3"
-      },
-      "left": 49,
-      "right": 86,
-      "textLeft": 49,
-      "textRight": 86,
-      "fullBleed": false,
-      "footer": true,
-      "hero": true,
-      "continues": false,
-      "pinned": false
-     }
-    ],
+    "sections": [],
     "gaps": [],
     "h1s": [
      {
-      "text": "Rekrutmen Crew",
-      "size": 36,
-      "top": 124,
+      "text": "MARMS",
+      "size": 20,
+      "top": 412,
       "firstScreen": true
      }
     ],
     "edgeText": [],
-    "edges": [
-     {
-      "x": 49,
-      "n": 1
-     },
-     {
-      "x": 294,
-      "n": 1
-     },
-     {
-      "x": 540,
-      "n": 1
-     }
-    ],
-    "leftBlocks": 3,
+    "edges": [],
+    "leftBlocks": 0,
     "bodySize": 16,
     "stage": false,
     "explains": false,
@@ -791,28 +566,26 @@
      "w": 768,
      "h": 1024
     },
-    "dark": false,
-    "ground": "#f8f8f8",
+    "dark": true,
+    "ground": "#0a0a0a",
     "sidebar": null,
-    "topbar": {
-     "h": 68
-    },
+    "topbar": null,
     "canvas": {
-     "left": 24,
-     "right": 24
+     "left": 225,
+     "right": 225
     },
     "hero": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
-     "chars": 14,
+     "text": "MARMS",
+     "words": 1,
+     "chars": 5,
      "lines": 1,
-     "size": 36,
-     "vw": 4.7,
+     "size": 20,
+     "vw": 2.6,
      "font": "Geist",
-     "weight": 700,
+     "weight": 600,
      "tracking": 0,
-     "leading": 1.11,
-     "top": 124,
+     "leading": 1.4,
+     "top": 412,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
@@ -820,18 +593,18 @@
     },
     "charts": 0,
     "layout": {
-     "panels": 3,
-     "firstScreen": 3,
+     "panels": 1,
+     "firstScreen": 1,
      "ragged": [],
      "voids": []
     },
     "tiles": 1,
     "panels": {
-     "count": 3,
+     "count": 1,
      "radii": [
       [
        8,
-       3
+       1
       ]
      ],
      "heavyBorders": 0,
@@ -857,23 +630,21 @@
     "chartHues": 0,
     "placeholders": [],
     "type": {
-     "under13": 0.08,
+     "under13": 0.38,
      "tiny": 0,
      "tinySamples": [],
      "sizes": [
       12,
       14,
-      16,
-      18,
-      36
+      20
      ]
     },
     "title": {
-     "text": "Rekrutmen Crew",
-     "size": 36,
-     "top": 124
+     "text": "MARMS",
+     "size": 20,
+     "top": 412
     },
-    "colourShare": 0.018
+    "colourShare": 0.016
    },
    "consoleErrors": []
   },
@@ -881,10 +652,9 @@
    "width": 390,
    "height": 844,
    "load": "load",
-   "screens": 2,
+   "screens": 1,
    "filled": [
-    0.77,
-    0.8
+    0.43
    ],
    "motion": {
     "elements": 0,
@@ -900,14 +670,14 @@
      "h": 844
     },
     "page": {
-     "height": 885,
+     "height": 844,
      "screens": 1,
-     "words": 47,
+     "words": 6,
      "img": 1,
      "video": 0,
      "canvas": 0,
      "svg": 0,
-     "sections": 2,
+     "sections": 0,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
@@ -923,58 +693,36 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
-     "chars": 14,
+     "text": "MARMS",
+     "words": 1,
+     "chars": 5,
      "lines": 1,
-     "size": 30,
-     "vw": 7.7,
+     "size": 20,
+     "vw": 5.1,
      "font": "Geist",
-     "weight": 700,
+     "weight": 600,
      "tracking": 0,
-     "leading": 1.25,
-     "top": 124,
+     "leading": 1.4,
+     "top": 322,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
      "position": "left"
     },
     "h1": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
+     "text": "MARMS",
+     "words": 1,
      "lines": 1,
-     "size": 30,
+     "size": 20,
      "font": "Geist"
     },
-    "headings": [
-     {
-      "text": "Rekrutmen Crew",
-      "words": 2,
-      "chars": 14,
-      "lines": 1,
-      "size": 30,
-      "vw": 7.7,
-      "font": "Geist",
-      "weight": 700,
-      "tracking": 0,
-      "leading": 1.25,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "center",
-      "position": "center",
-      "widthRatio": 0.88,
-      "top": 124,
-      "tag": "h1",
-      "kind": "heading"
-     }
-    ],
+    "headings": [],
     "headingSummary": {
-     "count": 1,
-     "maxLines": 1,
+     "count": 0,
+     "maxLines": 0,
      "over2Lines": 0,
      "statements": 0,
-     "centered": 1,
+     "centered": 0,
      "medianWords": null,
      "mixedFontHeadings": 0
     },
@@ -990,26 +738,17 @@
      "sizes": [
       12,
       14,
-      16,
-      18,
-      30
+      20
      ],
-     "sizeCount": 5,
+     "sizeCount": 3,
      "notLoaded": [],
-     "body": {
-      "font": "Geist",
-      "size": 16,
-      "leading": 1.5,
-      "weight": 400,
-      "tracking": 0,
-      "contrast": 14.1
-     },
-     "measureChars": 43,
+     "body": null,
+     "measureChars": null,
      "max": {
-      "size": 30,
-      "vw": 7.7,
+      "size": 20,
+      "vw": 5.1,
       "font": "Geist",
-      "text": "Rekrutmen Crew"
+      "text": "MARMS"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -1018,80 +757,80 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.02,
-     "centerShare": 0.48,
-     "smallText": 1
+     "upperShare": 0.15,
+     "centerShare": 0.62,
+     "smallText": 0
     },
     "eyebrows": [],
     "numbered": [],
     "color": {
-     "bodyBg": "#f8f8f8",
+     "bodyBg": "#0a0a0a",
      "bodyBgHsl": {
       "h": 0,
       "s": 0,
-      "l": 0.97
+      "l": 0.04
      },
-     "dark": false,
+     "dark": true,
      "sectionBgs": [
       {
-       "color": "#f8f8f8",
+       "color": "#0a0a0a",
        "top": 0,
        "hsl": {
         "h": 0,
         "s": 0,
-        "l": 0.97
+        "l": 0.04
        }
       },
       {
-       "color": "#0f2c4c",
-       "top": 68,
+       "color": "#141414",
+       "top": 233,
        "hsl": {
-        "h": 211,
-        "s": 0.67,
-        "l": 0.18
+        "h": 0,
+        "s": 0,
+        "l": 0.08
        }
       }
      ],
      "textColors": [
       {
-       "color": "#6b7280",
-       "share": 0.46
+       "color": "#b4b4b4",
+       "share": 0.38
+      },
+      {
+       "color": "#9a9a9a",
+       "share": 0.32
+      },
+      {
+       "color": "#f5f5f5",
+       "share": 0.15
       },
       {
        "color": "#ffffff",
-       "share": 0.36
-      },
-      {
-       "color": "#111827",
-       "share": 0.14
-      },
-      {
-       "color": "#0f2c4c",
-       "share": 0.05
+       "share": 0.15
       }
      ],
      "button": {
-      "bg": "#ffffff",
+      "bg": "#1d4a75",
       "hsl": {
-       "h": 0,
-       "s": 0,
-       "l": 1
+       "h": 209,
+       "s": 0.6,
+       "l": 0.29
       },
-      "fg": "#0f2c4c"
+      "fg": "#ffffff"
      },
      "lowContrast": []
     },
     "buttons": {
      "count": 1,
      "inHero": 1,
-     "radius": 8,
-     "height": 48,
+     "radius": 6,
+     "height": 36,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "Daftar Sekarang"
+      "Masuk"
      ]
     },
     "surfaces": {
@@ -1102,36 +841,21 @@
      "scrims": 0,
      "gradientSamples": [],
      "gradientText": 0,
-     "hairlines": 1,
-     "hairlineSamples": [
-      "footer.border-t.border-gray-200 390px"
-     ],
-     "outlinedBoxes": 3,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 1,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 3,
+     "roundedBoxes": 1,
      "boxRadius": 8,
      "squareMedia": 0,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
-     "cardRows": [
-      {
-       "count": 3,
-       "iconTopped": false,
-       "rounded": true,
-       "top": 434
-      }
-     ]
+     "cardRows": []
     },
     "heroMedia": [],
-    "nav": {
-     "links": 0,
-     "fixed": false,
-     "height": 68,
-     "floatingPill": false,
-     "blur": false
-    },
+    "nav": null,
     "fontsLoaded": [
      "geist"
     ]
@@ -1141,76 +865,24 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 885,
+    "pageH": 844,
     "margins": {
-     "left": 36,
-     "right": 36
+     "left": 49,
+     "right": 49
     },
-    "sections": [
-     {
-      "sel": "section.bg-navy.px-6",
-      "tag": "section",
-      "top": 68,
-      "height": 326,
-      "words": 19,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "Rekrutmen Crew",
-       "size": 30,
-       "tag": "h1"
-      },
-      "left": 36,
-      "right": 36,
-      "textLeft": 36,
-      "textRight": 36,
-      "fullBleed": false,
-      "footer": false,
-      "hero": true,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.mx-auto.w-full",
-      "tag": "section",
-      "top": 394,
-      "height": 426,
-      "words": 22,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "Isi Formulir",
-       "size": 16,
-       "tag": "h3"
-      },
-      "left": 49,
-      "right": 54,
-      "textLeft": 49,
-      "textRight": 54,
-      "fullBleed": false,
-      "footer": true,
-      "hero": true,
-      "continues": false,
-      "pinned": false
-     }
-    ],
+    "sections": [],
     "gaps": [],
     "h1s": [
      {
-      "text": "Rekrutmen Crew",
-      "size": 30,
-      "top": 124,
+      "text": "MARMS",
+      "size": 20,
+      "top": 322,
       "firstScreen": true
      }
     ],
     "edgeText": [],
-    "edges": [
-     {
-      "x": 49,
-      "n": 3
-     }
-    ],
-    "leftBlocks": 3,
+    "edges": [],
+    "leftBlocks": 0,
     "bodySize": 16,
     "stage": false,
     "explains": false,
@@ -1223,28 +895,26 @@
      "w": 390,
      "h": 844
     },
-    "dark": false,
-    "ground": "#f8f8f8",
+    "dark": true,
+    "ground": "#0a0a0a",
     "sidebar": null,
-    "topbar": {
-     "h": 68
-    },
+    "topbar": null,
     "canvas": {
-     "left": 24,
-     "right": 36
+     "left": 49,
+     "right": 49
     },
     "hero": {
-     "text": "Rekrutmen Crew",
-     "words": 2,
-     "chars": 14,
+     "text": "MARMS",
+     "words": 1,
+     "chars": 5,
      "lines": 1,
-     "size": 30,
-     "vw": 7.7,
+     "size": 20,
+     "vw": 5.1,
      "font": "Geist",
-     "weight": 700,
+     "weight": 600,
      "tracking": 0,
-     "leading": 1.25,
-     "top": 124,
+     "leading": 1.4,
+     "top": 322,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
@@ -1252,18 +922,18 @@
     },
     "charts": 0,
     "layout": {
-     "panels": 3,
-     "firstScreen": 3,
+     "panels": 1,
+     "firstScreen": 1,
      "ragged": [],
      "voids": []
     },
     "tiles": 1,
     "panels": {
-     "count": 3,
+     "count": 1,
      "radii": [
       [
        8,
-       3
+       1
       ]
      ],
      "heavyBorders": 0,
@@ -1289,23 +959,21 @@
     "chartHues": 0,
     "placeholders": [],
     "type": {
-     "under13": 0.09,
+     "under13": 0.38,
      "tiny": 0,
      "tinySamples": [],
      "sizes": [
       12,
       14,
-      16,
-      18,
-      30
+      20
      ]
     },
     "title": {
-     "text": "Rekrutmen Crew",
-     "size": 30,
-     "top": 124
+     "text": "MARMS",
+     "size": 20,
+     "top": 322
     },
-    "colourShare": 0.045
+    "colourShare": 0.032
    },
    "consoleErrors": []
   }
@@ -1313,14 +981,10 @@
  "findings": [
   {
    "level": "WARN",
-   "id": "app-title-size",
+   "id": "hero-void",
    "width": 1440,
-   "message": "The h1 is 36px (\"Rekrutmen Crew\").",
-   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
-   "alsoAt": [
-    768,
-    390
-   ]
+   "message": "33% of the first screen is one empty block (540×780px at 0,120).",
+   "fix": "Place the void on purpose or fill it: move the picture, the film or one fact into it, grow the headline to meet it, or shrink the screen to its content. A void reads as placed only when something closes it on the far side and it is the screen's one rest."
   }
  ],
  "images": [

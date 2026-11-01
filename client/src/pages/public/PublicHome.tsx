@@ -32,7 +32,7 @@ export default function PublicHome() {
           </p>
           <Link
             to="/career/daftar"
-            className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-base font-semibold text-navy hover:bg-gray-100"
+            className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-base font-semibold text-[#0F2C4C] hover:bg-gray-100"
           >
             Daftar Sekarang
           </Link>

@@ -159,7 +159,7 @@ export default function Customer() {
         <input placeholder="Cari nama / NPWP / bank..." value={search} onChange={(e) => setSearch(e.target.value)} className="input" />
       </div>
 
-      <table className="mt-4 w-full border-collapse bg-white text-sm">
+      <table className="mt-4 w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
             <th className="px-3 py-2">Nama</th>
@@ -180,7 +180,7 @@ export default function Customer() {
                   {v.banks.map((b) => `${b.bank} - ${b.accountNo} (${b.accountName})`).join('; ') || '-'}
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <button onClick={() => openEdit(v)} className="text-gray-700 hover:text-navy">Edit</button>
+                  <button onClick={() => openEdit(v)} className="text-gray-700 hover:text-gray-900">Edit</button>
                   <button onClick={() => handleDelete(v.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                 </td>
               </tr>
@@ -198,7 +198,7 @@ export default function Customer() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleSubmit} className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleSubmit} className="w-full max-w-2xl rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">{editingId ? 'Edit Customer' : 'Tambah Customer'}</h3>
 
             <div className="mt-4 grid grid-cols-2 gap-3">
@@ -233,7 +233,7 @@ export default function Customer() {
                 </div>
               </div>
             ))}
-            <button type="button" onClick={addBank} className="mt-2 text-sm text-gray-700 underline hover:text-navy">+ Tambah rekening</button>
+            <button type="button" onClick={addBank} className="mt-2 text-sm text-gray-700 underline hover:text-gray-900">+ Tambah rekening</button>
 
             <div className="mt-6 flex justify-end gap-2">
               <button type="button" onClick={() => setShowForm(false)} className="btn-ghost">Batal</button>

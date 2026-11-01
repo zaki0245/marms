@@ -169,7 +169,7 @@ export default function Kapal() {
         + Tambah Kapal
       </button>
 
-      <table className="w-full border-collapse bg-white text-sm">
+      <table className="w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
             <th className="px-3 py-2">Unit</th>
@@ -198,7 +198,7 @@ export default function Kapal() {
               <td className="px-3 py-2">{k.tbNama}</td>
               <td className="px-3 py-2">{k.bgNama}</td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => openEdit(k)} className="text-gray-700 hover:text-navy">Edit</button>
+                <button onClick={() => openEdit(k)} className="text-gray-700 hover:text-gray-900">Edit</button>
                 <button onClick={() => handleDelete(k.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
               </td>
             </tr>
@@ -217,7 +217,7 @@ export default function Kapal() {
       {/* Modal form tambah/edit */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleSubmit} className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleSubmit} className="w-full max-w-2xl rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">
               {editingId ? 'Edit Kapal' : 'Tambah Kapal'}
             </h3>

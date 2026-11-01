@@ -139,7 +139,7 @@ export default function Jabatan() {
         </button>
       </form>
 
-      <table className="w-full border-collapse bg-white text-sm">
+      <table className="w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
             <th className="px-3 py-2">Kode</th>
@@ -183,7 +183,7 @@ export default function Jabatan() {
                   <td className="px-3 py-2">{j.nama}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{formatRupiah(j.gajiPokok)}</td>
                   <td className="px-3 py-2 text-right">
-                    <button onClick={() => startEdit(j)} className="text-gray-700 hover:text-navy">
+                    <button onClick={() => startEdit(j)} className="text-gray-700 hover:text-gray-900">
                       Edit
                     </button>
                     <button onClick={() => handleDelete(j.kode)} className="ml-3 text-negative hover:text-negative/70">

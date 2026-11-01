@@ -47,7 +47,7 @@ interface Admin {
 function navCls({ isActive }: { isActive: boolean }) {
   return `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
     isActive
-      ? 'bg-gray-200/70 font-medium text-gray-900'
+      ? 'bg-gray-200 font-medium text-gray-900'
       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
   }`;
 }
@@ -62,6 +62,7 @@ export default function Layout() {
   const [passwordBaru, setPasswordBaru] = useState('');
   const [pwError, setPwError] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
 
   // [FUNGSI] Cek status login; arahkan ke /login bila belum login.
   useEffect(() => {
@@ -90,6 +91,20 @@ export default function Layout() {
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
+
+  // [FUNGSI] Ganti tema terang/gelap; simpan pilihan & toggle class .dark di <html>.
+  function toggleTheme() {
+    setDark((d) => {
+      const next = !d;
+      document.documentElement.classList.toggle('dark', next);
+      try {
+        localStorage.setItem('marms-theme', next ? 'dark' : 'light');
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }
 
   async function handleLogout() {
     try {
@@ -124,7 +139,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-surface">
       {/* Top bar mobile */}
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-gray-200 bg-card px-4 py-3 lg:hidden">
         <button
           onClick={() => setSidebarOpen(true)}
           aria-label="Buka menu"
@@ -146,7 +161,7 @@ export default function Layout() {
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-60 border-r border-gray-200 bg-white transition-transform lg:static lg:translate-x-0 ${
+          className={`fixed inset-y-0 left-0 z-50 w-60 border-r border-gray-200 bg-card transition-transform lg:static lg:translate-x-0 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
@@ -211,7 +226,23 @@ export default function Layout() {
 
             {/* [FUNGSI] Info user + logout di bawah sidebar. */}
             <div className="border-t border-gray-200 p-3">
-              <div className="truncate px-2 text-sm text-gray-600">{admin.email}</div>
+              <button
+                onClick={toggleTheme}
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+              >
+                {dark ? (
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+                {dark ? 'Mode Terang' : 'Mode Gelap'}
+              </button>
+              <div className="mt-1 truncate px-2 text-sm text-gray-600">{admin.email}</div>
               <button
                 onClick={handleLogout}
                 className="mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-negative hover:bg-negative/5"
@@ -231,7 +262,7 @@ export default function Layout() {
       {/* Modal ganti password wajib (login pertama) */}
       {admin.mustChangePassword && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <form onSubmit={handleChangePassword} className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-xl">
+          <form onSubmit={handleChangePassword} className="w-full max-w-sm rounded-lg border border-gray-200 bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Ganti Password</h3>
             <p className="mt-1 text-sm text-gray-500">Anda wajib mengganti password setelah login pertama.</p>
             {pwError && <div className="mt-3 rounded-md bg-negative/5 p-3 text-sm text-negative">{pwError}</div>}

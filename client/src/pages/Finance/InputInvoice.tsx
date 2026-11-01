@@ -274,7 +274,7 @@ export default function InputInvoice() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="page-title">{id ? 'Edit Invoice' : 'Input Invoice'}</h1>
-        <button onClick={() => navigate('/dashboard/finance/invoice')} className="text-sm text-gray-700 underline hover:text-navy">Kembali</button>
+        <button onClick={() => navigate('/dashboard/finance/invoice')} className="text-sm text-gray-700 underline hover:text-gray-900">Kembali</button>
       </div>
 
       {error && <div className="mt-3 rounded bg-negative/10 p-3 text-sm text-negative">{error}</div>}
@@ -386,7 +386,7 @@ export default function InputInvoice() {
                 </div>
               ))}
               <div className="flex gap-2">
-                <button type="button" onClick={addQuickBank} className="text-sm text-gray-700 underline hover:text-navy">+ Tambah rekening</button>
+                <button type="button" onClick={addQuickBank} className="text-sm text-gray-700 underline hover:text-gray-900">+ Tambah rekening</button>
                 <button type="button" onClick={handleQuickAdd} className="btn-primary px-3 py-2">Simpan {isAr ? 'Customer' : 'Vendor'}</button>
               </div>
             </div>
@@ -491,7 +491,7 @@ export default function InputInvoice() {
               <button type="button" onClick={() => removeFaktur(i)} className="text-negative hover:text-negative/70">Hapus</button>
             </div>
           ))}
-          <button type="button" onClick={addFaktur} className="mt-2 text-sm text-gray-700 underline hover:text-navy">+ Tambah faktur pajak</button>
+          <button type="button" onClick={addFaktur} className="mt-2 text-sm text-gray-700 underline hover:text-gray-900">+ Tambah faktur pajak</button>
         </section>
 
         <div className="flex justify-end gap-2">

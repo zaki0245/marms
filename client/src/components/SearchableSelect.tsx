@@ -47,7 +47,7 @@ export default function SearchableSelect({ value, options, placeholder, classNam
         onBlur={() => setOpen(false)}
       />
       {open && (
-        <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-lg">
+        <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-card shadow-lg">
           {filtered.length === 0 && (
             <li className="px-3 py-2 text-sm text-gray-500">Tidak ditemukan</li>
           )}

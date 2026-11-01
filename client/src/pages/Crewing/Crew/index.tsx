@@ -338,7 +338,7 @@ export default function Crew() {
 
       {tab === 'pool' && (
         <>
-        <table className="mt-4 w-full border-collapse bg-white text-sm">
+        <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">No. Pendaftaran</th>
@@ -397,7 +397,7 @@ export default function Crew() {
             </select>
           </div>
 
-          <table className="mt-4 w-full border-collapse bg-white text-sm">
+          <table className="mt-4 w-full border-collapse bg-card text-sm">
             <thead>
               <tr className="text-left text-xs text-gray-500">
                 <th className="px-3 py-2">Nama</th>
@@ -429,7 +429,7 @@ export default function Crew() {
                       ) : (
                         <button onClick={() => openAssignCrew(c)} className="text-positive hover:text-positive/70">Assign</button>
                       )}
-                      <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-navy">Detail</button>
+                      <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-gray-900">Detail</button>
                       <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                     </td>
                   </tr>
@@ -449,7 +449,7 @@ export default function Crew() {
 
       {tab === 'offboard' && (
         <>
-        <table className="mt-4 w-full border-collapse bg-white text-sm">
+        <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">Nama</th>
@@ -471,7 +471,7 @@ export default function Crew() {
                 <td className="px-3 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
                   <button onClick={() => openAssignCrew(c)} className="text-positive hover:text-positive/70">Assign</button>
-                  <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-navy">Detail</button>
+                  <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-gray-900">Detail</button>
                   <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                 </td>
               </tr>
@@ -491,7 +491,7 @@ export default function Crew() {
       {/* Modal detail */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
+          <div className="w-full max-w-2xl rounded-lg bg-card p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{selected.applicant.namaLengkap}</h3>
@@ -514,7 +514,7 @@ export default function Crew() {
                 <div><span className="text-gray-500">Nama Bank:</span> {selected.namaBank ?? '-'}</div>
                 <div><span className="text-gray-500">No Rekening:</span> {selected.noRekening ?? '-'}</div>
               </div>
-              <button onClick={() => openBankEdit(selected)} className="text-sm text-gray-700 underline hover:text-navy">Edit</button>
+              <button onClick={() => openBankEdit(selected)} className="text-sm text-gray-700 underline hover:text-gray-900">Edit</button>
             </div>
 
             <h4 className="mt-5 font-semibold text-gray-900">Riwayat Penempatan</h4>
@@ -548,8 +548,8 @@ export default function Crew() {
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-navy">Lihat file</a>
-                      <button onClick={() => openUpdate(d)} className="text-sm text-gray-700 underline hover:text-navy">Perbarui</button>
+                      <a href={d.filePath} target="_blank" rel="noreferrer" className="text-sm text-gray-700 underline hover:text-gray-900">Lihat file</a>
+                      <button onClick={() => openUpdate(d)} className="text-sm text-gray-700 underline hover:text-gray-900">Perbarui</button>
                     </div>
                   </div>
                 );
@@ -563,7 +563,7 @@ export default function Crew() {
       {/* Modal assign */}
       {assignTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleAssign} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleAssign} className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Assign ke Kapal</h3>
             <p className="mt-1 text-sm text-gray-500">{assignTarget.nama} · {assignTarget.posisi}</p>
 
@@ -607,7 +607,7 @@ export default function Crew() {
       {/* Modal off board */}
       {offBoardTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleOffBoard} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleOffBoard} className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Off Board</h3>
             <p className="mt-1 text-sm text-gray-500">{offBoardTarget.applicant.namaLengkap}</p>
 
@@ -635,7 +635,7 @@ export default function Crew() {
       {/* Modal perbarui dokumen */}
       {updateDoc && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleUpdate} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleUpdate} className="w-full max-w-sm rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Perbarui Dokumen</h3>
             <p className="mt-1 text-sm text-gray-500">{DOKUMEN_LABEL[updateDoc.jenis] ?? updateDoc.jenis}</p>
             <div className="mt-4 space-y-3">
@@ -659,7 +659,7 @@ export default function Crew() {
       {/* Modal edit bank */}
       {bankTarget && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleBankSave} className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleBankSave} className="w-full max-w-sm rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Edit Informasi Bank</h3>
             <p className="mt-1 text-sm text-gray-500">{bankTarget.applicant.namaLengkap}</p>
             <div className="mt-4 space-y-3">

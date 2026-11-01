@@ -120,7 +120,7 @@ export default function Accounts() {
               <tr key={a.id} className="border-t border-gray-100">
                 <td className="px-4 py-3">
                   <span className="font-medium text-gray-900">{a.email}</span>
-                  {a.mustChangePassword && <span className="ml-2 text-xs text-amber-600">(wajib ganti password)</span>}
+                  {a.mustChangePassword && <span className="ml-2 text-xs text-gray-500">(wajib ganti password)</span>}
                 </td>
                 <td className="px-4 py-3">
                   <select value={a.role} onChange={(e) => handleRole(a, e.target.value)} className="rounded-md border border-gray-300 px-2 py-1">
@@ -133,7 +133,7 @@ export default function Accounts() {
                   <span className={a.active ? 'text-positive' : 'text-negative'}>{a.active ? 'Aktif' : 'Nonaktif'}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <button onClick={() => handleToggle(a)} className="text-sm text-gray-700 hover:text-navy">
+                  <button onClick={() => handleToggle(a)} className="text-sm text-gray-700 hover:text-gray-900">
                     {a.active ? 'Nonaktifkan' : 'Aktifkan'}
                   </button>
                 </td>

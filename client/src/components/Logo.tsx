@@ -10,7 +10,7 @@ export default function Logo({ className = 'h-10 w-10' }: { className?: string }
   if (hidden) return null;
   return (
     <div
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-white ${className}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-card ${className}`}
     >
       <img
         src="/logo.png"

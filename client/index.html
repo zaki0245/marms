@@ -10,6 +10,18 @@
       href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // [FUNGSI] Terapkan tema sebelum render agar tidak berkedip (FOUC).
+      // [ALASAN] Baca pilihan tersimpan; fallback ke preferensi sistem.
+      (function () {
+        try {
+          var t = new URLSearchParams(location.search).get('theme') || localStorage.getItem('marms-theme');
+          if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -82,7 +82,7 @@ export default function FinanceDashboard() {
             {pageRows.map((r) => (
               <tr key={r.id} className="border-t border-gray-100">
                 <td className="px-3 py-2">
-                  <span className={`rounded px-2 py-0.5 text-xs ${r.jenis === 'AR' ? 'bg-positive/10 text-positive' : 'bg-amber-100 text-amber-700'}`}>{r.jenis}</span>
+                  <span className={`rounded px-2 py-0.5 text-xs ${r.jenis === 'AR' ? 'bg-positive/10 text-positive' : 'badge-warning'}`}>{r.jenis}</span>
                 </td>
                 <td className="px-3 py-2">{r.tanggal?.slice(0, 10)}</td>
                 <td className="px-3 py-2">{r.counterpartyName}</td>

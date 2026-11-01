@@ -302,8 +302,8 @@ export default function Cetak() {
                   </td>
                   <td className="px-3 py-2 text-right font-semibold">{formatUang(pvTotal(pv))}</td>
                   <td className="px-3 py-2 text-right whitespace-nowrap">
-                    <button onClick={() => handleCetak(pv)} className="text-gray-700 hover:text-navy">Cetak</button>
-                    <button onClick={() => openEdit(pv)} className="ml-3 text-gray-700 hover:text-navy">Edit</button>
+                    <button onClick={() => handleCetak(pv)} className="text-gray-700 hover:text-gray-900">Cetak</button>
+                    <button onClick={() => openEdit(pv)} className="ml-3 text-gray-700 hover:text-gray-900">Edit</button>
                     <button onClick={() => deletePv(pv.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
                   </td>
                 </tr>
@@ -323,7 +323,7 @@ export default function Cetak() {
 
       {form && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={submitForm} className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={submitForm} className="w-full max-w-2xl rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">{editingId ? 'Edit Voucher' : `Tambah ${isRv ? 'RV' : 'PV'}`}</h3>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div>
@@ -411,7 +411,7 @@ export default function Cetak() {
                 </div>
               );
             })}
-            <button type="button" onClick={addItem} className="mt-2 text-sm text-gray-700 underline hover:text-navy">+ Tambah invoice</button>
+            <button type="button" onClick={addItem} className="mt-2 text-sm text-gray-700 underline hover:text-gray-900">+ Tambah invoice</button>
 
             <div className="mt-6 flex justify-end gap-2">
               <button type="button" onClick={() => setForm(null)} className="btn-ghost">Batal</button>

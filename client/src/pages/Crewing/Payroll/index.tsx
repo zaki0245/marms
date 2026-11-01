@@ -54,8 +54,8 @@ const STATUS_LABEL: Record<string, string> = {
 function statusBadge(s: string) {
   const base = 'rounded px-2 py-0.5 text-xs font-medium';
   if (s === 'DIBAYAR') return `${base} bg-positive/10 text-positive`;
-  if (s === 'FINAL') return `${base} bg-navy/10 text-navy`;
-  return `${base} bg-amber-100 text-amber-700`;
+  if (s === 'FINAL') return `${base} badge-info`;
+  return `${base} badge-warning`;
 }
 
 export default function Payroll() {
@@ -224,7 +224,7 @@ export default function Payroll() {
         <p className="mt-6 text-gray-500">Memuat...</p>
       ) : (
         <>
-        <table className="mt-4 w-full border-collapse bg-white text-sm">
+        <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">Kapal</th>
@@ -247,7 +247,7 @@ export default function Payroll() {
                 <td className="px-3 py-2 text-right tabular-nums">{p._count?.details ?? 0}</td>
                 <td className="px-3 py-2"><span className={statusBadge(p.status)}>{STATUS_LABEL[p.status]}</span></td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => openDetail(p)} className="text-gray-700 hover:text-navy">Detail</button>
+                  <button onClick={() => openDetail(p)} className="text-gray-700 hover:text-gray-900">Detail</button>
                   {p.status === 'DRAFT' && (
                     <>
                       <button onClick={() => finalize(p.id)} className="ml-3 text-positive hover:text-positive/70">Final</button>
@@ -275,7 +275,7 @@ export default function Payroll() {
       {/* Modal generate */}
       {showGen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <form onSubmit={handleGenerate} className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+          <form onSubmit={handleGenerate} className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Buat {isGaji ? 'Gaji' : 'Uang Makan'}</h3>
             <div className="mt-4 space-y-3">
               <div>
@@ -309,7 +309,7 @@ export default function Payroll() {
       {/* Modal detail */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="w-full max-w-4xl rounded-lg bg-white p-6 shadow-xl">
+          <div className="w-full max-w-4xl rounded-lg bg-card p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{selected.vessel?.namaUnit} — {BULAN[selected.bulan - 1]} {selected.tahun}</h3>

@@ -2,6 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   [FUNGSI] Token warna terang/gelap.
+   [ALASAN] Semua warna netral & aksen dibaca dari CSS variable,
+            sehingga switch tema cukup dengan class `.dark` di <html>.
+   ============================================================ */
+:root {
+  color-scheme: light;
+
+  /* aksen (channel RGB agar opacity /10 /90 tetap jalan) */
+  --navy: 15 44 76;        /* #0F2C4C */
+  --positive: 46 125 50;   /* #2E7D32 */
+  --negative: 196 36 42;   /* #C4242A */
+
+  /* surface */
+  --surface: #f8f8f8;      /* ground halaman */
+  --card: #ffffff;         /* kartu/panel/input */
+
+  /* skala abu netral (sama dengan gray bawaan Tailwind v3) */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --gray-950: #030712;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* aksen: hijau/merah dinaikkan agar kontras di atas ground gelap */
+  --navy: 29 74 117;       /* #1d4a75 — navy lebih terang agar tombol terbaca */
+  --positive: 63 192 122;  /* #3fc07a */
+  --negative: 229 86 111;  /* #e5566f */
+
+  --surface: #0a0a0a;
+  --card: #141414;
+
+  --gray-50: #161616;
+  --gray-100: #1f1f1f;
+  --gray-200: #2a2a2a;
+  --gray-300: #3a3a3a;
+  --gray-400: #5a5a5a;
+  --gray-500: #9a9a9a;
+  --gray-600: #b4b4b4;
+  --gray-700: #d4d4d4;
+  --gray-800: #e5e5e5;
+  --gray-900: #f5f5f5;
+  --gray-950: #ffffff;
+}
+
 /* [FUNGSI] Gaya dasar global aplikasi. */
 /* [ALASAN] Ground netral, teks ink, antialiased, fokus konsisten. */
 body {
@@ -29,7 +84,7 @@ th {
 
   /* [FUNGSI] Kartu — batas tipis, tanpa bayangan di elemen diam. */
   .card {
-    @apply rounded-lg border border-gray-200 bg-white;
+    @apply rounded-lg border border-gray-200 bg-card;
   }
 
   /* [FUNGSI] Tombol utama (navy = aksen satu-satunya). */
@@ -39,7 +94,7 @@ th {
 
   /* [FUNGSI] Tombol sekunder (outline netral). */
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50;
+    @apply inline-flex items-center justify-center rounded-md border border-gray-300 bg-card px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50;
   }
 
   /* [FUNGSI] Tombol teks (ghost). */
@@ -54,7 +109,7 @@ th {
 
   /* [FUNGSI] Input/select — satu tinggi & radius. */
   .input {
-    @apply rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-navy/20;
+    @apply rounded-md border border-gray-300 bg-card px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-navy/20;
   }
 
   /* [FUNGSI] Label form di atas field. */
@@ -69,4 +124,25 @@ th {
   .alert-success {
     @apply rounded-md border border-positive/20 bg-positive/5 px-3 py-2 text-sm text-positive;
   }
+
+  /* [FUNGSI] Badge peringatan (amber) — satu-satunya badge yang butuh overridem dark
+     karena amber adalah palet literal, bukan token. */
+  .badge-warning {
+    @apply bg-amber-100 text-amber-700;
+  }
+
+  /* [FUNGSI] Badge info (navy) — dipisah dari token navy agar teks tetap terbaca di gelap. */
+  .badge-info {
+    @apply bg-navy/10 text-navy;
+  }
+}
+
+/* [FUNGSI] Override badge amber & navy di tema gelap (tint gelap + teks terang). */
+.dark .badge-warning {
+  background-color: #2a2410;
+  color: #eab308;
+}
+.dark .badge-info {
+  background-color: #14243a;
+  color: #8fb0d6;
 }

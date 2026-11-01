@@ -262,7 +262,7 @@ export default function DaftarInvoice() {
       </div>
 
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full border-collapse bg-white text-sm">
+        <table className="w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
               <th className="px-3 py-2">No</th>
@@ -293,7 +293,7 @@ export default function DaftarInvoice() {
               <tr key={i.id} className="border-t border-gray-100">
                 <td className="px-3 py-2 font-semibold text-gray-900">
                   {i.no}
-                  {i.incomplete && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-700">belum lengkap</span>}
+                  {i.incomplete && <span className="ml-2 rounded badge-warning px-1.5 py-0.5 text-xs">belum lengkap</span>}
                 </td>
                 <td className="px-3 py-2">{i.tanggal?.slice(0, 10)}</td>
                 <td className="px-3 py-2">{jenis === 'AR' ? i.customerName ?? '-' : i.vendorName ?? '-'}</td>
@@ -311,7 +311,7 @@ export default function DaftarInvoice() {
                 <td className="px-3 py-2">
                   <span className={`rounded px-2 py-0.5 text-xs ${
                     i.statusPembayaran === 'LUNAS' ? 'bg-positive/10 text-positive' :
-                    i.statusPembayaran === 'SEBAGIAN' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
+                    i.statusPembayaran === 'SEBAGIAN' ? 'badge-warning' : 'bg-gray-100 text-gray-600'
                   }`}>{statusLabel(i.statusPembayaran)}</span>
                 </td>
                 {jenis === 'AP' && (
@@ -335,9 +335,9 @@ export default function DaftarInvoice() {
                   </td>
                 )}
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => navigate(`/dashboard/finance/invoice/input/${i.id}`)} className="text-gray-700 hover:text-navy">Edit</button>
+                  <button onClick={() => navigate(`/dashboard/finance/invoice/input/${i.id}`)} className="text-gray-700 hover:text-gray-900">Edit</button>
                   {jenis === 'AP' && i.approvalStatus !== 'SUDAH_DIAPPROVE' && i.kategori !== 'FREIGHT' && (
-                    <button onClick={() => sendApproval(i.id)} className="ml-3 text-gray-700 hover:text-navy">
+                    <button onClick={() => sendApproval(i.id)} className="ml-3 text-gray-700 hover:text-gray-900">
                       {i.approvalSentAt ? 'Kirim Ulang' : 'Kirim Approval'}
                     </button>
                   )}
