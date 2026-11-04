@@ -20,6 +20,15 @@ export const bankSchema = z.object({
 });
 export type BankInput = z.infer<typeof bankSchema>;
 
+// [FUNGSI] Validasi input edit penempatan (kapal, jabatan, tanggal mulai on board).
+// [ALASAN] Koreksi penempatan yang salah input tanpa harus off board & assign ulang.
+export const updatePlacementSchema = z.object({
+  vesselId: z.string().min(1, 'Kapal wajib dipilih'),
+  jabatanKode: z.string().min(1, 'Jabatan wajib dipilih'),
+  tanggalMulai: z.string().min(1, 'Tanggal mulai on board wajib diisi'),
+});
+export type UpdatePlacementInput = z.infer<typeof updatePlacementSchema>;
+
 // [FUNGSI] Validasi input off board (turun kapal).
 export const offBoardSchema = z.object({
   alasan: z.enum(['RELIEF', 'CUTI', 'SAKIT', 'END_OF_CONTRACT']),

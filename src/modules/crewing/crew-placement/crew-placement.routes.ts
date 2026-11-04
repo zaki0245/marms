@@ -12,6 +12,7 @@ router.post('/assign-applicant/:applicantId', asyncHandler(c.assignApplicant));
 router.post('/:id/assign', asyncHandler(c.assignCrew));
 router.post('/:id/offboard', asyncHandler(c.offBoard));
 router.patch('/:id/bank', asyncHandler(c.updateBank));
+router.patch('/:id/placements/:placementId', asyncHandler(c.updatePlacement));
 router.delete('/:id', asyncHandler(c.deleteCrew));
 router.get('/', asyncHandler(c.listCrew));
 router.get('/:id', asyncHandler(c.getCrew));

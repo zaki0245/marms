@@ -6,7 +6,7 @@ import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
 import { getApplicant } from '../recruitment';
 import { liveMasaKerja } from '../../../shared/masaKerja';
-import type { AssignInput, BankInput, OffBoardInput } from './crew-placement.model';
+import type { AssignInput, BankInput, OffBoardInput, UpdatePlacementInput } from './crew-placement.model';
 
 // [FUNGSI] Buat nomor kontrak otomatis: CTK-YYYY-NNNN.
 async function generateNomorKontrak(): Promise<string> {
@@ -198,6 +198,104 @@ export async function getCrew(id: string) {
   });
   if (!crew) return null;
   return { ...crew, masaKerja: liveMasaKerja(crew) };
+}
+
+// [FUNGSI] Hitung durasi segmen inklusif (hari on board & off board dihitung).
+// [ALASAN] Samakan rumus dengan offBoardCrew agar total masa kerja konsisten.
+function hitungDurasi(onBoard: Date, offBoard: Date): number {
+  return Math.round((offBoard.getTime() - onBoard.getTime()) / 86400000) + 1;
+}
+
+// [FUNGSI] Koreksi penempatan: kapal, jabatan, dan tanggal mulai on board.
+// [ALASAN] Salah input penempatan bisa diperbaiki tanpa off board & assign ulang.
+export async function updatePlacement(crewId: string, placementId: string, input: UpdatePlacementInput) {
+  const penempatan = await prisma.penempatan.findUnique({
+    where: { id: placementId },
+    include: {
+      kontrak: true,
+      segments: { orderBy: { onBoardTanggal: 'asc' } },
+    },
+  });
+  if (!penempatan || penempatan.crewId !== crewId) {
+    throw new AppError(404, 'Penempatan tidak ditemukan');
+  }
+
+  // [FUNGSI] Pastikan kapal & jabatan yang dipilih benar-benar ada.
+  const [kapal, jabatan] = await Promise.all([
+    prisma.kapal.findUnique({ where: { id: input.vesselId } }),
+    prisma.jabatan.findUnique({ where: { kode: input.jabatanKode } }),
+  ]);
+  if (!kapal) throw new AppError(400, 'Kapal tidak ditemukan');
+  if (!jabatan) throw new AppError(400, 'Jabatan tidak ditemukan');
+
+  // [FUNGSI] Kunci penempatan bila payroll segmennya sudah final/dibayar.
+  // [ALASAN] Mengubah kapal/jabatan/tanggal membuat rekap gaji final jadi tidak valid.
+  const segmenIds = penempatan.segments.map((s) => s.id);
+  if (segmenIds.length > 0) {
+    const payrollFinal = await prisma.payrollDetail.findFirst({
+      where: {
+        segmentId: { in: segmenIds },
+        payroll: { status: { in: ['FINAL', 'DIBAYAR'] } },
+      },
+      select: { id: true },
+    });
+    if (payrollFinal) {
+      throw new AppError(400, 'Payroll segmen ini sudah difinalisasi, penempatan tidak bisa diubah');
+    }
+  }
+
+  // [FUNGSI] Validasi tanggal mulai on board.
+  const tanggalMulai = new Date(input.tanggalMulai);
+  if (Number.isNaN(tanggalMulai.getTime())) throw new AppError(400, 'Tanggal mulai tidak valid');
+
+  const segmenPertama = penempatan.segments[0];
+  if (segmenPertama?.offBoardTanggal && tanggalMulai > segmenPertama.offBoardTanggal) {
+    throw new AppError(400, 'Tanggal mulai tidak boleh setelah tanggal off board');
+  }
+  if (penempatan.tanggalSelesai && tanggalMulai > penempatan.tanggalSelesai) {
+    throw new AppError(400, 'Tanggal mulai tidak boleh setelah tanggal selesai penempatan');
+  }
+
+  // [FUNGSI] Bila segmen pertama sudah tertutup, koreksi durasi & total masa kerja.
+  // [ALASAN] liveMasaKerja hanya menghitung segmen terbuka; segmen tertutup perlu delta manual.
+  let koreksiMasaKerja: { durasiBaru: number; delta: number } | null = null;
+  if (segmenPertama?.offBoardTanggal) {
+    const durasiBaru = hitungDurasi(tanggalMulai, segmenPertama.offBoardTanggal);
+    const durasiLama =
+      segmenPertama.durasi ?? hitungDurasi(segmenPertama.onBoardTanggal, segmenPertama.offBoardTanggal);
+    koreksiMasaKerja = { durasiBaru, delta: durasiBaru - durasiLama };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.penempatan.update({
+      where: { id: penempatan.id },
+      data: { vesselId: input.vesselId, jabatanKode: input.jabatanKode, tanggalMulai },
+    });
+    // [FUNGSI] Sinkronkan kontrak agar jabatan & tanggal mulai tidak menyimpang.
+    await tx.kontrak.update({
+      where: { id: penempatan.kontrakId },
+      data: { jabatanKode: input.jabatanKode, tanggalMulai },
+    });
+    if (segmenPertama) {
+      await tx.segmen.update({
+        where: { id: segmenPertama.id },
+        data: koreksiMasaKerja
+          ? { onBoardTanggal: tanggalMulai, durasi: koreksiMasaKerja.durasiBaru }
+          : { onBoardTanggal: tanggalMulai },
+      });
+    }
+    if (koreksiMasaKerja && koreksiMasaKerja.delta !== 0) {
+      await tx.crew.update({
+        where: { id: crewId },
+        data: { totalMasaKerja: { increment: koreksiMasaKerja.delta } },
+      });
+    }
+  });
+
+  return prisma.penempatan.findUnique({
+    where: { id: penempatan.id },
+    include: { vessel: true, kontrak: true, segments: true },
+  });
 }
 
 // [FUNGSI] Perbarui info bank (nama bank & nomor rekening) sebuah crew.

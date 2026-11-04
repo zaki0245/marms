@@ -111,6 +111,9 @@ export default function Crew() {
   const [bankTarget, setBankTarget] = useState<Crew | null>(null);
   const [bankForm, setBankForm] = useState({ namaBank: '', noRekening: '' });
   const [bankLoading, setBankLoading] = useState(false);
+  const [placementTarget, setPlacementTarget] = useState<Penempatan | null>(null);
+  const [placementForm, setPlacementForm] = useState({ vesselId: '', jabatanKode: '', tanggalMulai: '' });
+  const [placementLoading, setPlacementLoading] = useState(false);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
@@ -277,6 +280,35 @@ export default function Crew() {
       setError(err?.response?.data?.error ?? 'Gagal memperbarui bank');
     } finally {
       setBankLoading(false);
+    }
+  }
+
+  // [FUNGSI] Buka modal edit penempatan (kapal, jabatan, tanggal mulai on board).
+  function openPlacementEdit(p: Penempatan) {
+    setPlacementForm({
+      vesselId: p.vessel?.id ?? '',
+      jabatanKode: p.jabatanKode,
+      tanggalMulai: p.tanggalMulai?.slice(0, 10) ?? '',
+    });
+    setPlacementTarget(p);
+    setError('');
+  }
+
+  async function handlePlacementSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selected || !placementTarget) return;
+    setPlacementLoading(true);
+    setError('');
+    try {
+      await api.patch(`/crew/${selected.id}/placements/${placementTarget.id}`, placementForm);
+      setPlacementTarget(null);
+      setMsg('Penempatan diperbarui');
+      loadCrew();
+      openDetail(selected);
+    } catch (err: any) {
+      setError(err?.response?.data?.error ?? 'Gagal memperbarui penempatan');
+    } finally {
+      setPlacementLoading(false);
     }
   }
 
@@ -526,9 +558,12 @@ export default function Crew() {
                     <span className="text-sm font-medium">{p.vessel?.namaUnit ?? '-'}</span>
                     <span className="ml-2 text-sm text-gray-500">{jabatanName(p.jabatanKode)}</span>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {p.tanggalMulai?.slice(0, 10)} {p.tanggalSelesai ? '– ' + p.tanggalSelesai.slice(0, 10) : '– sekarang'}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500">
+                      {p.tanggalMulai?.slice(0, 10)} {p.tanggalSelesai ? '– ' + p.tanggalSelesai.slice(0, 10) : '– sekarang'}
+                    </span>
+                    <button onClick={() => openPlacementEdit(p)} className="text-sm text-gray-700 underline hover:text-gray-900">Edit</button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -651,6 +686,43 @@ export default function Crew() {
             <div className="mt-6 flex justify-end gap-2">
               <button type="button" onClick={() => setUpdateDoc(null)} className="btn-ghost">Batal</button>
               <button type="submit" disabled={updateLoading} className="btn-primary">{updateLoading ? 'Menyimpan...' : 'Simpan'}</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Modal edit penempatan */}
+      {placementTarget && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
+          <form onSubmit={handlePlacementSave} className="w-full max-w-sm rounded-lg bg-card p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900">Edit Penempatan</h3>
+            <p className="mt-1 text-sm text-gray-500">{selected?.applicant.namaLengkap}</p>
+            {placementTarget.status === 'SELESAI' && (
+              <p className="mt-2 text-xs text-gray-500">Penempatan historis — Sea Service Record yang sudah tercatat tidak ikut berubah.</p>
+            )}
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="label">Jabatan</label>
+                <select required value={placementForm.jabatanKode} onChange={(e) => setPlacementForm({ ...placementForm, jabatanKode: e.target.value })} className="input mt-1 w-full">
+                  <option value="">Pilih jabatan</option>
+                  {jabatan.map((j) => <option key={j.kode} value={j.kode}>{j.nama}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="label">Kapal</label>
+                <select required value={placementForm.vesselId} onChange={(e) => setPlacementForm({ ...placementForm, vesselId: e.target.value })} className="input mt-1 w-full">
+                  <option value="">Pilih kapal</option>
+                  {kapal.map((k) => <option key={k.id} value={k.id}>{k.namaUnit}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="label">Tanggal Mulai On Board</label>
+                <input required type="date" value={placementForm.tanggalMulai} onChange={(e) => setPlacementForm({ ...placementForm, tanggalMulai: e.target.value })} className="input mt-1 w-full" />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button type="button" onClick={() => setPlacementTarget(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={placementLoading} className="btn-primary">{placementLoading ? 'Menyimpan...' : 'Simpan'}</button>
             </div>
           </form>
         </div>
