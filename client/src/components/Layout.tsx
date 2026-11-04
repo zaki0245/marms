@@ -43,6 +43,30 @@ interface Admin {
   mustChangePassword: boolean;
 }
 
+// [FUNGSI] Key section sidebar yang bisa dibuka/tutup.
+type SectionKey = 'crewing' | 'finance' | 'akun';
+
+const SECTIONS_STORAGE_KEY = 'marms-sidebar-sections';
+
+// [FUNGSI] Baca status buka/tutup section dari localStorage.
+// Default: Crewing & Finance terbuka, Akun tertutup.
+function readOpenSections(): Record<SectionKey, boolean> {
+  try {
+    const raw = localStorage.getItem(SECTIONS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        crewing: parsed.crewing !== false,
+        finance: parsed.finance !== false,
+        akun: parsed.akun === true,
+      };
+    }
+  } catch {
+    // abaikan JSON rusak
+  }
+  return { crewing: true, finance: true, akun: false };
+}
+
 // [FUNGSI] Gaya item nav; aktif = pill abu netral, bukan warna navy.
 function navCls({ isActive }: { isActive: boolean }) {
   return `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
@@ -63,6 +87,7 @@ export default function Layout() {
   const [pwError, setPwError] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>(readOpenSections);
 
   // [FUNGSI] Cek status login; arahkan ke /login bila belum login.
   useEffect(() => {
@@ -101,6 +126,19 @@ export default function Layout() {
         localStorage.setItem('marms-theme', next ? 'dark' : 'light');
       } catch {
         // ignore
+      }
+      return next;
+    });
+  }
+
+  // [FUNGSI] Buka/tutup satu section & simpan ke localStorage.
+  function toggleSection(key: SectionKey) {
+    setOpenSections((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      try {
+        localStorage.setItem(SECTIONS_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // abaikan bila storage penuh/diblokir
       }
       return next;
     });
@@ -178,49 +216,106 @@ export default function Layout() {
               {/* [FUNGSI] Payung bisnis Crewing — hanya untuk role Crewing/Superadmin. */}
               {canCrewing && (
                 <div>
-                  <div className="px-2 pb-1 text-xs font-medium text-gray-500">Crewing</div>
-                  <div className="space-y-0.5">
-                    {CREWING_MENU.map((m) => (
-                      <NavLink key={m.to} to={m.to} end={m.exact} className={navCls}>
-                        <span>{m.label}</span>
-                        {m.label === 'Rekrutmen' && pelamarBaru > 0 && (
-                          <span className="rounded-full bg-negative px-1.5 py-0.5 text-xs font-medium text-white">
-                            {pelamarBaru}
-                          </span>
-                        )}
-                      </NavLink>
-                    ))}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('crewing')}
+                    aria-expanded={openSections.crewing}
+                    aria-controls="sidebar-crewing"
+                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <span>Crewing</span>
+                    <svg
+                      className={`h-3.5 w-3.5 transition-transform ${openSections.crewing ? 'rotate-90' : ''}`}
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="M7 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  {openSections.crewing && (
+                    <div id="sidebar-crewing" className="space-y-0.5 pt-0.5">
+                      {CREWING_MENU.map((m) => (
+                        <NavLink key={m.to} to={m.to} end={m.exact} className={navCls}>
+                          <span>{m.label}</span>
+                          {m.label === 'Rekrutmen' && pelamarBaru > 0 && (
+                            <span className="rounded-full bg-negative px-1.5 py-0.5 text-xs font-medium text-white">
+                              {pelamarBaru}
+                            </span>
+                          )}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* [FUNGSI] Payung bisnis Finance — hanya untuk role Finance/Superadmin. */}
               {canFinance && (
                 <div>
-                  <div className="px-2 pb-1 text-xs font-medium text-gray-500">Finance</div>
-                  <div className="space-y-0.5">
-                    {FINANCE_MENU.map((m) => (
-                      <NavLink key={m.to} to={m.to} end={m.exact} className={navCls}>
-                        <span>{m.label}</span>
-                      </NavLink>
-                    ))}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('finance')}
+                    aria-expanded={openSections.finance}
+                    aria-controls="sidebar-finance"
+                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <span>Finance</span>
+                    <svg
+                      className={`h-3.5 w-3.5 transition-transform ${openSections.finance ? 'rotate-90' : ''}`}
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="M7 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  {openSections.finance && (
+                    <div id="sidebar-finance" className="space-y-0.5 pt-0.5">
+                      {FINANCE_MENU.map((m) => (
+                        <NavLink key={m.to} to={m.to} end={m.exact} className={navCls}>
+                          <span>{m.label}</span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* [FUNGSI] Pengaturan & Kelola Akun (di luar payung bisnis). */}
               <div>
-                <div className="px-2 pb-1 text-xs font-medium text-gray-500">Akun</div>
-                <div className="space-y-0.5">
-                  {admin.role === 'SUPERADMIN' && (
-                    <NavLink to="/dashboard/accounts" className={navCls}>
-                      <span>Kelola Akun</span>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('akun')}
+                  aria-expanded={openSections.akun}
+                  aria-controls="sidebar-akun"
+                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <span>Akun</span>
+                  <svg
+                    className={`h-3.5 w-3.5 transition-transform ${openSections.akun ? 'rotate-90' : ''}`}
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path d="M7 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                {openSections.akun && (
+                  <div id="sidebar-akun" className="space-y-0.5 pt-0.5">
+                    {admin.role === 'SUPERADMIN' && (
+                      <NavLink to="/dashboard/accounts" className={navCls}>
+                        <span>Kelola Akun</span>
+                      </NavLink>
+                    )}
+                    <NavLink to="/dashboard/settings" className={navCls}>
+                      <span>Pengaturan</span>
                     </NavLink>
-                  )}
-                  <NavLink to="/dashboard/settings" className={navCls}>
-                    <span>Pengaturan</span>
-                  </NavLink>
-                </div>
+                  </div>
+                )}
               </div>
             </nav>
 
