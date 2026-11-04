@@ -1,5 +1,5 @@
 // client/src/components/Layout.tsx
-// [FUNGSI] Kerangka halaman admin: sidebar terang, autentikasi, logout, ganti password wajib.
+// [FUNGSI] Kerangka halaman admin: sidebar navy, autentikasi, logout, ganti password wajib.
 // [ALASAN] Melindungi panel admin & memaksa ganti password saat login pertama.
 // [ALASAN] Sidebar dikelompokkan per payung bisnis (Crewing/Finance) sesuai role.
 
@@ -67,12 +67,12 @@ function readOpenSections(): Record<SectionKey, boolean> {
   return { crewing: true, finance: true, akun: false };
 }
 
-// [FUNGSI] Gaya item nav; aktif = pill abu netral, bukan warna navy.
+// [FUNGSI] Gaya item nav di atas sidebar navy; aktif = pill putih transparan.
 function navCls({ isActive }: { isActive: boolean }) {
   return `flex items-center justify-between rounded-md px-3 py-2 text-sm ${
     isActive
-      ? 'bg-gray-200 font-medium text-gray-900'
-      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+      ? 'bg-white/15 font-medium text-white dark:bg-gray-200 dark:text-gray-900'
+      : 'text-white/80 hover:bg-white/10 hover:text-white dark:text-gray-600 dark:hover:bg-gray-100 dark:hover:text-gray-900'
   }`;
 }
 
@@ -177,18 +177,18 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-surface">
       {/* Top bar mobile */}
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-gray-200 bg-card px-4 py-3 lg:hidden">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-white/10 bg-navy px-4 py-3 text-white dark:border-gray-200 dark:bg-card dark:text-gray-900 lg:hidden">
         <button
           onClick={() => setSidebarOpen(true)}
           aria-label="Buka menu"
-          className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
+          className="rounded-md p-1 text-white hover:bg-white/10 dark:text-gray-600 dark:hover:bg-gray-100"
         >
           <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="round" />
           </svg>
         </button>
         <Logo className="h-6 w-6" />
-        <span className="text-sm font-semibold text-gray-900">MARMS</span>
+        <span className="text-sm font-semibold text-white dark:text-gray-900">MARMS</span>
       </header>
 
       {/* Overlay drawer mobile */}
@@ -199,7 +199,7 @@ export default function Layout() {
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-60 border-r border-gray-200 bg-card transition-transform lg:static lg:translate-x-0 ${
+          className={`fixed inset-y-0 left-0 z-50 w-60 border-r border-white/10 bg-navy transition-transform dark:border-gray-200 dark:bg-card lg:static lg:translate-x-0 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
@@ -207,8 +207,8 @@ export default function Layout() {
             <div className="flex items-center gap-3 px-5 py-5">
               <Logo className="h-8 w-8" />
               <div className="min-w-0">
-                <div className="truncate text-sm font-semibold tracking-tight text-gray-900">MARMS</div>
-                <div className="text-xs text-gray-500">{ROLE_LABEL[admin.role]}</div>
+                <div className="truncate text-sm font-semibold tracking-tight text-white dark:text-gray-900">MARMS</div>
+                <div className="text-xs text-white/70 dark:text-gray-500">{ROLE_LABEL[admin.role]}</div>
               </div>
             </div>
 
@@ -221,7 +221,7 @@ export default function Layout() {
                     onClick={() => toggleSection('crewing')}
                     aria-expanded={openSections.crewing}
                     aria-controls="sidebar-crewing"
-                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
                   >
                     <span>Crewing</span>
                     <svg
@@ -259,7 +259,7 @@ export default function Layout() {
                     onClick={() => toggleSection('finance')}
                     aria-expanded={openSections.finance}
                     aria-controls="sidebar-finance"
-                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
                   >
                     <span>Finance</span>
                     <svg
@@ -291,7 +291,7 @@ export default function Layout() {
                   onClick={() => toggleSection('akun')}
                   aria-expanded={openSections.akun}
                   aria-controls="sidebar-akun"
-                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
                 >
                   <span>Akun</span>
                   <svg
@@ -320,10 +320,10 @@ export default function Layout() {
             </nav>
 
             {/* [FUNGSI] Info user + logout di bawah sidebar. */}
-            <div className="border-t border-gray-200 p-3">
+            <div className="border-t border-white/10 p-3 dark:border-gray-200">
               <button
                 onClick={toggleTheme}
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-white/80 hover:bg-white/10 hover:text-white dark:text-gray-600 dark:hover:bg-gray-100"
               >
                 {dark ? (
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -337,10 +337,10 @@ export default function Layout() {
                 )}
                 {dark ? 'Mode Terang' : 'Mode Gelap'}
               </button>
-              <div className="mt-1 truncate px-2 text-sm text-gray-600">{admin.email}</div>
+              <div className="mt-1 truncate px-2 text-sm text-white/70 dark:text-gray-600">{admin.email}</div>
               <button
                 onClick={handleLogout}
-                className="mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-negative hover:bg-negative/5"
+                className="mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-red-200 hover:bg-white/10 hover:text-red-100 dark:text-negative dark:hover:bg-negative/5"
               >
                 Keluar
               </button>

@@ -8,12 +8,12 @@
 
 ## 1. Mood
 Profesional, data-dense, bersih, fokus keterbacaan tabel & angka. Seperti dashboard logistik/perbankan.
-Chrome (sidebar, judul, tabel) netral/tidak berwarna; navy hanya jadi aksen. Tidak playful.
+Chrome **header & sidebar** memakai navy solid (acuan: halaman `/career`); area konten (kartu, tabel, judul halaman) tetap netral. Tidak playful.
 
 ## 2. Warna
 | Nama | Hex | Kegunaan |
 |---|---|---|
-| Navy (Aksen) | `#0F2C4C` | HANYA: tombol utama & aksen data. Bukan untuk sidebar/judul/header tabel. |
+| Navy (Aksen) | `#0F2C4C` | Tombol utama, aksen data, **header publik & sidebar/topbar admin**. Bukan untuk header tabel. |
 | Surface | `#F8F8F8` | Background halaman (ground netral). |
 | Ink | `gray-900` (`#111827`) | Teks utama: judul, angka, nama. |
 | Muted | `gray-500`/`gray-600` | Teks sekunder, label, header tabel (sentence-case). |
@@ -49,7 +49,8 @@ Chrome (sidebar, judul, tabel) netral/tidak berwarna; navy hanya jadi aksen. Tid
 - **Tabel:** header `text-xs text-gray-500` tanpa `bg-navy-light`, baris dipisah `border-t border-gray-100`, angka rata kanan `tabular-nums`, baris kosong `text-gray-500`.
 - **Tab:** underline 2px — aktif `-mb-px border-b-2 border-gray-900 text-gray-900`, non-aktif `text-gray-500`.
 - **Badge status:** tint pucat + teks gelap senada (mis. `bg-positive/10 text-positive`); tidak pakai teks putih di atas warna jenuh, kecuali aksi langka.
-- **Sidebar:** terang (`bg-white border-r border-gray-200`), item aktif pill abu `bg-gray-200/70 text-gray-900`, label grup sentence-case abu `text-gray-400`. Mobile: sidebar jadi drawer (tombol menu di top bar).
+- **Header publik & sidebar admin:** navy (`bg-navy text-white`), pembatas `border-white/10`. Item nav default `text-white/80 hover:bg-white/10`, item aktif pill `bg-white/15 text-white`. Label grup sentence-case `text-white/70`. Tombol tema/email `text-white/80`/`text-white/70`, tombol Keluar `text-red-200 hover:bg-white/10`. Mobile: sidebar jadi drawer + topbar navy (tombol menu `text-white hover:bg-white/10`). Logo di kotak putih (`bg-white`) agar tetap kontras.
+  - **Mode gelap:** varian navy di atas **hanya berlaku di mode terang**. Di `.dark`, sidebar/topbar kembali netral (`dark:bg-card`, `dark:border-gray-200`), item aktif pill abu (`dark:bg-gray-200 dark:text-gray-900`), label grup `dark:text-gray-500`, teks nav `dark:text-gray-600`. Header Login disembunyikan (`dark:hidden`); Logo kembali `dark:bg-card`. Halaman publik (`/career*`, `/approve/:token`) tetap navy di kedua mode.
 
 ## 6. Angka & Uang
 - Format Rupiah: `'Rp ' + n.toLocaleString('id-ID')`; Finance 2 desimal via `formatUang`.
