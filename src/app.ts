@@ -13,6 +13,7 @@ import { AppError } from './shared/AppError';
 import { UPLOAD_DIR } from './shared/upload';
 import { getCurrentAdmin } from './shared/authorization';
 import { masterDataRoutes } from './modules/crewing/master-data';
+import { kapalRoutes } from './modules/kapal';
 import { recruitmentRoutes } from './modules/crewing/recruitment';
 import { crewPlacementRoutes } from './modules/crewing/crew-placement';
 import { payrollRoutes } from './modules/crewing/payroll';
@@ -86,6 +87,7 @@ app.get('/health', (_req, res) => {
 // [FUNGSI] Daftarkan route tiap modul di bawah prefix /api.
 // [ALASAN] Semua endpoint API terpusat di sini agar mudah dilacak.
 app.use('/api/master-data', masterDataRoutes);
+app.use('/api/kapal', kapalRoutes);
 app.use('/api/recruitment', recruitmentRoutes);
 app.use('/api/crew', crewPlacementRoutes);
 app.use('/api/payroll', payrollRoutes);

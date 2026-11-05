@@ -1,19 +1,19 @@
-// client/src/pages/MasterData/index.tsx
-// [FUNGSI] Kerangka halaman Master Data dengan sub-navigasi.
-// [ALASAN] Menyatukan Jabatan, Kapal, dan Pengaturan dalam satu menu.
+// client/src/pages/Crewing/DataCrewing/index.tsx
+// [FUNGSI] Kerangka halaman Data Crewing dengan sub-navigasi.
+// [ALASAN] Menyatukan Jabatan dan Uang Makan dalam satu menu.
+//          Kapal sudah dipindah ke modul top-level "Data Master".
 
 import { NavLink, Outlet } from 'react-router-dom';
 
-export default function MasterData() {
+export default function DataCrewing() {
   const tabs = [
-    { to: '/dashboard/master-data/jabatan', label: 'Jabatan' },
-    { to: '/dashboard/master-data/kapal', label: 'Kapal' },
-    { to: '/dashboard/master-data/pengaturan', label: 'Uang Makan' },
+    { to: '/dashboard/data-crewing/jabatan', label: 'Jabatan' },
+    { to: '/dashboard/data-crewing/pengaturan', label: 'Uang Makan' },
   ];
 
   return (
     <div>
-      <h1 className="page-title">Master Data</h1>
+      <h1 className="page-title">Data Crewing</h1>
       <div className="mt-4 flex border-b border-gray-200">
         {tabs.map((t) => (
           <NavLink

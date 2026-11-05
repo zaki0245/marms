@@ -19,7 +19,7 @@ const ROLE_LABEL: Record<Role, string> = {
 // [FUNGSI] Menu modul Crewing.
 const CREWING_MENU = [
   { to: '/dashboard', label: 'Dashboard', exact: true },
-  { to: '/dashboard/master-data', label: 'Master Data' },
+  { to: '/dashboard/data-crewing', label: 'Data Crewing' },
   { to: '/dashboard/recruitment', label: 'Rekrutmen' },
   { to: '/dashboard/crew', label: 'Crew & Penempatan' },
   { to: '/dashboard/payroll', label: 'Payroll & Uang Makan' },
@@ -44,7 +44,7 @@ interface Admin {
 }
 
 // [FUNGSI] Key section sidebar yang bisa dibuka/tutup.
-type SectionKey = 'crewing' | 'finance' | 'akun';
+type SectionKey = 'crewing' | 'dataMaster' | 'finance' | 'akun';
 
 const SECTIONS_STORAGE_KEY = 'marms-sidebar-sections';
 
@@ -57,6 +57,7 @@ function readOpenSections(): Record<SectionKey, boolean> {
       const parsed = JSON.parse(raw);
       return {
         crewing: parsed.crewing !== false,
+        dataMaster: parsed.dataMaster !== false,
         finance: parsed.finance !== false,
         akun: parsed.akun === true,
       };
@@ -64,7 +65,7 @@ function readOpenSections(): Record<SectionKey, boolean> {
   } catch {
     // abaikan JSON rusak
   }
-  return { crewing: true, finance: true, akun: false };
+  return { crewing: true, dataMaster: true, finance: true, akun: false };
 }
 
 // [FUNGSI] Gaya item nav di atas sidebar navy; aktif = pill putih transparan.
@@ -213,6 +214,35 @@ export default function Layout() {
             </div>
 
             <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-6">
+              {/* [FUNGSI] Data Master — modul top-level yang bisa dipakai lintas payung bisnis. */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('dataMaster')}
+                  aria-expanded={openSections.dataMaster}
+                  aria-controls="sidebar-data-master"
+                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
+                >
+                  <span>Data Master</span>
+                  <svg
+                    className={`h-3.5 w-3.5 transition-transform ${openSections.dataMaster ? 'rotate-90' : ''}`}
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path d="M7 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                {openSections.dataMaster && (
+                  <div id="sidebar-data-master" className="space-y-0.5 pt-0.5">
+                    <NavLink to="/dashboard/kapal" className={navCls}>
+                      <span>Kapal</span>
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+
               {/* [FUNGSI] Payung bisnis Crewing — hanya untuk role Crewing/Superadmin. */}
               {canCrewing && (
                 <div>

@@ -1,9 +1,9 @@
 // src/modules/master-data/master-data.service.ts
-// [FUNGSI] Logika bisnis Master Data: jabatan, pengaturan, kapal.
+// [FUNGSI] Logika bisnis Master Data: jabatan, pengaturan.
 // [ALASAN] Semua akses database modul ini terpusat di sini (tidak bocor ke modul lain).
 
 import { prisma } from '../../../shared/prisma';
-import type { JabatanInput, KapalInput, PengaturanInput } from './master-data.model';
+import type { JabatanInput, PengaturanInput } from './master-data.model';
 
 // ================== JABATAN ==================
 
@@ -41,26 +41,4 @@ export async function updatePengaturan(input: PengaturanInput) {
     create: { key: 'UANG_MAKAN_PER_BULAN', value: String(input.uangMakanPerBulan) },
   });
   return getPengaturan();
-}
-
-// ================== KAPAL ==================
-
-export function listKapal() {
-  return prisma.kapal.findMany({ orderBy: { namaUnit: 'asc' } });
-}
-
-export function getKapal(id: string) {
-  return prisma.kapal.findUnique({ where: { id } });
-}
-
-export function createKapal(input: KapalInput) {
-  return prisma.kapal.create({ data: input });
-}
-
-export function updateKapal(id: string, input: KapalInput) {
-  return prisma.kapal.update({ where: { id }, data: input });
-}
-
-export function deleteKapal(id: string) {
-  return prisma.kapal.delete({ where: { id } });
 }

@@ -18,18 +18,3 @@ export const pengaturanSchema = z.object({
   uangMakanPerBulan: z.number().int().positive('Uang makan harus angka positif'),
 });
 export type PengaturanInput = z.infer<typeof pengaturanSchema>;
-
-// [FUNGSI] Validasi data kapal (unit TB + BG).
-export const kapalSchema = z.object({
-  namaUnit: z.string().min(1, 'Nama unit wajib diisi'),
-  status: z.enum(['AKTIF', 'DOCKING']).default('AKTIF'),
-  tbNama: z.string().min(1, 'Nama TB wajib diisi'),
-  tbImo: z.string().optional().nullable(),
-  tbGt: z.number().int().positive().optional().nullable(),
-  tbTahun: z.number().int().positive().optional().nullable(),
-  bgNama: z.string().min(1, 'Nama BG wajib diisi'),
-  bgImo: z.string().optional().nullable(),
-  bgGt: z.number().int().positive().optional().nullable(),
-  bgTahun: z.number().int().positive().optional().nullable(),
-});
-export type KapalInput = z.infer<typeof kapalSchema>;

@@ -6,7 +6,7 @@ import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
 import { liveMasaKerja, berhakLeavePay } from '../../../shared/masaKerja';
 import { sortByJabatan } from '../../../shared/jabatanOrder';
-import type { DisburseInput } from './leave-pay.model';
+import type { DisburseInput, UpdateDisbursementInput } from './leave-pay.model';
 
 // [FUNGSI] Daftar kelayakan leave pay semua crew.
 export async function listLeavePay() {
@@ -70,6 +70,18 @@ export async function disburseLeavePay(crewId: string, input: DisburseInput) {
   });
 
   return disbursement;
+}
+
+// [FUNGSI] Edit pencairan: hanya nominal & tanggal.
+// [ALASAN] Urutan pencairan & counter jumlahLeavePay tidak berubah.
+export async function updateDisbursement(id: string, input: UpdateDisbursementInput) {
+  return prisma.leavePayDisbursement.update({
+    where: { id },
+    data: {
+      nominal: input.nominal,
+      tanggalPencairan: new Date(input.tanggalPencairan),
+    },
+  });
 }
 
 export function getRiwayat(crewId: string) {

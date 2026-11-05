@@ -44,6 +44,11 @@ enum VesselStatus {
   DOCKING
 }
 
+enum KapalSkema {
+  MILIK
+  SEWA
+}
+
 enum PlacementStatus {
   AKTIF
   SELESAI
@@ -137,6 +142,7 @@ model Pengaturan {
 model Kapal {
   id           String           @id @default(cuid())
   namaUnit     String           @unique
+  skema        KapalSkema       @default(MILIK)
   status       VesselStatus     @default(AKTIF)
   tbNama       String
   tbImo        String?

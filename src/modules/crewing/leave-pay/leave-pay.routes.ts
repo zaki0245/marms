@@ -9,6 +9,7 @@ import * as c from './leave-pay.controller';
 const router = Router();
 
 router.get('/', asyncHandler(c.list));
+router.put('/disbursement/:id', asyncHandler(c.updateDisbursement));
 router.get('/:crewId/riwayat', asyncHandler(c.riwayat));
 router.post('/:crewId/disburse', asyncHandler(c.disburse));
 

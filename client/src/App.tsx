@@ -5,10 +5,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Crewing';
-import MasterData from './pages/Crewing/MasterData';
-import Jabatan from './pages/Crewing/MasterData/Jabatan';
-import Kapal from './pages/Crewing/MasterData/Kapal';
-import Pengaturan from './pages/Crewing/MasterData/Pengaturan';
+import DataCrewing from './pages/Crewing/DataCrewing';
+import Jabatan from './pages/Crewing/DataCrewing/Jabatan';
+import Pengaturan from './pages/Crewing/DataCrewing/Pengaturan';
+import Kapal from './pages/Kapal';
 import PublicHome from './pages/public/PublicHome';
 import Daftar from './pages/public/Daftar';
 import TerimaKasih from './pages/public/TerimaKasih';
@@ -43,12 +43,12 @@ export default function App() {
       {/* Admin */}
       <Route path="/dashboard" element={<Layout />}>
         <Route index element={<Dashboard />} />
-        <Route path="master-data" element={<MasterData />}>
+        <Route path="data-crewing" element={<DataCrewing />}>
           <Route index element={<Navigate to="jabatan" replace />} />
           <Route path="jabatan" element={<Jabatan />} />
-          <Route path="kapal" element={<Kapal />} />
           <Route path="pengaturan" element={<Pengaturan />} />
         </Route>
+        <Route path="kapal" element={<Kapal />} />
         <Route path="recruitment" element={<Recruitment />} />
         <Route path="crew" element={<Crew />} />
         <Route path="payroll" element={<Payroll />} />

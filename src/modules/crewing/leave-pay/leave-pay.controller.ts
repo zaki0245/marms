@@ -4,7 +4,7 @@
 
 import type { Request, Response } from 'express';
 import * as service from './leave-pay.service';
-import { disburseSchema } from './leave-pay.model';
+import { disburseSchema, updateDisbursementSchema } from './leave-pay.model';
 
 export async function list(_req: Request, res: Response) {
   res.json(await service.listLeavePay());
@@ -18,4 +18,9 @@ export async function disburse(req: Request, res: Response) {
 
 export async function riwayat(req: Request, res: Response) {
   res.json(await service.getRiwayat(req.params.crewId));
+}
+
+export async function updateDisbursement(req: Request, res: Response) {
+  const input = updateDisbursementSchema.parse(req.body);
+  res.json(await service.updateDisbursement(req.params.id, input));
 }

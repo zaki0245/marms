@@ -10,3 +10,10 @@ export const disburseSchema = z.object({
   catatanPerforma: z.string().optional(),
 });
 export type DisburseInput = z.infer<typeof disburseSchema>;
+
+// [FUNGSI] Validasi edit pencairan (hanya nominal & tanggal).
+export const updateDisbursementSchema = z.object({
+  nominal: z.number().int().positive('Nominal wajib diisi'),
+  tanggalPencairan: z.string().min(1, 'Tanggal pencairan wajib diisi'),
+});
+export type UpdateDisbursementInput = z.infer<typeof updateDisbursementSchema>;

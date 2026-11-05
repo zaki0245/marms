@@ -143,7 +143,7 @@ export default function Crew() {
     loadPool();
     loadCrew();
     api.get<Jabatan[]>('/master-data/jabatan').then(({ data }) => setJabatan(data)).catch(() => undefined);
-    api.get<Vessel[]>('/master-data/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
+    api.get<Vessel[]>('/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
   }, []);
 
   function jabatanName(kode: string) {

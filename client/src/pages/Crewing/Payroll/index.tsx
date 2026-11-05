@@ -87,7 +87,7 @@ export default function Payroll() {
 
   useEffect(() => {
     load();
-    api.get<Vessel[]>('/master-data/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
+    api.get<Vessel[]>('/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
   }, []);
 
   // [FUNGSI] Reset halaman saat tab Gaji/Uang Makan berganti.

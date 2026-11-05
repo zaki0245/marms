@@ -119,6 +119,10 @@ export default function Reports() {
   const [cairkanLoading, setCairkanLoading] = useState(false);
   const [riwayatTarget, setRiwayatTarget] = useState<LeavePayItem | null>(null);
   const [riwayat, setRiwayat] = useState<RiwayatItem[]>([]);
+  const [editTarget, setEditTarget] = useState<RiwayatItem | null>(null);
+  const [editNominal, setEditNominal] = useState('');
+  const [editTanggal, setEditTanggal] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
@@ -130,7 +134,7 @@ export default function Reports() {
 
   useEffect(() => {
     api.get<Crew[]>('/reports/crew-per-kapal').then(({ data }) => setCrewList(data)).catch(() => undefined);
-    api.get<Vessel[]>('/master-data/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
+    api.get<Vessel[]>('/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
     api.get<Jabatan[]>('/master-data/jabatan').then(({ data }) => setJabatan(data)).catch(() => undefined);
     loadLeavePay();
     setLoading(false);
@@ -216,6 +220,36 @@ export default function Reports() {
       setRiwayat(data);
     } catch {
       setRiwayat([]);
+    }
+  }
+
+  function openEditRiwayat(r: RiwayatItem) {
+    setEditTarget(r);
+    setEditNominal(String(r.nominal));
+    setEditTanggal(r.tanggalPencairan.slice(0, 10));
+    setError('');
+  }
+
+  async function handleEditRiwayat(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editTarget) return;
+    setEditLoading(true);
+    setError('');
+    try {
+      await api.put(`/leave-pay/disbursement/${editTarget.id}`, {
+        nominal: Number(editNominal),
+        tanggalPencairan: editTanggal,
+      });
+      setEditTarget(null);
+      setMsg('Pencairan leave pay diperbarui');
+      if (riwayatTarget) {
+        const { data } = await api.get<RiwayatItem[]>(`/leave-pay/${riwayatTarget.crewId}/riwayat`);
+        setRiwayat(data);
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.error ?? 'Gagal memperbarui pencairan');
+    } finally {
+      setEditLoading(false);
     }
   }
 
@@ -550,22 +584,50 @@ export default function Reports() {
                   <th className="px-3 py-2">Ke</th>
                   <th className="px-3 py-2">Tanggal Dibayarkan</th>
                   <th className="px-3 py-2 text-right">Nominal</th>
+                  <th className="px-3 py-2 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {riwayat.length === 0 && (
-                  <tr><td colSpan={3} className="px-3 py-6 text-center text-gray-500">Belum ada pencairan.</td></tr>
+                  <tr><td colSpan={4} className="px-3 py-6 text-center text-gray-500">Belum ada pencairan.</td></tr>
                 )}
                 {riwayat.map((r) => (
                   <tr key={r.id} className="border-t border-gray-100">
                     <td className="px-3 py-2">{r.pencairanKe}</td>
                     <td className="px-3 py-2">{r.tanggalPencairan.slice(0, 10)}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{formatRupiah(r.nominal)}</td>
+                    <td className="px-3 py-2 text-right whitespace-nowrap">
+                      <button onClick={() => openEditRiwayat(r)} className="text-gray-700 hover:text-gray-900">Edit</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Modal edit pencairan leave pay */}
+      {editTarget && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4">
+          <form onSubmit={handleEditRiwayat} className="w-full max-w-sm rounded-lg bg-card p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900">Edit Pencairan ke-{editTarget.pencairanKe}</h3>
+            {error && <div className="mt-3 alert-error">{error}</div>}
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div>
+                <label className="label">Nominal (Rp)</label>
+                <input type="number" required value={editNominal} onChange={(e) => setEditNominal(e.target.value)} className="input mt-1 w-full" />
+              </div>
+              <div>
+                <label className="label">Tanggal Dibayarkan</label>
+                <input type="date" required value={editTanggal} onChange={(e) => setEditTanggal(e.target.value)} className="input mt-1 w-full" />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button type="button" onClick={() => setEditTarget(null)} className="btn-ghost">Batal</button>
+              <button type="submit" disabled={editLoading} className="btn-primary">{editLoading ? 'Menyimpan...' : 'Simpan'}</button>
+            </div>
+          </form>
         </div>
       )}
     </div>

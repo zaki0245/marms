@@ -1,14 +1,15 @@
-// client/src/pages/MasterData/Kapal.tsx
+// client/src/pages/Kapal/index.tsx
 // [FUNGSI] Halaman kelola data kapal (unit TB + BG).
 // [ALASAN] Kapal jadi dasar penempatan crew & perhitungan payroll per kapal.
 
 import { FormEvent, useEffect, useState } from 'react';
-import { api } from '../../../api/client';
-import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { api } from '../../api/client';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
 
 interface Kapal {
   id: string;
   namaUnit: string;
+  skema: 'MILIK' | 'SEWA';
   status: string;
   tbNama: string;
   tbImo?: string | null;
@@ -22,6 +23,7 @@ interface Kapal {
 
 interface KapalForm {
   namaUnit: string;
+  skema: string;
   status: string;
   tbNama: string;
   tbImo: string;
@@ -35,6 +37,7 @@ interface KapalForm {
 
 const emptyForm: KapalForm = {
   namaUnit: '',
+  skema: 'MILIK',
   status: 'AKTIF',
   tbNama: '',
   tbImo: '',
@@ -51,6 +54,11 @@ const STATUS_LABEL: Record<string, string> = {
   DOCKING: 'Docking',
 };
 
+const SKEMA_LABEL: Record<string, string> = {
+  MILIK: 'Milik',
+  SEWA: 'Sewa',
+};
+
 export default function Kapal() {
   const [items, setItems] = useState<Kapal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +72,7 @@ export default function Kapal() {
 
   async function load() {
     try {
-      const { data } = await api.get<Kapal[]>('/master-data/kapal');
+      const { data } = await api.get<Kapal[]>('/kapal');
       setItems(data);
     } catch {
       setError('Gagal memuat data kapal');
@@ -91,6 +99,7 @@ export default function Kapal() {
     setEditingId(k.id);
     setForm({
       namaUnit: k.namaUnit,
+      skema: k.skema,
       status: k.status,
       tbNama: k.tbNama,
       tbImo: k.tbImo ?? '',
@@ -108,6 +117,7 @@ export default function Kapal() {
   function buildPayload() {
     return {
       namaUnit: form.namaUnit,
+      skema: form.skema,
       status: form.status,
       tbNama: form.tbNama,
       tbImo: form.tbImo || null,
@@ -126,10 +136,10 @@ export default function Kapal() {
     setSuccess('');
     try {
       if (editingId) {
-        await api.put(`/master-data/kapal/${editingId}`, buildPayload());
+        await api.put(`/kapal/${editingId}`, buildPayload());
         setSuccess('Kapal diperbarui');
       } else {
-        await api.post('/master-data/kapal', buildPayload());
+        await api.post('/kapal', buildPayload());
         setSuccess('Kapal ditambahkan');
       }
       setShowForm(false);
@@ -144,7 +154,7 @@ export default function Kapal() {
     setSuccess('');
     if (!window.confirm('Hapus kapal ini?')) return;
     try {
-      await api.delete(`/master-data/kapal/${id}`);
+      await api.delete(`/kapal/${id}`);
       setSuccess('Kapal dihapus');
       load();
     } catch (err: any) {
@@ -173,6 +183,7 @@ export default function Kapal() {
         <thead>
           <tr className="text-left text-xs text-gray-500">
             <th className="px-3 py-2">Unit</th>
+            <th className="px-3 py-2">Skema</th>
             <th className="px-3 py-2">Status</th>
             <th className="px-3 py-2">Tugboat (TB)</th>
             <th className="px-3 py-2">Barge (BG)</th>
@@ -182,7 +193,7 @@ export default function Kapal() {
         <tbody>
           {items.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-3 py-6 text-center text-gray-500">
+              <td colSpan={6} className="px-3 py-6 text-center text-gray-500">
                 Belum ada kapal. Klik "+ Tambah Kapal".
               </td>
             </tr>
@@ -190,6 +201,11 @@ export default function Kapal() {
           {pageRows.map((k) => (
             <tr key={k.id} className="border-t border-gray-100">
               <td className="px-3 py-2 font-semibold text-gray-900">{k.namaUnit}</td>
+              <td className="px-3 py-2">
+                <span className={`rounded px-2 py-0.5 text-xs ${k.skema === 'MILIK' ? 'bg-navy/10 text-navy' : 'bg-amber-100 text-amber-700'}`}>
+                  {SKEMA_LABEL[k.skema] ?? k.skema}
+                </span>
+              </td>
               <td className="px-3 py-2">
                 <span className={`rounded px-2 py-0.5 text-xs ${k.status === 'AKTIF' ? 'bg-positive/10 text-positive' : 'bg-gray-200 text-gray-600'}`}>
                   {STATUS_LABEL[k.status] ?? k.status}
@@ -230,6 +246,17 @@ export default function Kapal() {
                   onChange={(e) => setField('namaUnit', e.target.value)}
                   className="input mt-1 w-full"
                 />
+              </div>
+              <div className="col-span-2">
+                <label className="label">Skema</label>
+                <select
+                  value={form.skema}
+                  onChange={(e) => setField('skema', e.target.value)}
+                  className="input mt-1 w-full"
+                >
+                  <option value="MILIK">Milik</option>
+                  <option value="SEWA">Sewa</option>
+                </select>
               </div>
               <div className="col-span-2">
                 <label className="label">Status</label>
