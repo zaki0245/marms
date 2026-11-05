@@ -5,6 +5,7 @@
 import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
 import { prorata } from '../../../shared/prorata';
+import { sortByJabatan } from '../../../shared/jabatanOrder';
 import type { GenerateInput } from './payroll.model';
 
 const DAY = 86400000;
@@ -126,14 +127,22 @@ export function listPayroll() {
   });
 }
 
-export function getPayroll(id: string) {
-  return prisma.payroll.findUnique({
+export async function getPayroll(id: string) {
+  const payroll = await prisma.payroll.findUnique({
     where: { id },
     include: {
       vessel: true,
       details: { include: { crew: { include: { applicant: true } } } },
     },
   });
+  if (!payroll) return payroll;
+  // [FUNGSI] Urutkan detail sesuai hierarki jabatan, lalu nama crew.
+  const details = sortByJabatan(
+    payroll.details,
+    (d) => d.jabatanKode,
+    (d) => d.crew?.applicant.namaLengkap,
+  );
+  return { ...payroll, details };
 }
 
 // [FUNGSI] Finalisasi payroll: kunci status menjadi Final (nilai sudah tersnapshot).

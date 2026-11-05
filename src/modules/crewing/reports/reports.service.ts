@@ -5,6 +5,7 @@
 
 import { prisma } from '../../../shared/prisma';
 import { liveMasaKerja, berhakLeavePay } from '../../../shared/masaKerja';
+import { sortByJabatan } from '../../../shared/jabatanOrder';
 
 export async function getDashboard() {
   const now = new Date();
@@ -55,5 +56,11 @@ export async function getCrewPerKapal() {
     },
     orderBy: { createdAt: 'desc' },
   });
-  return crews.map((c) => ({ ...c, masaKerja: liveMasaKerja(c) }));
+  const withMasaKerja = crews.map((c) => ({ ...c, masaKerja: liveMasaKerja(c) }));
+  // [FUNGSI] Urutkan sesuai hierarki jabatan (placement AKTIF), lalu nama.
+  return sortByJabatan(
+    withMasaKerja,
+    (c) => c.placements.find((p) => p.status === 'AKTIF')?.jabatanKode ?? c.applicant.posisiDilamar,
+    (c) => c.applicant.namaLengkap,
+  );
 }

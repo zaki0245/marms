@@ -5,6 +5,7 @@
 import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
 import { liveMasaKerja, berhakLeavePay } from '../../../shared/masaKerja';
+import { sortByJabatan } from '../../../shared/jabatanOrder';
 import type { DisburseInput } from './leave-pay.model';
 
 // [FUNGSI] Daftar kelayakan leave pay semua crew.
@@ -13,13 +14,15 @@ export async function listLeavePay() {
     include: { applicant: true, placements: { include: { segments: true } } },
     orderBy: { createdAt: 'desc' },
   });
-  return crews.map((c) => {
+  const rows = crews.map((c) => {
     const masaKerja = liveMasaKerja(c);
     const berhak = berhakLeavePay(masaKerja);
+    const activePlacement = c.placements.find((p) => p.status === 'AKTIF');
     return {
       crewId: c.id,
       nama: c.applicant.namaLengkap,
       posisi: c.applicant.posisiDilamar,
+      jabatanKode: activePlacement?.jabatanKode ?? c.applicant.posisiDilamar,
       status: c.status,
       masaKerja,
       berhak,
@@ -27,6 +30,12 @@ export async function listLeavePay() {
       sisa: berhak - c.jumlahLeavePay,
     };
   });
+  // [FUNGSI] Urutkan sesuai hierarki jabatan, lalu nama.
+  return sortByJabatan(
+    rows,
+    (r) => r.jabatanKode,
+    (r) => r.nama,
+  );
 }
 
 // [FUNGSI] Cairkan leave pay: catat pencairan & tambah jumlah yang sudah dibayar.

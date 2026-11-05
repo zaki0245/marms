@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
-import { DOKUMEN_LABEL } from '../../../constants';
+import { DOKUMEN_LABEL, sortByJabatan } from '../../../constants';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Dokumen {
@@ -326,10 +326,20 @@ export default function Crew() {
   }
 
   const activeCrew = crew.filter((c) => c.status !== 'OFF_BOARD');
-  const filteredCrew = vesselFilter
+  const filteredByVessel = vesselFilter
     ? activeCrew.filter((c) => activePlacement(c)?.vessel?.id === vesselFilter)
     : activeCrew;
-  const offBoardCrew = crew.filter((c) => c.status === 'OFF_BOARD');
+  // [FUNGSI] Urutkan sesuai hierarki jabatan (placement AKTIF), lalu nama.
+  const filteredCrew = sortByJabatan(
+    filteredByVessel,
+    (c) => activePlacement(c)?.jabatanKode ?? c.applicant.posisiDilamar,
+    (c) => c.applicant.namaLengkap,
+  );
+  const offBoardCrew = sortByJabatan(
+    crew.filter((c) => c.status === 'OFF_BOARD'),
+    (c) => activePlacement(c)?.jabatanKode ?? c.applicant.posisiDilamar,
+    (c) => c.applicant.namaLengkap,
+  );
 
   // [FUNGSI] Reset halaman saat tab/filter kapal berganti.
   useEffect(() => {

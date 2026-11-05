@@ -6,6 +6,7 @@ import { prisma } from '../../../shared/prisma';
 import { AppError } from '../../../shared/AppError';
 import { getApplicant } from '../recruitment';
 import { liveMasaKerja } from '../../../shared/masaKerja';
+import { sortByJabatan } from '../../../shared/jabatanOrder';
 import type { AssignInput, BankInput, OffBoardInput, UpdatePlacementInput } from './crew-placement.model';
 
 // [FUNGSI] Buat nomor kontrak otomatis: CTK-YYYY-NNNN.
@@ -183,7 +184,13 @@ export async function listCrew() {
     },
     orderBy: { createdAt: 'desc' },
   });
-  return crews.map((c) => ({ ...c, masaKerja: liveMasaKerja(c) }));
+  const withMasaKerja = crews.map((c) => ({ ...c, masaKerja: liveMasaKerja(c) }));
+  // [FUNGSI] Urutkan sesuai hierarki jabatan (placement AKTIF), lalu nama.
+  return sortByJabatan(
+    withMasaKerja,
+    (c) => c.placements.find((p) => p.status === 'AKTIF')?.jabatanKode ?? c.applicant.posisiDilamar,
+    (c) => c.applicant.namaLengkap,
+  );
 }
 
 export async function getCrew(id: string) {

@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { api, formatRupiah } from '../../../api/client';
-import { DOKUMEN_LABEL } from '../../../constants';
+import { DOKUMEN_LABEL, sortByJabatan } from '../../../constants';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Dokumen {
@@ -73,6 +73,7 @@ interface LeavePayItem {
   crewId: string;
   nama: string;
   posisi: string;
+  jabatanKode?: string | null;
   status: string;
   masaKerja: number;
   berhak: number;
@@ -143,13 +144,19 @@ export default function Reports() {
     return (c.placements ?? []).find((p) => p.status === 'AKTIF');
   }
 
-  const filtered = vesselFilter
+  const filteredByVessel = vesselFilter
     ? crewList.filter((c) => {
         const active = activePlacement(c);
         if (vesselFilter === TANPA_KAPAL) return !active;
         return active?.vessel?.id === vesselFilter;
       })
     : crewList;
+  // [FUNGSI] Urutkan sesuai hierarki jabatan (placement AKTIF), lalu nama.
+  const filtered = sortByJabatan(
+    filteredByVessel,
+    (c) => activePlacement(c)?.jabatanKode ?? c.applicant.posisiDilamar,
+    (c) => c.applicant.namaLengkap,
+  );
 
   const grouped = filtered.reduce((acc, c) => {
     const active = activePlacement(c);
@@ -167,7 +174,13 @@ export default function Reports() {
     setPage(1);
   }, [tab]);
 
-  const leavePayRows = leavePay.slice((page - 1) * pageSize, page * pageSize);
+  // [FUNGSI] Urutkan leave pay sesuai hierarki jabatan, lalu nama.
+  const sortedLeavePay = sortByJabatan(
+    leavePay,
+    (c) => c.jabatanKode ?? c.posisi,
+    (c) => c.nama,
+  );
+  const leavePayRows = sortedLeavePay.slice((page - 1) * pageSize, page * pageSize);
 
   function openCairkan(item: LeavePayItem) {
     setCairkanTarget(item);

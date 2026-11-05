@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { api, formatRupiah } from '../../../api/client';
+import { sortByJabatan } from '../../../constants';
 import { exportExcel, exportPdf } from '../../../utils/export';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
@@ -119,7 +120,15 @@ export default function Payroll() {
   async function openDetail(p: Payroll) {
     try {
       const { data } = await api.get<Payroll>(`/payroll/${p.id}`);
-      setSelected(data);
+      // [FUNGSI] Pastikan detail urut sesuai hierarki jabatan, lalu nama crew.
+      const details = data.details
+        ? sortByJabatan(
+            data.details,
+            (d) => d.jabatanKode,
+            (d) => d.crew?.applicant.namaLengkap,
+          )
+        : data.details;
+      setSelected({ ...data, details });
     } catch {
       // ignore
     }
