@@ -8,7 +8,7 @@ import { z } from 'zod';
 export const kapalSchema = z.object({
   namaUnit: z.string().min(1, 'Nama unit wajib diisi'),
   skema: z.enum(['MILIK', 'SEWA']).default('MILIK'),
-  status: z.enum(['AKTIF', 'DOCKING']).default('AKTIF'),
+  status: z.enum(['AKTIF', 'DOCKING', 'TIDAK_AKTIF']).default('AKTIF'),
   tbNama: z.string().min(1, 'Nama TB wajib diisi'),
   tbImo: z.string().optional().nullable(),
   tbGt: z.number().int().positive().optional().nullable(),

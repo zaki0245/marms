@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import { DOKUMEN_LABEL } from '../../../constants';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import PoolKandidat from './PoolKandidat';
 
 interface Dokumen {
   id: string;
@@ -72,6 +73,7 @@ function DokumenRow({ doc }: { doc: Dokumen }) {
 }
 
 export default function Recruitment() {
+  const [tab, setTab] = useState<'pelamar' | 'pool'>('pelamar');
   const [items, setItems] = useState<Pelamar[]>([]);
   const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
@@ -129,10 +131,24 @@ export default function Recruitment() {
 
   const pageRows = items.slice((page - 1) * pageSize, page * pageSize);
 
+  const tabCls = (t: typeof tab) =>
+    `px-4 py-2 text-sm font-medium ${tab === t ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
+
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="page-title">Rekrutmen</h1>
+      <h1 className="page-title">Rekrutmen</h1>
+
+      <div className="mt-4 flex border-b border-gray-200">
+        <button onClick={() => setTab('pelamar')} className={tabCls('pelamar')}>Pelamar</button>
+        <button onClick={() => setTab('pool')} className={tabCls('pool')}>Pool Kandidat</button>
+      </div>
+
+      {tab === 'pool' && <PoolKandidat />}
+
+      {tab === 'pelamar' && (
+      <>
+      <div className="flex items-center justify-between mt-4">
+        <span className="text-sm text-gray-600">Filter Status</span>
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -260,6 +276,8 @@ export default function Recruitment() {
             )}
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

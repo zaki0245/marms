@@ -52,6 +52,7 @@ const emptyForm: KapalForm = {
 const STATUS_LABEL: Record<string, string> = {
   AKTIF: 'Aktif',
   DOCKING: 'Docking',
+  TIDAK_AKTIF: 'TIDAK AKTIF',
 };
 
 const SKEMA_LABEL: Record<string, string> = {
@@ -207,7 +208,13 @@ export default function Kapal() {
                 </span>
               </td>
               <td className="px-3 py-2">
-                <span className={`rounded px-2 py-0.5 text-xs ${k.status === 'AKTIF' ? 'bg-positive/10 text-positive' : 'bg-gray-200 text-gray-600'}`}>
+                <span className={`rounded px-2 py-0.5 text-xs ${
+                  k.status === 'AKTIF'
+                    ? 'bg-positive/10 text-positive'
+                    : k.status === 'TIDAK_AKTIF'
+                    ? 'bg-negative/10 text-negative'
+                    : 'bg-gray-200 text-gray-600'
+                }`}>
                   {STATUS_LABEL[k.status] ?? k.status}
                 </span>
               </td>
@@ -267,6 +274,7 @@ export default function Kapal() {
                 >
                   <option value="AKTIF">Aktif</option>
                   <option value="DOCKING">Docking</option>
+                  <option value="TIDAK_AKTIF">TIDAK AKTIF</option>
                 </select>
               </div>
             </div>

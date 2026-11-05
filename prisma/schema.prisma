@@ -42,6 +42,7 @@ enum ContractStatus {
 enum VesselStatus {
   AKTIF
   DOCKING
+  TIDAK_AKTIF
 }
 
 enum KapalSkema {

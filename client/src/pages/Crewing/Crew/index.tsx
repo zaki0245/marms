@@ -1,6 +1,6 @@
-// client/src/pages/Crew/index.tsx
-// [FUNGSI] Halaman Kru & Penempatan: Pool Kandidat (assign ke kapal) + Crew (filter & status).
-// [ALASAN] Admin menempatkan kandidat ke kapal dan memantau status + masa kerja crew.
+// client/src/pages/Crewing/Crew/index.tsx
+// [FUNGSI] Halaman Kru & Penempatan: Crew aktif (filter & status) + crew off board.
+// [ALASAN] Pool Kandidat sudah dipindah ke halaman Rekrutmen (tab Pool Kandidat).
 
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
@@ -83,15 +83,13 @@ const ALASAN: Record<string, string> = {
 };
 
 interface AssignTarget {
-  type: 'applicant' | 'crew';
   id: string;
   nama: string;
   posisi: string;
 }
 
 export default function Crew() {
-  const [tab, setTab] = useState<'pool' | 'crew' | 'offboard'>('pool');
-  const [pool, setPool] = useState<Applicant[]>([]);
+  const [tab, setTab] = useState<'crew' | 'offboard'>('crew');
   const [crew, setCrew] = useState<Crew[]>([]);
   const [jabatan, setJabatan] = useState<Jabatan[]>([]);
   const [kapal, setKapal] = useState<Vessel[]>([]);
@@ -119,15 +117,6 @@ export default function Crew() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
-  async function loadPool() {
-    try {
-      const { data } = await api.get<Applicant[]>('/recruitment/kandidat');
-      setPool(data);
-    } catch {
-      // ignore
-    }
-  }
-
   async function loadCrew() {
     try {
       const { data } = await api.get<Crew[]>('/crew');
@@ -140,7 +129,6 @@ export default function Crew() {
   }
 
   useEffect(() => {
-    loadPool();
     loadCrew();
     api.get<Jabatan[]>('/master-data/jabatan').then(({ data }) => setJabatan(data)).catch(() => undefined);
     api.get<Vessel[]>('/kapal').then(({ data }) => setKapal(data)).catch(() => undefined);
@@ -154,18 +142,11 @@ export default function Crew() {
     return (c.placements ?? []).find((p) => p.status === 'AKTIF');
   }
 
-  function openAssignApplicant(p: Applicant) {
-    const match = jabatan.find((j) => j.nama === p.posisiDilamar);
-    setAssignForm({ jabatanKode: match?.kode ?? '', vesselId: '', tanggalMulai: '', namaBank: '', noRekening: '' });
-    setAssignTarget({ type: 'applicant', id: p.id, nama: p.namaLengkap, posisi: p.posisiDilamar });
-    setError('');
-  }
-
   function openAssignCrew(c: Crew) {
     const active = activePlacement(c);
     const kode = active?.jabatanKode ?? jabatan.find((j) => j.nama === c.applicant.posisiDilamar)?.kode ?? '';
     setAssignForm({ jabatanKode: kode, vesselId: '', tanggalMulai: '', namaBank: c.namaBank ?? '', noRekening: c.noRekening ?? '' });
-    setAssignTarget({ type: 'crew', id: c.id, nama: c.applicant.namaLengkap, posisi: c.applicant.posisiDilamar });
+    setAssignTarget({ id: c.id, nama: c.applicant.namaLengkap, posisi: c.applicant.posisiDilamar });
     setError('');
   }
 
@@ -182,14 +163,9 @@ export default function Crew() {
         namaBank: assignForm.namaBank,
         noRekening: assignForm.noRekening,
       };
-      if (assignTarget.type === 'applicant') {
-        await api.post(`/crew/assign-applicant/${assignTarget.id}`, payload);
-      } else {
-        await api.post(`/crew/${assignTarget.id}/assign`, payload);
-      }
+      await api.post(`/crew/${assignTarget.id}/assign`, payload);
       setAssignTarget(null);
       setMsg('Crew berhasil ditempatkan di kapal');
-      loadPool();
       loadCrew();
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal menempatkan crew');
@@ -313,13 +289,12 @@ export default function Crew() {
   }
 
   async function handleDelete(c: Crew) {
-    if (!window.confirm(`Hapus ${c.applicant.namaLengkap} beserta seluruh riwayat penempatannya? Kandidat akan kembali ke Pool Kandidat.`)) return;
+    if (!window.confirm(`Hapus ${c.applicant.namaLengkap} beserta seluruh riwayat penempatannya? Kandidat akan kembali ke Pool Kandidat di menu Rekrutmen.`)) return;
     setError('');
     try {
       await api.delete(`/crew/${c.id}`);
-      setMsg('Crew dihapus, kandidat kembali ke Pool Kandidat');
+      setMsg('Crew dihapus, kandidat kembali ke Pool Kandidat di menu Rekrutmen');
       loadCrew();
-      loadPool();
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal menghapus crew');
     }
@@ -346,7 +321,6 @@ export default function Crew() {
     setPage(1);
   }, [tab, vesselFilter]);
 
-  const poolRows = pool.slice((page - 1) * pageSize, page * pageSize);
   const crewRows = filteredCrew.slice((page - 1) * pageSize, page * pageSize);
   const offBoardRows = offBoardCrew.slice((page - 1) * pageSize, page * pageSize);
 
@@ -355,12 +329,6 @@ export default function Crew() {
       <h1 className="page-title">Crew & Penempatan</h1>
 
       <div className="mt-4 flex border-b border-gray-200">
-        <button
-          onClick={() => setTab('pool')}
-          className={`px-4 py-2 text-sm font-medium ${tab === 'pool' ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`}
-        >
-          Pool Kandidat
-        </button>
         <button
           onClick={() => setTab('crew')}
           className={`px-4 py-2 text-sm font-medium ${tab === 'crew' ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`}
@@ -377,51 +345,6 @@ export default function Crew() {
 
       {msg && <div className="mt-3 alert-success">{msg}</div>}
       {error && <div className="mt-3 alert-error">{error}</div>}
-
-      {tab === 'pool' && (
-        <>
-        <table className="mt-4 w-full border-collapse bg-card text-sm">
-          <thead>
-            <tr className="text-left text-xs text-gray-500">
-              <th className="px-3 py-2">No. Pendaftaran</th>
-              <th className="px-3 py-2">Nama</th>
-              <th className="px-3 py-2">Posisi</th>
-              <th className="px-3 py-2">No HP</th>
-              <th className="px-3 py-2 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pool.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-3 py-6 text-center text-gray-500">
-                  Tidak ada kandidat. Ubah status pelamar jadi "Diterima" dulu di menu Rekrutmen.
-                </td>
-              </tr>
-            )}
-            {poolRows.map((p) => (
-              <tr key={p.id} className="border-t border-gray-100">
-                <td className="px-3 py-2 font-mono">{p.nomorPendaftaran}</td>
-                <td className="px-3 py-2">{p.namaLengkap}</td>
-                <td className="px-3 py-2">{p.posisiDilamar}</td>
-                <td className="px-3 py-2">{p.noHp}</td>
-                <td className="px-3 py-2 text-right">
-                  <button onClick={() => openAssignApplicant(p)} className="rounded-md bg-navy px-3 py-1 text-xs font-medium text-white">
-                    Assign ke Kapal
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Pagination
-          page={page}
-          pageSize={pageSize}
-          total={pool.length}
-          onPageChange={setPage}
-          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
-        />
-        </>
-      )}
 
       {tab === 'crew' && (
         <div>

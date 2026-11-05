@@ -22,7 +22,7 @@ const CREWING_MENU = [
   { to: '/dashboard/data-crewing', label: 'Data Crewing' },
   { to: '/dashboard/recruitment', label: 'Rekrutmen' },
   { to: '/dashboard/crew', label: 'Crew & Penempatan' },
-  { to: '/dashboard/payroll', label: 'Payroll & Uang Makan' },
+  { to: '/dashboard/payroll', label: 'Payroll, Uang Makan, & Leave Pay' },
   { to: '/dashboard/reports', label: 'Laporan' },
 ];
 

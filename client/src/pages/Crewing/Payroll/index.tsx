@@ -7,6 +7,7 @@ import { api, formatRupiah } from '../../../api/client';
 import { sortByJabatan } from '../../../constants';
 import { exportExcel, exportPdf } from '../../../utils/export';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import LeavePaySection from './LeavePaySection';
 
 interface Vessel {
   id: string;
@@ -59,9 +60,12 @@ function statusBadge(s: string) {
   return `${base} badge-warning`;
 }
 
+type Tab = 'GAJI' | 'UANG_MAKAN' | 'LEAVE_PAY';
+
 export default function Payroll() {
-  const [jenis, setJenis] = useState<'GAJI' | 'UANG_MAKAN'>('GAJI');
+  const [jenis, setJenis] = useState<Tab>('GAJI');
   const isGaji = jenis === 'GAJI';
+  const isPayroll = jenis === 'GAJI' || jenis === 'UANG_MAKAN';
   const [items, setItems] = useState<Payroll[]>([]);
   const [kapal, setKapal] = useState<Vessel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -172,7 +176,7 @@ export default function Payroll() {
     }
   }
 
-  const filtered = items.filter((p) => p.jenis === jenis);
+  const filtered = isPayroll ? items.filter((p) => p.jenis === jenis) : [];
   const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
   const totalKeseluruhan = (selected?.details ?? []).reduce((s, d) => s + d.total, 0);
 
@@ -208,18 +212,23 @@ export default function Payroll() {
     exportPdf(buildExportSheet());
   }
 
-  const tabCls = (t: 'GAJI' | 'UANG_MAKAN') =>
+  const tabCls = (t: Tab) =>
     `px-4 py-2 text-sm font-medium ${jenis === t ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
 
   return (
     <div>
-      <h1 className="page-title">Payroll & Uang Makan</h1>
+      <h1 className="page-title">Payroll, Uang Makan, & Leave Pay</h1>
 
       <div className="mt-4 flex border-b border-gray-200">
         <button onClick={() => setJenis('GAJI')} className={tabCls('GAJI')}>Payroll</button>
         <button onClick={() => setJenis('UANG_MAKAN')} className={tabCls('UANG_MAKAN')}>Uang Makan</button>
+        <button onClick={() => setJenis('LEAVE_PAY')} className={tabCls('LEAVE_PAY')}>Leave Pay</button>
       </div>
 
+      {jenis === 'LEAVE_PAY' && <LeavePaySection />}
+
+      {isPayroll && (
+      <>
       <div className="mt-4 flex justify-end">
         <button onClick={() => { setGenForm({ vesselId: '', bulan: 1, tahun: new Date().getFullYear() }); setError(''); setShowGen(true); }} className="btn-primary">
           + Buat {isGaji ? 'Gaji' : 'Uang Makan'}
@@ -279,6 +288,8 @@ export default function Payroll() {
           onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
         />
         </>
+      )}
+      </>
       )}
 
       {/* Modal generate */}
