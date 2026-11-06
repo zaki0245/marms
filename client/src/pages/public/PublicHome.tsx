@@ -17,7 +17,7 @@ export default function PublicHome() {
       <header className="bg-navy px-6 py-4 text-white">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between">
           <div className="flex items-center gap-3">
-            <Logo className="h-9 w-9" />
+            <Logo className="h-9 w-auto" />
             <span className="text-lg font-bold tracking-wide">MARMS</span>
           </div>
           <span className="hidden text-sm text-white/70 sm:block">Maritim Armada Raya</span>

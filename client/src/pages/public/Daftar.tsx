@@ -86,7 +86,7 @@ export default function Daftar() {
       <header className="bg-navy px-6 py-5 text-white">
         <div className="mx-auto max-w-3xl">
           <div className="flex items-center gap-3">
-            <Logo className="h-9 w-9" />
+            <Logo className="h-9 w-auto" />
             <span className="text-xl font-bold">MARMS</span>
           </div>
           <p className="mt-1 text-sm text-white/70">Formulir Pendaftaran Pelamar</p>

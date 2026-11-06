@@ -10,7 +10,7 @@ export default function TerimaKasih() {
     <div className="flex min-h-screen flex-col bg-surface">
       <header className="bg-navy px-6 py-5 text-white">
         <div className="mx-auto flex w-full max-w-3xl items-center gap-3">
-          <Logo className="h-8 w-8" />
+          <Logo className="h-8 w-auto" />
           <span className="text-lg font-bold tracking-wide">MARMS</span>
         </div>
       </header>
