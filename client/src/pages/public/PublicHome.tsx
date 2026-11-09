@@ -3,7 +3,6 @@
 // [ALASAN] Pelamar mulai dari sini lalu klik "Daftar Sekarang".
 
 import { Link } from 'react-router-dom';
-import Logo from '../../components/Logo';
 
 const LANGKAH = [
   { no: '1', judul: 'Isi Formulir', desk: 'Lengkapi data pribadi dan pengalaman Anda.' },
@@ -14,16 +13,6 @@ const LANGKAH = [
 export default function PublicHome() {
   return (
     <div className="min-h-screen bg-surface">
-      <header className="bg-navy px-6 py-4 text-white">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Logo className="h-9 w-auto" />
-            <span className="text-lg font-bold tracking-wide">MARMS</span>
-          </div>
-          <span className="hidden text-sm text-white/70 sm:block">Maritim Armada Raya</span>
-        </div>
-      </header>
-
       <section className="bg-navy px-6 pb-16 pt-14 text-center text-white">
         <div className="mx-auto max-w-2xl">
           <h1 className="text-3xl font-bold leading-tight sm:text-4xl">Rekrutmen Crew</h1>

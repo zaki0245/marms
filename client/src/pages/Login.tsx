@@ -30,7 +30,6 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
       <form onSubmit={handleSubmit} className="card w-full max-w-sm p-8">
         <h1 className="text-center text-xl font-semibold text-gray-900">MARMS</h1>
-        <p className="mt-1 text-center text-sm text-gray-500">Masuk Admin</p>
         {error && <div className="alert-error mt-4">{error}</div>}
         <div className="mt-4 space-y-3">
           <div>
