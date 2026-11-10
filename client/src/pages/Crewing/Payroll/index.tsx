@@ -7,6 +7,7 @@ import { api, formatRupiah } from '../../../api/client';
 import { sortByJabatan } from '../../../constants';
 import { exportExcel, exportPdf } from '../../../utils/export';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 import LeavePaySection from './LeavePaySection';
 
 interface Vessel {
@@ -77,6 +78,8 @@ export default function Payroll() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
+  const { sort: detailSort, toggle: toggleDetailSort } = useSort();
 
   async function load() {
     try {
@@ -98,6 +101,11 @@ export default function Payroll() {
   useEffect(() => {
     setPage(1);
   }, [jenis]);
+
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
@@ -177,7 +185,13 @@ export default function Payroll() {
   }
 
   const filtered = isPayroll ? items.filter((p) => p.jenis === jenis) : [];
-  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(filtered, sort, {
+    kapal: (p) => p.vessel?.namaUnit ?? '',
+    periode: (p) => p.tahun * 100 + p.bulan,
+    hari: (p) => p.jumlahHari,
+    crew: (p) => p._count?.details ?? 0,
+    status: (p) => STATUS_LABEL[p.status] ?? p.status,
+  }).slice((page - 1) * pageSize, page * pageSize);
   const totalKeseluruhan = (selected?.details ?? []).reduce((s, d) => s + d.total, 0);
 
   // [FUNGSI] Susun data untuk export Excel/PDF.
@@ -245,11 +259,11 @@ export default function Payroll() {
         <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
-              <th className="px-3 py-2">Kapal</th>
-              <th className="px-3 py-2">Periode</th>
-              <th className="px-3 py-2 text-right">Hari</th>
-              <th className="px-3 py-2 text-right">Crew</th>
-              <th className="px-3 py-2">Status</th>
+              <SortableTh label="Kapal" sortKey="kapal" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Periode" sortKey="periode" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Hari" sortKey="hari" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Crew" sortKey="crew" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Status" sortKey="status" sort={sort} onSort={toggle} className="px-3 py-2" />
               <th className="px-3 py-2 text-right">Aksi</th>
             </tr>
           </thead>
@@ -341,31 +355,41 @@ export default function Payroll() {
             <table className="mt-4 w-full border-collapse text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-500">
-                  <th className="px-3 py-2">Nama</th>
-                  <th className="px-3 py-2">Jabatan</th>
-                  <th className="px-3 py-2">Nama Bank</th>
-                  <th className="px-3 py-2">No Rekening</th>
-                  <th className="px-3 py-2">Periode</th>
-                  <th className="px-3 py-2 text-right">Hari</th>
+                  <SortableTh label="Nama" sortKey="nama" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2" />
+                  <SortableTh label="Jabatan" sortKey="jabatan" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2" />
+                  <SortableTh label="Nama Bank" sortKey="bank" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2" />
+                  <SortableTh label="No Rekening" sortKey="noRekening" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2" />
+                  <SortableTh label="Periode" sortKey="periode" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2" />
+                  <SortableTh label="Hari" sortKey="hari" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2 text-right" />
                   {isGaji ? (
                     <>
-                      <th className="px-3 py-2 text-right">Gaji Pokok</th>
-                      <th className="px-3 py-2 text-right">Gaji Prorata</th>
+                      <SortableTh label="Gaji Pokok" sortKey="nilaiPokok" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2 text-right" />
+                      <SortableTh label="Gaji Prorata" sortKey="nilaiProrata" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2 text-right" />
                     </>
                   ) : (
                     <>
-                      <th className="px-3 py-2 text-right">U.Makan/bln</th>
-                      <th className="px-3 py-2 text-right">U.Makan Prorata</th>
+                      <SortableTh label="U.Makan/bln" sortKey="nilaiPokok" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2 text-right" />
+                      <SortableTh label="U.Makan Prorata" sortKey="nilaiProrata" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2 text-right" />
                     </>
                   )}
-                  <th className="px-3 py-2 text-right">Total</th>
+                  <SortableTh label="Total" sortKey="total" sort={detailSort} onSort={toggleDetailSort} className="px-3 py-2 text-right" />
                 </tr>
               </thead>
               <tbody>
                 {(selected.details ?? []).length === 0 && (
                   <tr><td colSpan={9} className="px-3 py-6 text-center text-gray-500">Tidak ada crew aktif bulan ini.</td></tr>
                 )}
-                {(selected.details ?? []).map((d) => (
+                {sortRows(selected.details ?? [], detailSort, {
+                  nama: (d) => d.crew?.applicant.namaLengkap,
+                  jabatan: (d) => d.jabatanNama,
+                  bank: (d) => d.namaBank,
+                  noRekening: (d) => d.noRekening,
+                  periode: (d) => d.periodeKerja,
+                  hari: (d) => d.hariAktif,
+                  nilaiPokok: (d) => (isGaji ? d.gajiPokokSnapshot : d.uangMakanSnapshot),
+                  nilaiProrata: (d) => (isGaji ? d.gajiProrata : d.uangMakanProrata),
+                  total: (d) => d.total,
+                }).map((d) => (
                   <tr key={d.id} className="border-t border-gray-100">
                     <td className="px-3 py-2">{d.crew?.applicant.namaLengkap}</td>
                     <td className="px-3 py-2">{d.jabatanNama}</td>

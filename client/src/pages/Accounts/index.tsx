@@ -5,6 +5,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../components/sortable';
 
 interface Account {
   id: string;
@@ -27,6 +28,7 @@ export default function Accounts() {
   const [msg, setMsg] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
 
   async function load() {
     try {
@@ -73,7 +75,16 @@ export default function Accounts() {
     }
   }
 
-  const pageRows = accounts.slice((page - 1) * pageSize, page * pageSize);
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
+
+  const pageRows = sortRows(accounts, sort, {
+    email: (a) => a.email,
+    role: (a) => ROLE_LABEL[a.role] ?? a.role,
+    status: (a) => (a.active ? 'Aktif' : 'Nonaktif'),
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -109,9 +120,9 @@ export default function Accounts() {
         <table className="w-full text-left text-sm">
           <thead className="text-xs text-gray-500">
             <tr>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Status</th>
+              <SortableTh label="Email" sortKey="email" sort={sort} onSort={toggle} className="px-4 py-3" />
+              <SortableTh label="Role" sortKey="role" sort={sort} onSort={toggle} className="px-4 py-3" />
+              <SortableTh label="Status" sortKey="status" sort={sort} onSort={toggle} className="px-4 py-3" />
               <th className="px-4 py-3">Aksi</th>
             </tr>
           </thead>

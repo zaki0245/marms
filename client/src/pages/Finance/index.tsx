@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 import { formatUang } from './utils';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../components/sortable';
 
 interface DashboardData {
   totalHutangBulanIni: number;
@@ -31,6 +32,7 @@ export default function FinanceDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
 
   useEffect(() => {
     api.get('/finance/laporan/dashboard').then(({ data }) => setData(data)).catch(() => undefined);
@@ -41,8 +43,20 @@ export default function FinanceDashboard() {
     setPage(1);
   }, [data]);
 
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
+
   const jatuhTempo = data?.jatuhTempoTerdekat ?? [];
-  const pageRows = jatuhTempo.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(jatuhTempo, sort, {
+    jenis: (r) => r.jenis,
+    tanggal: (r) => r.tanggal,
+    counterparty: (r) => r.counterpartyName,
+    inv: (r) => r.inv,
+    total: (r) => Number(r.total),
+    dueDate: (r) => r.dueDate,
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -67,12 +81,12 @@ export default function FinanceDashboard() {
         <table className="mt-3 w-full text-left text-sm">
           <thead className="text-xs text-gray-500">
             <tr>
-              <th className="px-3 py-2">Jenis</th>
-              <th className="px-3 py-2">Tanggal</th>
-              <th className="px-3 py-2">Customer/Vendor</th>
-              <th className="px-3 py-2">INV</th>
-              <th className="px-3 py-2 text-right">Total</th>
-              <th className="px-3 py-2">Jatuh Tempo</th>
+              <SortableTh label="Jenis" sortKey="jenis" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Tanggal" sortKey="tanggal" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Customer/Vendor" sortKey="counterparty" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="INV" sortKey="inv" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Total" sortKey="total" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Jatuh Tempo" sortKey="dueDate" sort={sort} onSort={toggle} className="px-3 py-2" />
             </tr>
           </thead>
           <tbody>

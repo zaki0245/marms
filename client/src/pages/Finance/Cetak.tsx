@@ -8,6 +8,7 @@ import { num, formatUang } from './utils';
 import { cetakPV } from '../../utils/pvPrint';
 import SearchableSelect from '../../components/SearchableSelect';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../components/sortable';
 
 interface Bank { id?: string; accountNo: string; accountName: string; bank: string; }
 interface Vendor { id: string; nama: string; alamat?: string | null; banks: Bank[]; }
@@ -59,6 +60,7 @@ export default function Cetak() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -89,10 +91,10 @@ export default function Cetak() {
     api.get('/finance/konfigurasi').then(({ data }) => setKonfigurasi(data)).catch(() => undefined);
   }, []);
 
-  // [FUNGSI] Reset halaman saat pencarian/jenis berubah.
+  // [FUNGSI] Reset halaman saat pencarian/jenis/sorting berubah.
   useEffect(() => {
     setPage(1);
-  }, [search, jenis]);
+  }, [search, jenis, sort]);
 
   function openAdd() {
     setEditingId(null);
@@ -253,7 +255,12 @@ export default function Cetak() {
     return [pv.pvNo, pvCounterparty(pv), ...pv.items.map((it) => it.invoice.inv)].some((v) => v && v.toLowerCase().includes(s));
   });
 
-  const pagePvs = filteredPvs.slice((page - 1) * pageSize, page * pageSize);
+  const pagePvs = sortRows(filteredPvs, sort, {
+    pvNo: (pv) => pv.pvNo,
+    tanggal: (pv) => pv.tanggal,
+    counterparty: (pv) => pvCounterparty(pv),
+    total: (pv) => pvTotal(pv),
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   const tabCls = (active: boolean) =>
     `px-4 py-2 text-sm font-medium ${active ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
@@ -284,10 +291,10 @@ export default function Cetak() {
           <table className="w-full text-left text-sm">
             <thead className="text-xs text-gray-500">
               <tr>
-                <th className="px-3 py-2">{isRv ? 'RV No' : 'PV No'}</th>
-                <th className="px-3 py-2">Tanggal</th>
-                <th className="px-3 py-2">{isRv ? 'Customer' : 'Vendor'}</th>
-                <th className="px-3 py-2 text-right">Total</th>
+                <SortableTh label={isRv ? 'RV No' : 'PV No'} sortKey="pvNo" sort={sort} onSort={toggle} className="px-3 py-2" />
+                <SortableTh label="Tanggal" sortKey="tanggal" sort={sort} onSort={toggle} className="px-3 py-2" />
+                <SortableTh label={isRv ? 'Customer' : 'Vendor'} sortKey="counterparty" sort={sort} onSort={toggle} className="px-3 py-2" />
+                <SortableTh label="Total" sortKey="total" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
                 <th className="px-3 py-2 text-right">Aksi</th>
               </tr>
             </thead>

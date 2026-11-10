@@ -5,6 +5,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../components/sortable';
 
 interface Kapal {
   id: string;
@@ -70,6 +71,7 @@ export default function Kapal() {
   const [form, setForm] = useState<KapalForm>(emptyForm);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
 
   async function load() {
     try {
@@ -85,6 +87,11 @@ export default function Kapal() {
   useEffect(() => {
     load();
   }, []);
+
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
 
   function setField(field: keyof KapalForm, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -165,7 +172,13 @@ export default function Kapal() {
 
   if (loading) return <p className="text-gray-500">Memuat...</p>;
 
-  const pageRows = items.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(items, sort, {
+    unit: (k) => k.namaUnit,
+    skema: (k) => SKEMA_LABEL[k.skema] ?? k.skema,
+    status: (k) => STATUS_LABEL[k.status] ?? k.status,
+    tb: (k) => k.tbNama,
+    bg: (k) => k.bgNama,
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -183,11 +196,11 @@ export default function Kapal() {
       <table className="w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
-            <th className="px-3 py-2">Unit</th>
-            <th className="px-3 py-2">Skema</th>
-            <th className="px-3 py-2">Status</th>
-            <th className="px-3 py-2">Tugboat (TB)</th>
-            <th className="px-3 py-2">Barge (BG)</th>
+            <SortableTh label="Unit" sortKey="unit" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Skema" sortKey="skema" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Status" sortKey="status" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Tugboat (TB)" sortKey="tb" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Barge (BG)" sortKey="bg" sort={sort} onSort={toggle} className="px-3 py-2" />
             <th className="px-3 py-2 text-right">Aksi</th>
           </tr>
         </thead>

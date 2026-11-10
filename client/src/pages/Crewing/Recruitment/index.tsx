@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import { DOKUMEN_LABEL } from '../../../constants';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 import PoolKandidat from './PoolKandidat';
 
 interface Dokumen {
@@ -83,6 +84,7 @@ export default function Recruitment() {
   const [success, setSuccess] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
 
   async function load() {
     setLoading(true);
@@ -102,6 +104,11 @@ export default function Recruitment() {
     setPage(1);
     load();
   }, [filter]);
+
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
 
   async function openDetail(p: Pelamar) {
     try {
@@ -129,7 +136,12 @@ export default function Recruitment() {
     }
   }
 
-  const pageRows = items.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(items, sort, {
+    nomor: (p) => p.nomorPendaftaran,
+    nama: (p) => p.namaLengkap,
+    posisi: (p) => p.posisiDilamar,
+    status: (p) => STATUS_LABEL[p.status] ?? p.status,
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   const tabCls = (t: typeof tab) =>
     `px-4 py-2 text-sm font-medium ${tab === t ? '-mb-px border-b-2 border-gray-900 text-gray-900' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-900'}`;
@@ -168,10 +180,10 @@ export default function Recruitment() {
         <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
-              <th className="px-3 py-2">No. Pendaftaran</th>
-              <th className="px-3 py-2">Nama</th>
-              <th className="px-3 py-2">Posisi</th>
-              <th className="px-3 py-2">Status</th>
+              <SortableTh label="No. Pendaftaran" sortKey="nomor" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Nama" sortKey="nama" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Posisi" sortKey="posisi" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Status" sortKey="status" sort={sort} onSort={toggle} className="px-3 py-2" />
               <th className="px-3 py-2 text-right">Aksi</th>
             </tr>
           </thead>

@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 
 interface Applicant {
   id: string;
@@ -42,6 +43,7 @@ export default function PoolKandidat() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
 
   async function loadPool() {
     try {
@@ -89,7 +91,17 @@ export default function PoolKandidat() {
     }
   }
 
-  const rows = pool.slice((page - 1) * pageSize, page * pageSize);
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
+
+  const sortedPool = sortRows(pool, sort, {
+    nomor: (p) => p.nomorPendaftaran,
+    nama: (p) => p.namaLengkap,
+    posisi: (p) => p.posisiDilamar,
+    noHp: (p) => p.noHp,
+  });
+  const rows = sortedPool.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -99,10 +111,10 @@ export default function PoolKandidat() {
       <table className="mt-4 w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
-            <th className="px-3 py-2">No. Pendaftaran</th>
-            <th className="px-3 py-2">Nama</th>
-            <th className="px-3 py-2">Posisi</th>
-            <th className="px-3 py-2">No HP</th>
+            <SortableTh label="No. Pendaftaran" sortKey="nomor" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Nama" sortKey="nama" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Posisi" sortKey="posisi" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="No HP" sortKey="noHp" sort={sort} onSort={toggle} className="px-3 py-2" />
             <th className="px-3 py-2 text-right">Aksi</th>
           </tr>
         </thead>

@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import { DOKUMEN_LABEL, sortByJabatan } from '../../../constants';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 
 interface Dokumen {
   id: string;
@@ -94,6 +95,7 @@ export default function Reports() {
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
+  const { sort, toggle } = useSort();
 
   useEffect(() => {
     api.get<Crew[]>('/reports/crew-per-kapal').then(({ data }) => setCrewList(data)).catch(() => undefined);
@@ -225,15 +227,23 @@ export default function Reports() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-gray-500">
-                  <th className="px-4 py-2 font-medium">Nama</th>
-                  <th className="px-4 py-2 font-medium">Posisi</th>
-                  <th className="px-4 py-2 font-medium">Naik Sejak</th>
-                  <th className="px-4 py-2 text-right font-medium">Masa Kerja</th>
+                  <SortableTh label="Nama" sortKey="nama" sort={sort} onSort={toggle} className="px-4 py-2 font-medium" />
+                  <SortableTh label="Posisi" sortKey="posisi" sort={sort} onSort={toggle} className="px-4 py-2 font-medium" />
+                  <SortableTh label="Naik Sejak" sortKey="naikSejak" sort={sort} onSort={toggle} className="px-4 py-2 font-medium" />
+                  <SortableTh label="Masa Kerja" sortKey="masaKerja" sort={sort} onSort={toggle} className="px-4 py-2 text-right font-medium" />
                   <th className="px-4 py-2 text-right font-medium">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {g.crews.map((c) => {
+                {sortRows(g.crews, sort, {
+                  nama: (c) => c.applicant.namaLengkap,
+                  posisi: (c) => {
+                    const active = activePlacement(c);
+                    return active ? jabatanName(active.jabatanKode) : c.applicant.posisiDilamar;
+                  },
+                  naikSejak: (c) => activePlacement(c)?.tanggalMulai ?? '',
+                  masaKerja: (c) => c.masaKerja ?? c.totalMasaKerja,
+                }).map((c) => {
                   const active = activePlacement(c);
                   return (
                     <tr key={c.id} className="border-t border-gray-100">

@@ -8,6 +8,7 @@ import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
 import { formatUang, formatDecimal3 } from './utils';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../components/sortable';
 
 interface Invoice {
   id: string;
@@ -55,6 +56,7 @@ export default function DaftarInvoice() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const { sort, toggle } = useSort();
 
   // [FUNGSI] Deteksi role SUPERADMIN untuk mengaktifkan ubah approval manual.
   useEffect(() => {
@@ -140,9 +142,26 @@ export default function DaftarInvoice() {
   // [FUNGSI] Reset halaman saat filter berubah agar tidak tertinggal di halaman terakhir.
   useEffect(() => {
     setPage(1);
-  }, [search, filter, approval, kategori, bulan, tahun, jenis]);
+  }, [search, filter, approval, kategori, bulan, tahun, jenis, sort]);
 
-  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(filtered, sort, {
+    no: (i) => i.no,
+    tanggal: (i) => i.tanggal,
+    pihak: (i) => (jenis === 'AR' ? i.customerName : i.vendorName),
+    inv: (i) => i.inv,
+    keterangan: (i) => i.keterangan,
+    kategori: (i) => KATEGORI[i.kategori] ?? i.kategori,
+    tipe: (i) => TIPE[i.tipe] ?? i.tipe,
+    cargoQuantity: (i) => (i.cargoQuantity != null ? Number(i.cargoQuantity) : null),
+    unitPrice: (i) => (i.unitPrice != null ? Number(i.unitPrice) : null),
+    dpp: (i) => Number(i.dpp),
+    ppn: (i) => (i.ppn != null ? Number(i.ppn) : null),
+    pph: (i) => (i.pph != null ? Number(i.pph) : null),
+    total: (i) => Number(i.total),
+    faktur: (i) => STATUS_FAKTUR[i.statusFakturPajak] ?? i.statusFakturPajak,
+    status: (i) => statusLabel(i.statusPembayaran),
+    approval: (i) => (i.approvalStatus === 'SUDAH_DIAPPROVE' ? 'Sudah di Approve' : 'Belum di Approve'),
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   function doExport() {
     const columns = jenis === 'AP'
@@ -265,22 +284,22 @@ export default function DaftarInvoice() {
         <table className="w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
-              <th className="px-3 py-2">No</th>
-              <th className="px-3 py-2">Tanggal</th>
-              <th className="px-3 py-2">{jenis === 'AR' ? 'Customer' : 'Vendor'}</th>
-              <th className="px-3 py-2">INV</th>
-              <th className="px-3 py-2">Keterangan (TB/BG/voyage)</th>
-              <th className="px-3 py-2">Kategori</th>
-              <th className="px-3 py-2">Tipe</th>
-              {jenis === 'AR' && <th className="px-3 py-2 text-right">Cargo Quantity</th>}
-              {jenis === 'AR' && <th className="px-3 py-2 text-right">Unit Price</th>}
-              <th className="px-3 py-2 text-right">DPP</th>
-              <th className="px-3 py-2 text-right">PPN</th>
-              <th className="px-3 py-2 text-right">PPH</th>
-              <th className="px-3 py-2 text-right">Total</th>
-              <th className="px-3 py-2">Faktur</th>
-              <th className="px-3 py-2">Status</th>
-              {jenis === 'AP' && <th className="px-3 py-2">Approval</th>}
+              <SortableTh label="No" sortKey="no" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Tanggal" sortKey="tanggal" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label={jenis === 'AR' ? 'Customer' : 'Vendor'} sortKey="pihak" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="INV" sortKey="inv" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Keterangan (TB/BG/voyage)" sortKey="keterangan" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Kategori" sortKey="kategori" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Tipe" sortKey="tipe" sort={sort} onSort={toggle} className="px-3 py-2" />
+              {jenis === 'AR' && <SortableTh label="Cargo Quantity" sortKey="cargoQuantity" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />}
+              {jenis === 'AR' && <SortableTh label="Unit Price" sortKey="unitPrice" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />}
+              <SortableTh label="DPP" sortKey="dpp" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="PPN" sortKey="ppn" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="PPH" sortKey="pph" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Total" sortKey="total" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Faktur" sortKey="faktur" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Status" sortKey="status" sort={sort} onSort={toggle} className="px-3 py-2" />
+              {jenis === 'AP' && <SortableTh label="Approval" sortKey="approval" sort={sort} onSort={toggle} className="px-3 py-2" />}
               <th className="px-3 py-2 text-right">Aksi</th>
             </tr>
           </thead>

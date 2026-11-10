@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { api, formatRupiah } from '../../../api/client';
 import { sortByJabatan } from '../../../constants';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 
 interface LeavePayItem {
   crewId: string;
@@ -42,6 +43,8 @@ export default function LeavePaySection() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
+  const { sort: riwayatSort, toggle: toggleRiwayatSort } = useSort();
 
   async function loadLeavePay() {
     api.get<LeavePayItem[]>('/leave-pay').then(({ data }) => setLeavePay(data)).catch(() => undefined);
@@ -51,11 +54,22 @@ export default function LeavePaySection() {
     loadLeavePay();
   }, []);
 
-  const sortedLeavePay = sortByJabatan(
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
+
+  const sortedLeavePay = sortRows(sortByJabatan(
     leavePay,
     (c) => c.jabatanKode ?? c.posisi,
     (c) => c.nama,
-  );
+  ), sort, {
+    nama: (c) => c.nama,
+    masaKerja: (c) => c.masaKerja,
+    berhak: (c) => c.berhak,
+    dibayar: (c) => c.dibayar,
+    sisa: (c) => c.sisa,
+  });
   const leavePayRows = sortedLeavePay.slice((page - 1) * pageSize, page * pageSize);
 
   function openCairkan(item: LeavePayItem) {
@@ -134,11 +148,11 @@ export default function LeavePaySection() {
       <table className="w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
-            <th className="px-3 py-2">Nama</th>
-            <th className="px-3 py-2 text-right">Masa Kerja</th>
-            <th className="px-3 py-2 text-right">Berhak</th>
-            <th className="px-3 py-2 text-right">Dibayar</th>
-            <th className="px-3 py-2 text-right">Sisa</th>
+            <SortableTh label="Nama" sortKey="nama" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Masa Kerja" sortKey="masaKerja" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+            <SortableTh label="Berhak" sortKey="berhak" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+            <SortableTh label="Dibayar" sortKey="dibayar" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+            <SortableTh label="Sisa" sortKey="sisa" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
             <th className="px-3 py-2 text-right">Aksi</th>
           </tr>
         </thead>
@@ -207,9 +221,9 @@ export default function LeavePaySection() {
             <table className="mt-3 w-full border-collapse text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-500">
-                  <th className="px-3 py-2">Ke</th>
-                  <th className="px-3 py-2">Tanggal Dibayarkan</th>
-                  <th className="px-3 py-2 text-right">Nominal</th>
+                  <SortableTh label="Ke" sortKey="ke" sort={riwayatSort} onSort={toggleRiwayatSort} className="px-3 py-2" />
+                  <SortableTh label="Tanggal Dibayarkan" sortKey="tanggal" sort={riwayatSort} onSort={toggleRiwayatSort} className="px-3 py-2" />
+                  <SortableTh label="Nominal" sortKey="nominal" sort={riwayatSort} onSort={toggleRiwayatSort} className="px-3 py-2 text-right" />
                   <th className="px-3 py-2 text-right">Aksi</th>
                 </tr>
               </thead>
@@ -217,7 +231,11 @@ export default function LeavePaySection() {
                 {riwayat.length === 0 && (
                   <tr><td colSpan={4} className="px-3 py-6 text-center text-gray-500">Belum ada pencairan.</td></tr>
                 )}
-                {riwayat.map((r) => (
+                {sortRows(riwayat, riwayatSort, {
+                  ke: (r) => r.pencairanKe,
+                  tanggal: (r) => r.tanggalPencairan,
+                  nominal: (r) => r.nominal,
+                }).map((r) => (
                   <tr key={r.id} className="border-t border-gray-100">
                     <td className="px-3 py-2">{r.pencairanKe}</td>
                     <td className="px-3 py-2">{r.tanggalPencairan.slice(0, 10)}</td>

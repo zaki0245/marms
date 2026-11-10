@@ -5,6 +5,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../components/sortable';
 
 interface Bank {
   id?: string;
@@ -36,6 +37,7 @@ export default function Customer() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -61,6 +63,11 @@ export default function Customer() {
   useEffect(() => {
     setPage(1);
   }, [search]);
+
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
 
   function setBank(idx: number, field: keyof Bank, value: string) {
     setForm((f) => ({
@@ -143,7 +150,11 @@ export default function Customer() {
     const bankText = v.banks.map((b) => `${b.bank} ${b.accountNo} ${b.accountName}`).join(' ');
     return [v.nama, v.npwp, bankText].some((x) => x && x.toLowerCase().includes(s));
   });
-  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(filtered, sort, {
+    nama: (v) => v.nama,
+    npwp: (v) => v.npwp,
+    rekening: (v) => v.banks.map((b) => `${b.bank} ${b.accountNo} ${b.accountName}`).join('; '),
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -162,9 +173,9 @@ export default function Customer() {
       <table className="mt-4 w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
-            <th className="px-3 py-2">Nama</th>
-            <th className="px-3 py-2">NPWP</th>
-            <th className="px-3 py-2">Rekening</th>
+            <SortableTh label="Nama" sortKey="nama" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="NPWP" sortKey="npwp" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Rekening" sortKey="rekening" sort={sort} onSort={toggle} className="px-3 py-2" />
             <th className="px-3 py-2 text-right">Aksi</th>
           </tr>
         </thead>

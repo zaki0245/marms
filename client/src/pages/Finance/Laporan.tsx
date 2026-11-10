@@ -7,6 +7,7 @@ import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
 import { num, formatUang, formatDecimal3 } from './utils';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../components/sortable';
 
 interface Row {
   id: string;
@@ -47,6 +48,7 @@ export default function Laporan() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
+  const { sort, toggle } = useSort();
 
   const voucherJenis = jenis === 'AR' ? 'RV' : 'PV';
 
@@ -77,9 +79,24 @@ export default function Laporan() {
   // [FUNGSI] Reset halaman saat filter berubah.
   useEffect(() => {
     setPage(1);
-  }, [search, bulan, tahun, voucherJenis]);
+  }, [search, bulan, tahun, voucherJenis, sort]);
 
-  const pageRows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(filtered, sort, {
+    voucher: (r) => r.pvNo,
+    tanggal: (r) => r.tanggal,
+    counterparty: (r) => r.counterpartyName,
+    inv: (r) => r.inv,
+    ref: (r) => r.ref,
+    keterangan: (r) => r.keterangan,
+    cargoQuantity: (r) => r.cargoQuantity,
+    unitPrice: (r) => r.unitPrice,
+    dpp: (r) => r.dpp,
+    ppn: (r) => r.ppn,
+    pph: (r) => r.pph,
+    bankCharge: (r) => r.bankCharge,
+    balance: (r) => r.balance,
+    total: (r) => num(r.dpp) + num(r.ppn) - num(r.pph) + num(r.bankCharge) + num(r.balance),
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   function doExport() {
     const data = filtered.map((r, i) => [
@@ -145,20 +162,20 @@ export default function Laporan() {
           <thead className="text-xs text-gray-500">
             <tr>
               <th className="px-3 py-2">No</th>
-              <th className="px-3 py-2">Voucher</th>
-              <th className="px-3 py-2">Tanggal</th>
-              <th className="px-3 py-2">Counterparty</th>
-              <th className="px-3 py-2">INV</th>
-              <th className="px-3 py-2">REF</th>
-              <th className="px-3 py-2">Keterangan</th>
-              <th className="px-3 py-2 text-right">Cargo Quantity</th>
-              <th className="px-3 py-2 text-right">Unit Price</th>
-              <th className="px-3 py-2 text-right">DPP</th>
-              <th className="px-3 py-2 text-right">PPN</th>
-              <th className="px-3 py-2 text-right">PPH</th>
-              <th className="px-3 py-2 text-right">Bank Charge</th>
-              <th className="px-3 py-2 text-right">Balance</th>
-              <th className="px-3 py-2 text-right">Total</th>
+              <SortableTh label="Voucher" sortKey="voucher" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Tanggal" sortKey="tanggal" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Counterparty" sortKey="counterparty" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="INV" sortKey="inv" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="REF" sortKey="ref" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Keterangan" sortKey="keterangan" sort={sort} onSort={toggle} className="px-3 py-2" />
+              <SortableTh label="Cargo Quantity" sortKey="cargoQuantity" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Unit Price" sortKey="unitPrice" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="DPP" sortKey="dpp" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="PPN" sortKey="ppn" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="PPH" sortKey="pph" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Bank Charge" sortKey="bankCharge" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Balance" sortKey="balance" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
+              <SortableTh label="Total" sortKey="total" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
             </tr>
           </thead>
           <tbody>

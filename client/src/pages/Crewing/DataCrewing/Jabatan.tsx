@@ -5,6 +5,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { api, formatRupiah } from '../../../api/client';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 
 interface Jabatan {
   kode: string;
@@ -22,6 +23,7 @@ export default function Jabatan() {
   const [editForm, setEditForm] = useState({ nama: '', gajiPokok: '' });
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort, toggle } = useSort();
 
   // [FUNGSI] Muat daftar jabatan dari backend.
   async function load() {
@@ -38,6 +40,11 @@ export default function Jabatan() {
   useEffect(() => {
     load();
   }, []);
+
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [sort]);
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
@@ -94,7 +101,11 @@ export default function Jabatan() {
 
   if (loading) return <p className="text-gray-500">Memuat...</p>;
 
-  const pageRows = items.slice((page - 1) * pageSize, page * pageSize);
+  const pageRows = sortRows(items, sort, {
+    kode: (j) => j.kode,
+    nama: (j) => j.nama,
+    gajiPokok: (j) => j.gajiPokok,
+  }).slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -142,9 +153,9 @@ export default function Jabatan() {
       <table className="w-full border-collapse bg-card text-sm">
         <thead>
           <tr className="text-left text-xs text-gray-500">
-            <th className="px-3 py-2">Kode</th>
-            <th className="px-3 py-2">Nama</th>
-            <th className="px-3 py-2 text-right">Gaji Pokok</th>
+            <SortableTh label="Kode" sortKey="kode" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Nama" sortKey="nama" sort={sort} onSort={toggle} className="px-3 py-2" />
+            <SortableTh label="Gaji Pokok" sortKey="gajiPokok" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
             <th className="px-3 py-2 text-right">Aksi</th>
           </tr>
         </thead>

@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import { DOKUMEN_LABEL, sortByJabatan } from '../../../constants';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
 
 interface Dokumen {
@@ -116,6 +117,8 @@ export default function Crew() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { sort: crewSort, toggle: toggleCrewSort } = useSort();
+  const { sort: offBoardSort, toggle: toggleOffBoardSort } = useSort();
 
   async function loadCrew() {
     try {
@@ -321,8 +324,29 @@ export default function Crew() {
     setPage(1);
   }, [tab, vesselFilter]);
 
-  const crewRows = filteredCrew.slice((page - 1) * pageSize, page * pageSize);
-  const offBoardRows = offBoardCrew.slice((page - 1) * pageSize, page * pageSize);
+  // [FUNGSI] Reset halaman saat sorting berubah.
+  useEffect(() => {
+    setPage(1);
+  }, [crewSort, offBoardSort]);
+
+  const sortedCrew = sortRows(filteredCrew, crewSort, {
+    nama: (c) => c.applicant.namaLengkap,
+    jabatan: (c) => {
+      const active = activePlacement(c);
+      return active ? jabatanName(active.jabatanKode) : c.applicant.posisiDilamar;
+    },
+    kapal: (c) => activePlacement(c)?.vessel?.namaUnit ?? '',
+    status: (c) => CREW_STATUS[c.status] ?? c.status,
+    masaKerja: (c) => c.masaKerja ?? c.totalMasaKerja,
+  });
+  const sortedOffBoard = sortRows(offBoardCrew, offBoardSort, {
+    nama: (c) => c.applicant.namaLengkap,
+    posisi: (c) => c.applicant.posisiDilamar,
+    masaKerja: (c) => c.masaKerja ?? c.totalMasaKerja,
+  });
+
+  const crewRows = sortedCrew.slice((page - 1) * pageSize, page * pageSize);
+  const offBoardRows = sortedOffBoard.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -365,11 +389,11 @@ export default function Crew() {
           <table className="mt-4 w-full border-collapse bg-card text-sm">
             <thead>
               <tr className="text-left text-xs text-gray-500">
-                <th className="px-3 py-2">Nama</th>
-                <th className="px-3 py-2">Jabatan</th>
-                <th className="px-3 py-2">Kapal</th>
-                <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2 text-right">Masa Kerja</th>
+                <SortableTh label="Nama" sortKey="nama" sort={crewSort} onSort={toggleCrewSort} className="px-3 py-2" />
+                <SortableTh label="Jabatan" sortKey="jabatan" sort={crewSort} onSort={toggleCrewSort} className="px-3 py-2" />
+                <SortableTh label="Kapal" sortKey="kapal" sort={crewSort} onSort={toggleCrewSort} className="px-3 py-2" />
+                <SortableTh label="Status" sortKey="status" sort={crewSort} onSort={toggleCrewSort} className="px-3 py-2" />
+                <SortableTh label="Masa Kerja" sortKey="masaKerja" sort={crewSort} onSort={toggleCrewSort} className="px-3 py-2 text-right" />
                 <th className="px-3 py-2 text-right">Aksi</th>
               </tr>
             </thead>
@@ -417,9 +441,9 @@ export default function Crew() {
         <table className="mt-4 w-full border-collapse bg-card text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500">
-              <th className="px-3 py-2">Nama</th>
-              <th className="px-3 py-2">Posisi</th>
-              <th className="px-3 py-2 text-right">Masa Kerja</th>
+              <SortableTh label="Nama" sortKey="nama" sort={offBoardSort} onSort={toggleOffBoardSort} className="px-3 py-2" />
+              <SortableTh label="Posisi" sortKey="posisi" sort={offBoardSort} onSort={toggleOffBoardSort} className="px-3 py-2" />
+              <SortableTh label="Masa Kerja" sortKey="masaKerja" sort={offBoardSort} onSort={toggleOffBoardSort} className="px-3 py-2 text-right" />
               <th className="px-3 py-2 text-right">Aksi</th>
             </tr>
           </thead>
