@@ -5,6 +5,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
+import Logo from '../../components/Logo';
 import { DOKUMEN } from '../../constants';
 
 interface Jabatan {
@@ -83,7 +84,8 @@ export default function Daftar() {
   return (
     <div className="min-h-screen bg-surface pb-16">
       <header className="bg-navy px-6 py-5 text-white">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto flex max-w-3xl items-center gap-3">
+          <Logo plain className="h-9 w-auto brightness-0 invert" />
           <p className="text-sm text-white/70">Formulir Pendaftaran Pelamar</p>
         </div>
       </header>

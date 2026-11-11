@@ -188,7 +188,7 @@ export default function Layout() {
             <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="round" />
           </svg>
         </button>
-        <Logo className="h-6 w-auto" plain />
+        <Logo className="h-6 w-auto brightness-0 invert" plain />
         <span className="text-sm font-semibold text-white dark:text-gray-900">MARMS</span>
       </header>
 
@@ -206,7 +206,7 @@ export default function Layout() {
         >
           <div className="flex h-full flex-col">
             <div className="flex items-center gap-3 px-5 py-5">
-              <Logo className="h-8 w-auto" plain />
+              <Logo className="h-8 w-auto brightness-0 invert" plain />
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold tracking-tight text-white dark:text-gray-900">MARMS</div>
                 <div className="text-xs text-white/70 dark:text-gray-500">{ROLE_LABEL[admin.role]}</div>

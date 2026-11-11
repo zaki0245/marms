@@ -3,6 +3,7 @@
 // [ALASAN] Pelamar mulai dari sini lalu klik "Daftar Sekarang".
 
 import { Link } from 'react-router-dom';
+import Logo from '../../components/Logo';
 
 const LANGKAH = [
   { no: '1', judul: 'Isi Formulir', desk: 'Lengkapi data pribadi dan pengalaman Anda.' },
@@ -15,6 +16,7 @@ export default function PublicHome() {
     <div className="min-h-screen bg-surface">
       <section className="bg-navy px-6 pb-16 pt-14 text-center text-white">
         <div className="mx-auto max-w-2xl">
+          <Logo plain className="mx-auto mb-6 h-14 w-auto brightness-0 invert" />
           <h1 className="text-3xl font-bold leading-tight sm:text-4xl">Rekrutmen Crew</h1>
           <p className="mt-4 text-white/80">
             Bergabunglah sebagai crew PT. Maritim Armada Raya dan mulai karier maritim Anda bersama kami.
