@@ -13,6 +13,7 @@ export default defineConfig({
     // [ALASAN] Saat dev, frontend & backend beda port; proxy menyatukan jalur API.
     proxy: {
       '/api': 'http://localhost:3000',
+      '/uploads': 'http://localhost:3000',
     },
   },
 });

@@ -17,10 +17,10 @@ export const changePasswordSchema = z.object({
 export const createAccountSchema = z.object({
   email: z.string().email('Format email tidak valid'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
-  role: z.enum(['SUPERADMIN', 'CREWING', 'FINANCE']),
+  role: z.enum(['SUPERADMIN', 'CREWING', 'FINANCE', 'OPERATION']),
 });
 
 export const updateAccountSchema = z.object({
-  role: z.enum(['SUPERADMIN', 'CREWING', 'FINANCE']).optional(),
+  role: z.enum(['SUPERADMIN', 'CREWING', 'FINANCE', 'OPERATION']).optional(),
   active: z.boolean().optional(),
 });

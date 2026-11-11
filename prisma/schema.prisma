@@ -83,6 +83,7 @@ enum Role {
   SUPERADMIN
   CREWING
   FINANCE
+  OPERATION
 }
 
 enum InvoiceCategory {
@@ -499,4 +500,80 @@ model Admin {
   mustChangePassword  Boolean  @default(true)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+}
+
+// ================== OPERATION ==================
+
+// [FUNGSI] Status voyage untuk peta & laporan. | [ALASAN] Peta hanya mem-pin yang ON_GOING.
+enum ShipmentStatus {
+  PLANNED
+  ON_GOING
+  COMPLETED
+}
+
+// [FUNGSI] Satu voyage tongkang (TB + BG) beserta jadwal, laytime, posisi, dan laporan harian.
+// [ALASAN] Menggantikan sheet BARGING MONITORING + VDR agar laporan bisa dibuat langsung.
+model Shipment {
+  id                String         @id @default(cuid())
+  kode              String         @unique
+  tb                String
+  bg                String
+  ownerOperator     String?
+  shipper           String?
+  commodities       String?
+  contactMaster     String?
+  laycan            String?
+  size              Float?
+  pol               String
+  agentPol          String?
+  picPol            String?
+  contactAgentPol   String?
+  pod               String?
+  agentPod          String?
+  picPod            String?
+  contactAgentPod   String?
+  taPol             DateTime?
+  tbPol             DateTime?
+  slPol             DateTime?
+  clPol             DateTime?
+  coPol             DateTime?
+  tdPol             DateTime?
+  dsPol             DateTime?
+  taPod             DateTime?
+  tbPod             DateTime?
+  sdPod             DateTime?
+  cdPod             DateTime?
+  coPod             DateTime?
+  tdPod             DateTime?
+  dsPod             DateTime?
+  laytimePol        Float?
+  laytimePod        Float?
+  totalLaytime      Float?
+  laytimeAllowed    Float?
+  demurrageDespatch Float?
+  dsrPol            Float?
+  dsrPod            Float?
+  position          String?
+  remarks           String?
+  status            ShipmentStatus @default(PLANNED)
+  latitude          Float?
+  longitude         Float?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  documents         ShipmentDocument[]
+
+  @@index([status])
+}
+
+// [FUNGSI] Dokumen pendukung satu shipment (BL, invoice, COO, dsb).
+// [ALASAN] Satu shipment bisa punya banyak file; file disimpan di folder uploads.
+model ShipmentDocument {
+  id         String   @id @default(cuid())
+  shipmentId String
+  nama       String
+  file       String
+  createdAt  DateTime @default(now())
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
 }

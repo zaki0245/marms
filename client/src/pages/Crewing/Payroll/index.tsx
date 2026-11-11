@@ -231,7 +231,7 @@ export default function Payroll() {
 
   return (
     <div>
-      <h1 className="page-title">Payroll, Uang Makan, & Leave Pay</h1>
+      <h1 className="page-title">Payroll &amp; Benefits</h1>
 
       <div className="mt-4 flex border-b border-gray-200">
         <button onClick={() => setJenis('GAJI')} className={tabCls('GAJI')}>Payroll</button>

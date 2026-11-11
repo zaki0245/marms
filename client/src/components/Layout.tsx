@@ -8,12 +8,13 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import Logo from './Logo';
 
-type Role = 'SUPERADMIN' | 'CREWING' | 'FINANCE';
+type Role = 'SUPERADMIN' | 'CREWING' | 'FINANCE' | 'OPERATION';
 
 const ROLE_LABEL: Record<Role, string> = {
   SUPERADMIN: 'Super Admin',
   CREWING: 'Crewing',
   FINANCE: 'Finance',
+  OPERATION: 'Operation',
 };
 
 // [FUNGSI] Menu modul Crewing.
@@ -22,7 +23,7 @@ const CREWING_MENU = [
   { to: '/dashboard/data-crewing', label: 'Data Crewing' },
   { to: '/dashboard/recruitment', label: 'Rekrutmen' },
   { to: '/dashboard/crew', label: 'Crew & Penempatan' },
-  { to: '/dashboard/payroll', label: 'Payroll, Uang Makan, & Leave Pay' },
+  { to: '/dashboard/payroll', label: 'Payroll & Benefits' },
   { to: '/dashboard/reports', label: 'Laporan' },
 ];
 
@@ -37,6 +38,12 @@ const FINANCE_MENU = [
   { to: '/dashboard/finance/laporan', label: 'Laporan' },
 ];
 
+// [FUNGSI] Menu modul Operation (voyage tongkang).
+const OPERATION_MENU = [
+  { to: '/dashboard/operation', label: 'Dashboard', exact: true },
+  { to: '/dashboard/operation/shipment', label: 'Shipment' },
+];
+
 interface Admin {
   email: string;
   role: Role;
@@ -44,7 +51,7 @@ interface Admin {
 }
 
 // [FUNGSI] Key section sidebar yang bisa dibuka/tutup.
-type SectionKey = 'crewing' | 'dataMaster' | 'finance' | 'akun';
+type SectionKey = 'crewing' | 'dataMaster' | 'finance' | 'operation' | 'akun';
 
 const SECTIONS_STORAGE_KEY = 'marms-sidebar-sections';
 
@@ -59,13 +66,14 @@ function readOpenSections(): Record<SectionKey, boolean> {
         crewing: parsed.crewing !== false,
         dataMaster: parsed.dataMaster !== false,
         finance: parsed.finance !== false,
+        operation: parsed.operation !== false,
         akun: parsed.akun === true,
       };
     }
   } catch {
     // abaikan JSON rusak
   }
-  return { crewing: true, dataMaster: true, finance: true, akun: false };
+  return { crewing: true, dataMaster: true, finance: true, operation: true, akun: false };
 }
 
 // [FUNGSI] Gaya item nav di atas sidebar navy; aktif = pill putih transparan.
@@ -76,6 +84,9 @@ function navCls({ isActive }: { isActive: boolean }) {
       : 'text-white/80 hover:bg-white/10 hover:text-white dark:text-gray-600 dark:hover:bg-gray-100 dark:hover:text-gray-900'
   }`;
 }
+
+// [FUNGSI] Gaya judul top-level sidebar (lebih besar & tebal dari item menu).
+const sectionCls = 'flex w-full items-center justify-between rounded-md px-2 py-1.5 text-base font-bold text-white hover:bg-white/10 dark:text-gray-200 dark:hover:bg-white/10 dark:hover:text-white';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -110,6 +121,13 @@ export default function Layout() {
   useEffect(() => {
     if (admin && admin.role === 'FINANCE' && location.pathname === '/dashboard') {
       navigate('/dashboard/finance', { replace: true });
+    }
+  }, [admin, location.pathname, navigate]);
+
+  // [FUNGSI] User OPERATION diarahkan ke Dashboard Operation.
+  useEffect(() => {
+    if (admin && admin.role === 'OPERATION' && location.pathname === '/dashboard') {
+      navigate('/dashboard/operation', { replace: true });
     }
   }, [admin, location.pathname, navigate]);
 
@@ -174,6 +192,7 @@ export default function Layout() {
 
   const canCrewing = admin.role === 'SUPERADMIN' || admin.role === 'CREWING';
   const canFinance = admin.role === 'SUPERADMIN' || admin.role === 'FINANCE';
+  const canOperation = admin.role === 'SUPERADMIN' || admin.role === 'OPERATION';
 
   return (
     <div className="min-h-screen bg-surface">
@@ -221,7 +240,7 @@ export default function Layout() {
                   onClick={() => toggleSection('dataMaster')}
                   aria-expanded={openSections.dataMaster}
                   aria-controls="sidebar-data-master"
-                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
+                  className={sectionCls}
                 >
                   <span>Data Master</span>
                   <svg
@@ -243,6 +262,39 @@ export default function Layout() {
                 )}
               </div>
 
+              {/* [FUNGSI] Payung bisnis Operation — hanya untuk role Operation/Superadmin. */}
+              {canOperation && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('operation')}
+                    aria-expanded={openSections.operation}
+                    aria-controls="sidebar-operation"
+                    className={sectionCls}
+                  >
+                    <span>Operation</span>
+                    <svg
+                      className={`h-3.5 w-3.5 transition-transform ${openSections.operation ? 'rotate-90' : ''}`}
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="M7 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  {openSections.operation && (
+                    <div id="sidebar-operation" className="space-y-0.5 pt-0.5">
+                      {OPERATION_MENU.map((m) => (
+                        <NavLink key={m.to} to={m.to} end={m.exact} className={navCls}>
+                          <span>{m.label}</span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* [FUNGSI] Payung bisnis Crewing — hanya untuk role Crewing/Superadmin. */}
               {canCrewing && (
                 <div>
@@ -251,7 +303,7 @@ export default function Layout() {
                     onClick={() => toggleSection('crewing')}
                     aria-expanded={openSections.crewing}
                     aria-controls="sidebar-crewing"
-                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
+                    className={sectionCls}
                   >
                     <span>Crewing</span>
                     <svg
@@ -289,7 +341,7 @@ export default function Layout() {
                     onClick={() => toggleSection('finance')}
                     aria-expanded={openSections.finance}
                     aria-controls="sidebar-finance"
-                    className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
+                    className={sectionCls}
                   >
                     <span>Finance</span>
                     <svg
@@ -321,7 +373,7 @@ export default function Layout() {
                   onClick={() => toggleSection('akun')}
                   aria-expanded={openSections.akun}
                   aria-controls="sidebar-akun"
-                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white dark:text-gray-500 dark:hover:bg-gray-100 dark:hover:text-gray-700"
+                  className={sectionCls}
                 >
                   <span>Akun</span>
                   <svg

@@ -10,7 +10,7 @@ import { SortableTh, sortRows, useSort } from '../../components/sortable';
 interface Account {
   id: string;
   email: string;
-  role: 'SUPERADMIN' | 'CREWING' | 'FINANCE';
+  role: 'SUPERADMIN' | 'CREWING' | 'FINANCE' | 'OPERATION';
   active: boolean;
   mustChangePassword: boolean;
 }
@@ -19,6 +19,7 @@ const ROLE_LABEL: Record<string, string> = {
   SUPERADMIN: 'Super Admin',
   CREWING: 'Crewing',
   FINANCE: 'Finance',
+  OPERATION: 'Operation',
 };
 
 export default function Accounts() {
@@ -109,6 +110,7 @@ export default function Accounts() {
             <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="input mt-1 w-full">
               <option value="CREWING">Crewing</option>
               <option value="FINANCE">Finance</option>
+              <option value="OPERATION">Operation</option>
               <option value="SUPERADMIN">Super Admin</option>
             </select>
           </div>
@@ -137,6 +139,7 @@ export default function Accounts() {
                   <select value={a.role} onChange={(e) => handleRole(a, e.target.value)} className="rounded-md border border-gray-300 px-2 py-1">
                     <option value="CREWING">Crewing</option>
                     <option value="FINANCE">Finance</option>
+                    <option value="OPERATION">Operation</option>
                     <option value="SUPERADMIN">Super Admin</option>
                   </select>
                 </td>

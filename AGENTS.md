@@ -63,3 +63,17 @@ npx prisma migrate reset --force      # reset database + seed ulang
 - `cd client && npm run build` harus sukses.
 - Setelah mengubah schema/instal dependency baru, jalankan `docker compose up -d --build`.
 - Pastikan tidak menambahkan `.env`, `node_modules`, atau `uploads/` ke git.
+
+## 6. Standar Halaman Daftar
+Semua halaman daftar/tabel wajib mengikuti pola halaman **Daftar Invoice**:
+- Toolbar di atas tabel: **pencarian** + **filter**.
+- **Sorting** semua kolom lewat `SortableTh`, `sortRows`, `useSort` (`client/src/components/sortable.tsx`).
+- **Pagination** lewat `Pagination` + `DEFAULT_PAGE_SIZE` (`client/src/components/Pagination.tsx`), termasuk pilihan jumlah per halaman dan tombol Sebelumnya/Berikutnya.
+- Reset halaman ke 1 saat pencarian, filter, atau sorting berubah.
+- Urutan layout: toolbar filter → tabel (`overflow-x-auto`) → `Pagination`.
+
+> **Penjelasan untuk Pemula:** Ini "resep" halaman daftar. Kalau semua halaman memakai komponen
+> yang sama, tampilan dan perilakunya konsisten, dan tidak ada halaman yang lupa pagination.
+
+> **Kenapa Ini Penting:** Tanpa standar ini, tiap halaman daftar punya perilaku berbeda
+> (mis. ada search tapi tidak bisa pindah halaman).

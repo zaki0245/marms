@@ -17,8 +17,15 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      await api.post('/auth/login', form);
-      navigate('/dashboard');
+      const { data } = await api.post<{ role: string }>('/auth/login', form);
+      // [FUNGSI] Arahkan user ke payung bisnisnya. | [ALASAN] Hindari tampilan dashboard lain sesaat.
+      navigate(
+        data.role === 'FINANCE'
+          ? '/dashboard/finance'
+          : data.role === 'OPERATION'
+          ? '/dashboard/operation'
+          : '/dashboard'
+      );
     } catch (err: any) {
       setError(err?.response?.data?.error ?? 'Gagal login');
     } finally {

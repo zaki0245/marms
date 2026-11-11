@@ -21,6 +21,7 @@ import { reportsRoutes } from './modules/crewing/reports';
 import { authRoutes } from './modules/auth';
 import { leavePayRoutes } from './modules/crewing/leave-pay';
 import { financeRoutes } from './modules/finance';
+import { operationRoutes } from './modules/operation';
 import approveRoutes from './modules/finance/approve.routes';
 import { sessionMiddleware } from './shared/session';
 
@@ -31,9 +32,17 @@ const app = express();
 //          berguna dan deteksi HTTPS keliru.
 app.set('trust proxy', 1);
 
-// [FUNGSI] Header keamanan dasar (nosniff, X-Frame-Options, dsb.).
-// [ALASAN] Melindungi app & file upload dari interpretasi konten berbahaya.
-app.use(helmet());
+// [FUNGSI] Header keamanan dasar (nosniff, X-Frame-Options, dsb.) + izin tile peta OSM.
+// [ALASAN] CSP default memblokir gambar lintas domain, sehingga peta Leaflet tampil kosong.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        'img-src': ["'self'", 'data:', 'https://tile.openstreetmap.org'],
+      },
+    },
+  })
+);
 
 // [FUNGSI] Middleware dasar: izinkan CORS & parsing body JSON.
 // [ALASAN] Frontend (React) butuh akses API; JSON untuk kirim/terima data.
@@ -66,8 +75,13 @@ app.use('/api', async (req: Request, res: Response, next: NextFunction) => {
       return;
     }
     // [FUNGSI] Tentukan role yang diizinkan berdasarkan prefix path.
+    const isOperation = req.path.startsWith('/operation');
     const isFinance = req.path.startsWith('/finance');
-    const allowed = isFinance ? ['FINANCE', 'SUPERADMIN'] : ['CREWING', 'SUPERADMIN'];
+    const allowed = isOperation
+      ? ['OPERATION', 'SUPERADMIN']
+      : isFinance
+      ? ['FINANCE', 'SUPERADMIN']
+      : ['CREWING', 'SUPERADMIN'];
     if (!allowed.includes(admin.role)) {
       res.status(403).json({ error: 'Akses ditolak' });
       return;
@@ -94,6 +108,7 @@ app.use('/api/payroll', payrollRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/leave-pay', leavePayRoutes);
 app.use('/api/finance', financeRoutes);
+app.use('/api/operation', operationRoutes);
 
 // [FUNGSI] Sajikan hasil build frontend (client/dist) sebagai file statis.
 // [ALASAN] Satu server (satu URL, satu proses) menyajikan UI + API sekaligus.
