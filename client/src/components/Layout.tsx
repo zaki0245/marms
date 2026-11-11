@@ -200,7 +200,7 @@ export default function Layout() {
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-60 border-r border-white/10 bg-navy transition-transform dark:border-gray-200 dark:bg-card lg:static lg:translate-x-0 ${
+          className={`fixed inset-y-0 left-0 z-50 w-60 shrink-0 border-r border-white/10 bg-navy transition-transform dark:border-gray-200 dark:bg-card lg:static lg:translate-x-0 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
@@ -379,7 +379,7 @@ export default function Layout() {
         </aside>
 
         {/* Konten */}
-        <main className="flex-1 px-6 py-6">
+        <main className="min-w-0 flex-1 overflow-x-auto px-6 py-6">
           <Outlet />
         </main>
       </div>
