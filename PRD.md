@@ -12,7 +12,7 @@
 - Nama: MARMS (Maritim Armada Raya Management System)
 - Pemilik: PT. Maritim Armada Raya
 - Jenis: Aplikasi web internal operasional crewing & finance
-- Modul: CREWING (Rekrutmen, Rotasi Crew, Payroll, Leave Pay) + FINANCE (AP/AR, Invoice, Voucher PV/RV)
+- Modul: CREWING (Rekrutmen, Rotasi Crew, Payroll, Leave Pay) + FINANCE (AP/AR, Invoice, Voucher PV/RV) + OPERATION (shipment/voyage, laytime, posisi kapal)
 - Bahasa antarmuka: Indonesia
 - Fase saat ini: **Lokal** (WSL2 + PostgreSQL), DevOps menyusul
 
@@ -25,7 +25,11 @@ kumulatif, tidak ada riwayat terpusat per crew, dokumen sering expired, rekap ga
 | Aktor | Login? | Hak Akses |
 |---|---|---|
 | Pelamar (publik) | TIDAK | Isi form pendaftaran + upload dokumen. Tidak bisa cek status/edit. |
-| Admin | YA (1 akun) | Full access semua modul. |
+| Penerima approval voucher | TIDAK | Buka tautan `/approve/:token` dari email, tanpa login. |
+| `SUPERADMIN` | YA | Semua payung (Crewing, Finance, Operation) + Kelola Akun. |
+| `CREWING` | YA | Modul Crewing saja. |
+| `FINANCE` | YA | Modul Finance saja. |
+| `OPERATION` | YA | Modul Operation saja. |
 
 ## 4. Alur Bisnis Utama
 1. **Rekrutmen:** Pelamar isi form → upload dokumen (opsional) → submit → admin seleksi
@@ -39,6 +43,11 @@ kumulatif, tidak ada riwayat terpusat per crew, dokumen sering expired, rekap ga
 5. **Finance (AP/AR):** Input invoice (pilih jenis AR/AP) → daftar invoice (tab AR/AP) →
    cetak voucher (RV untuk AR, PV untuk AP). Satu voucher bisa membayar banyak invoice dari
    satu vendor/customer; pembayaran sebagian didukung (DPP per voucher + flag lunasi PPN/PPH).
+   Invoice bisa dikirim ke email penerima untuk approval; tautan `/approve/:token` menandai
+   `SUDAH_DIAPPROVE` tanpa login.
+6. **Operation:** Input shipment (data voyage TB/BG, POL/POD, jadwal, laycan, laytime) →
+   update posisi & status (`PLANNED` → `ON_GOING` → `COMPLETED`) → Dashboard menampilkan pin
+   shipment `ON_GOING` di peta → cetak laporan voyage (termasuk hitungan laytime/demurrage).
 
 ## 5. Entitas Bisnis (Ringkas)
 - **Pelamar:** nomor pendaftaran `PLR-YYYY-NNNN` (reset tiap tahun), data pribadi (nama, tempat/tanggal
@@ -62,6 +71,14 @@ kumulatif, tidak ada riwayat terpusat per crew, dokumen sering expired, rekap ga
   DPP/PPN/PPH/total, nomor invoice (opsional), ref, keterangan, status faktur & pembayaran.
 - **Voucher (Pv):** jenis RV/PV, nomor, tanggal, counterparty, bank, bank charge, balance,
   keterangan, item (invoice + DPP + flag includeTax).
+- **Shipment (Operation):** satu voyage tongkang — kode, TB/BG, owner/operator, shipper,
+  komoditas, laycan, POL/POD + agen/PIC/kontak, jadwal kegiatan (arrival, berthing, commenced
+  loading/discharge, cast off, departure), laytime per pelabuhan, demurrage/despatch, posisi
+  terakhir (koordinat + teks), status PLANNED/ON_GOING/COMPLETED, dokumen pendukung.
+  Field TB/BG/owner/shipper/komoditas/contact/POL/POD punya saran dari riwayat shipment.
+- **Agen (Operation):** master agen pelabuhan **terpisah per tipe** — tab POL & POD, nama unik
+  per tipe, PIC & kontak. Dipakai untuk Agent POL & POD pada shipment. Memilih agen mengisi
+  PIC/kontak otomatis (bisa diubah per shipment); satu nama boleh ada di kedua tipe.
 
 ### Daftar 21 Dokumen
 Foto 4x6, CV, KTP, NPWP, Paspor*, Buku Pelaut*, SKCK*, MCU*, BPJS Kesehatan, BPJS Ketenagakerjaan,
@@ -77,7 +94,8 @@ CoC/ANT/ATT*, BST*, SCRB*, AFF*, MFA*, MC*, RADAR*, ARPA*, GOC/GMDSS*, MOORING M
 6. Payroll di-snapshot saat dibuat (nilai gaji/uang makan tersimpan di detail).
 7. Masa kerja kumulatif = total hari semua segmen; bertambah live saat On Board.
 8. Leave pay tiap kelipatan 180 hari kumulatif; nominal & tanggal pencairan keputusan admin.
-9. Dokumen expired → blokir penempatan baru; admin bisa perbarui dokumen expired (file baru + tanggal).
+9. Dokumen expired **tidak** memblokir penempatan baru; memperbarui dokumen expired menjadi
+   tanggung jawab crew, admin tetap bisa memperbarui (file baru + tanggal).
 10. Alasan off board: Relief, Cuti, Sakit, Habis Kontrak.
 
 ## 7. Rumus Kalkulasi
@@ -101,17 +119,26 @@ CoC/ANT/ATT*, BST*, SCRB*, AFF*, MFA*, MC*, RADAR*, ARPA*, GOC/GMDSS*, MOORING M
 | Finance: Invoice | Input invoice AR/AP, daftar invoice (tab AR/AP), status faktur & pembayaran. |
 | Finance: Cetak | Cetak voucher RV (AR) & PV (AP) ke PDF. |
 | Finance: Laporan | Rekap AR/AP (filter bulan/tahun, export Excel). |
+| Operation: Shipment | CRUD shipment/voyage, dokumen pendukung, status voyage, memori field voyage. |
+| Operation: Agen | Master agen POL & POD terpisah per tipe (nama, PIC, kontak) + tambah cepat dari form. |
+| Operation: Dashboard | Peta posisi shipment `ON_GOING` + ringkasan jumlah. |
+| Operation: Laporan | Laporan voyage per shipment (laytime, demurrage/despatch). |
+| Accounts | Kelola akun admin & role (khusus SUPERADMIN). |
 
 ## 9. Fitur & Batasan
-- Login admin di `/admin/login` (1 akun, full access), ganti password wajib saat login pertama.
-- Rate limiting login: 5x salah → terkunci 15 menit (in-memory).
-- Halaman publik form rekrutmen (tanpa login), tanpa nomor lamaran setelah daftar.
+- Login admin di `/login` (role menentukan payung yang bisa dibuka), ganti password wajib saat
+  login pertama. Kelola akun (buat/nonaktifkan akun + role) khusus SUPERADMIN.
+- Rate limiting: login 5x salah per email → terkunci 15 menit; pendaftaran pelamar 20x per IP →
+  terkunci 15 menit (in-memory, reset saat restart).
+- Halaman publik: form rekrutmen (tanpa login), tanpa nomor lamaran setelah daftar; halaman
+  approval voucher `/approve/:token` dari email.
 - Badge angka pelamar baru di sidebar.
 - Export Excel & PDF di Payroll & Uang Makan.
 - Info bank crew (nama bank, no rekening) dapat diedit admin.
-- **Di luar cakupan V1:** BPJS/PPh21, multi-currency, approval berjenjang, portal self-service crew,
-  notifikasi WA/email, training matrix, multi-role RBAC, audit log, cek status publik, grafik statistik.
+- **Di luar cakupan saat ini:** BPJS/PPh21, multi-currency, approval berjenjang, portal
+  self-service crew, notifikasi WA, training matrix, audit log, cek status publik, grafik statistik.
 
 ## 10. Gaya Visual
-Navy Blue `#0F2C4C` (utama) · Abu-abu `#F5F6F8` (background) · Hijau `#1E7A46` (positif) ·
-Merah Bata `#B3261E` (negatif). Rapi, formal, data-dense, seperti dashboard logistik/perbankan.
+Navy Blue `#0F2C4C` (utama) · Abu-abu `#F8F8F8` (background) · Hijau `#2E7D32` (positif) ·
+Merah Bata `#C4242A` (negatif). Rapi, formal, data-dense, seperti dashboard logistik/perbankan.
+Detail lengkap ada di `DESIGN_SYSTEM.md`.

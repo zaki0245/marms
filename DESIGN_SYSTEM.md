@@ -59,4 +59,25 @@ Chrome **header & sidebar** memakai navy solid (acuan: halaman `/career`); area 
 ## 7. Responsif
 - Grid kartu: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`.
 - Form dua kolom: `grid-cols-1 sm:grid-cols-2`.
-- Tabel lebar boleh `overflow-x-auto`; sidebar terang menjadi drawer di bawah `lg`.
+- Tabel lebar boleh `overflow-x-auto`; sidebar navy menjadi drawer di bawah `lg`.
+
+## 8. Peta (Leaflet)
+- Tile: **Geoapify** style `osm-carto`
+  (`https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}{r}.png?apiKey=...`); `{r}` = `@2x`
+  di layar retina. URL & atribusi terpusat di `client/src/components/mapTiles.ts`.
+- API key dari `VITE_GEOAPIFY_API_KEY` (root `.env`, ditanam saat build frontend). Tanpa key,
+  peta diganti pesan "Peta belum dikonfigurasi".
+- Attribution wajib: `Powered by Geoapify` + `© OpenStreetMap contributors`.
+- `.leaflet-container { isolation: isolate }` di `index.css` **wajib dipertahankan**: pane & kontrol
+  Leaflet ber-z-index 400–1000, tanpa isolasi akan menimpa sidebar/drawer/modal (z-index 30–50)
+  di layar HP.
+- Jangan kembali ke `tile.openstreetmap.org` (server sukarela OSM memblokir aplikasi → 403
+  "Access blocked").
+
+## 9. Pola Halaman Daftar
+Halaman daftar/tabel mengikuti pola **Daftar Invoice**:
+- Toolbar pencarian + filter di atas tabel.
+- Sorting semua kolom via `SortableTh`, `sortRows`, `useSort` (`components/sortable.tsx`).
+- Pagination via `Pagination` + `DEFAULT_PAGE_SIZE` (`components/Pagination.tsx`).
+- Urutan layout: toolbar → tabel (`overflow-x-auto`) → pagination; halaman kembali ke 1 saat
+  pencarian/filter/sorting berubah.

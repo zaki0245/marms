@@ -18,7 +18,7 @@ docker compose up -d --build
 ```
 Akses dari browser Windows:
 - Beranda publik: `http://localhost:3000/`
-- Login admin: `http://localhost:3000/admin/login`
+- Login admin: `http://localhost:3000/login`
 
 ## 3. Setiap Ada Perubahan Kode
 - **Backend** (`src/`) atau **Frontend** (`client/`): jalankan `docker compose up -d --build`
@@ -28,7 +28,7 @@ Akses dari browser Windows:
 
 ## 4. Alur Kerja per Fitur
 1. Kerjakan SATU fitur sampai selesai & bisa dites.
-2. Test manual sesuai skenario di `TESTING.md`.
+2. Jalankan `npm test` (prorata, masa kerja, laytime) lalu cek manual alur yang berubah.
 3. Jika error, baca log, perbaiki, jalankan ulang.
 4. Baru lanjut ke fitur berikutnya.
 

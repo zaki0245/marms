@@ -7,9 +7,10 @@
 > struktur modul, dan mengikuti konvensi yang sudah disepakati.
 
 ## 1. Ringkasan Project
-MARMS = aplikasi web internal berbentuk Modular Monolith dengan dua payung bisnis:
-**Crewing** (rekrutmen, rotasi crew, payroll, leave pay) dan **Finance** (AP/AR: hutang ke
-vendor & piutang dari customer, invoice, voucher PV/RV). Backend Node.js + Express + TypeScript
+MARMS = aplikasi web internal berbentuk Modular Monolith dengan tiga payung bisnis:
+**Crewing** (rekrutmen, rotasi crew, payroll, leave pay), **Finance** (AP/AR: hutang ke
+vendor & piutang dari customer, invoice, voucher PV/RV), dan **Operation** (monitoring voyage
+tongkang: shipment, laytime, posisi kapal). Backend Node.js + Express + TypeScript
 + Prisma + PostgreSQL. Frontend React + Vite + Tailwind. Semua kode satu repo, satu container
 app + satu DB.
 
@@ -28,14 +29,19 @@ npx prisma migrate reset --force      # reset database + seed ulang
 ## 3. Struktur & Konvensi
 - Backend per payung bisnis di `src/modules/<payung>/`:
   - `crewing/`: `master-data`, `recruitment`, `crew-placement`, `payroll`, `reports`, `leave-pay`.
-  - `finance/`: `vendor`, `customer`, `invoice`, `pv` (voucher PV/RV), `konfigurasi`, `laporan`.
+  - `finance/`: `vendor`, `customer`, `invoice`, `pv` (voucher PV/RV), `approve` (approval via email), `konfigurasi`, `laporan`.
+  - `operation/`: `operation` (shipment/voyage + `laytime.ts` untuk hitung laytime & demurrage).
+  - `kapal/`: master kapal (TB + BG) — dipakai lintas payung.
   - `auth/`: login/logout (lintas payung).
   Isi tiap modul: `controller`, `service`, `routes`, `model`.
 - Modul mengekspor fungsi publik lewat `index.ts`; JANGAN akses tabel modul lain langsung
   (kecuali modul baca-saja `reports`/`laporan`).
-- Util bersama di `src/shared/`: `prisma`, `AppError`, `asyncHandler`, `session`, `upload`, `masaKerja`.
-- Frontend di `client/src/`; halaman dikelompokkan per payung: `client/src/pages/Crewing/` dan
-  `client/src/pages/Finance/` (plus `Accounts`, `Settings`, `Login`, `public`).
+- Util bersama di `src/shared/`: `prisma`, `AppError`, `asyncHandler`, `session`, `authorization`,
+  `rateLimit`, `mailer`, `upload`, `masaKerja`, `prorata`, `jabatanOrder`.
+- Frontend di `client/src/`; halaman dikelompokkan per payung: `client/src/pages/Crewing/`,
+  `client/src/pages/Finance/`, dan `client/src/pages/Operation/` (plus `Kapal`, `Accounts`,
+  `Settings`, `Login`, `public`). Komponen bersama di `client/src/components/` (`Layout`,
+  `Pagination`, `sortable`, `SearchableSelect`, `MapResizer`, `leafletPin`, `PublicLayout`, `Logo`).
 - Semua komentar kode dalam Bahasa Indonesia, format:
   `// [FUNGSI] <apa yang dilakukan> | [ALASAN] <kenapa ada di sini>`.
 - Schema database di `prisma/schema.prisma`; perubahan struktur WAJIB lewat migration.
@@ -56,11 +62,29 @@ npx prisma migrate reset --force      # reset database + seed ulang
 - Kolom `nominal` di `PvItem` = **DPP yang dibayar** (bukan total); flag `includeTax` menandakan
   voucher itu melunasi PPN/PPH (dibayar sekali, biasanya di pelunasan).
 - Status invoice (`BELUM_BAYAR`/`SEBAGIAN`/`LUNAS`) dihitung otomatis dari akumulasi nominal.
+- Approval invoice: kirim tautan ke email penerima (SMTP) → penerima klik `/approve/:token` →
+  status `SUDAH_DIAPPROVE`. Token di-null-kan setelah disetujui/dibatalkan manual.
+- Operation: status voyage `PLANNED`/`ON_GOING`/`COMPLETED`; peta dashboard hanya mem-pin
+  shipment `ON_GOING` yang punya `latitude`/`longitude`. Laytime dihitung di
+  `src/modules/operation/laytime.ts` (ada test di `tests/laytime.test.ts`).
+- Agen POL/POD memakai master `OperationAgent` yang dipisah per tipe (`POL`/`POD`, unik per
+  `(tipe, nama)`) lewat halaman Operation → Agen (tab POL/POD). Saat agen dipilih di form shipment,
+  PIC & Contact terisi otomatis tetapi tetap bisa diubah; shipment menyimpan
+  `agentPolId`/`agentPodId` + snapshot teks.
+- Memori field voyage (TB, BG, Owner/Operator, Shipper, Commodities, Contact Master, POL, POD)
+  berasal dari nilai unik data shipment (`GET /api/operation/refs`) dan ditampilkan lewat
+  `MemoryInput` (datalist). Tidak ada tabel master untuk field-field ini.
+- Tile peta memakai **Geoapify** style `osm-carto` (`https://maps.geoapify.com/v1/tile/...`).
+  API key dibaca dari `VITE_GEOAPIFY_API_KEY` (root `.env`, ditanam saat build frontend), dan
+  CSP `img-src` di `src/app.ts` hanya mengizinkan `https://maps.geoapify.com`. Attribution wajib:
+  "Powered by Geoapify" + "© OpenStreetMap contributors". Jangan kembali ke
+  `tile.openstreetmap.org`: server tile sukarela OSM memblokir aplikasi (403 "Access blocked").
 - Jangan buat file DevOps (Docker production, K3s, CI/CD, OCI) di fase ini.
 
 ## 5. Validasi Sebelum Selesai
 - `npx tsc --noEmit` (root) dan `cd client && npx tsc --noEmit` harus sukses.
 - `cd client && npm run build` harus sukses.
+- `npm test` (root) harus sukses — test prorata, masa kerja, laytime.
 - Setelah mengubah schema/instal dependency baru, jalankan `docker compose up -d --build`.
 - Pastikan tidak menambahkan `.env`, `node_modules`, atau `uploads/` ke git.
 

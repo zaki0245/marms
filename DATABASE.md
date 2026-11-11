@@ -14,7 +14,8 @@
 | `ApplicantStatus` | BARU, VERIFIKASI, INTERVIEW, DITERIMA, DITOLAK |
 | `CrewStatus` | AVAILABLE, ON_BOARD, OFF_BOARD |
 | `ContractStatus` | AKTIF, BERAKHIR, DIPERPANJANG |
-| `VesselStatus` | AKTIF, DOCKING |
+| `VesselStatus` | AKTIF, DOCKING, TIDAK_AKTIF |
+| `KapalSkema` | MILIK, SEWA |
 | `PlacementStatus` | AKTIF, SELESAI |
 | `OffBoardReason` | RELIEF, CUTI, SAKIT, END_OF_CONTRACT |
 | `PayrollStatus` | DRAFT, FINAL, DIBAYAR |
@@ -26,6 +27,10 @@
 | `InvoiceType` | REGULAR, DP, PELUNASAN |
 | `FakturPajakStatus` | SUDAH_DITERIMA, BELUM_DITERIMA, TIDAK_ADA |
 | `PaymentStatus` | BELUM_BAYAR, SEBAGIAN, LUNAS |
+| `ApprovalStatus` | BELUM_DIAPPROVE, SUDAH_DIAPPROVE |
+| `Role` | SUPERADMIN, CREWING, FINANCE, OPERATION |
+| `ShipmentStatus` | PLANNED, ON_GOING, COMPLETED |
+| `AgentTipe` | POL, POD |
 
 > Catatan: enum `OffBoardReason` punya 4 nilai (RELIEF, CUTI, SAKIT, END_OF_CONTRACT),
 > dan keempatnya tersedia di form off board.
@@ -36,7 +41,7 @@
 |---|---|---|
 | `Jabatan` | kode (PK), nama, gajiPokok, createdAt, updatedAt | — (referensi longgar: Kontrak/Penempatan/PayrollDetail menyimpan `jabatanKode` string) |
 | `Pengaturan` | key (PK), value, updatedAt | — |
-| `Kapal` | id, namaUnit (unik), status, tbNama/tbImo/tbGt/tbTahun, bgNama/bgImo/bgGt/bgTahun | → Penempatan, Payroll |
+| `Kapal` | id, namaUnit (unik), skema (MILIK/SEWA), status, tbNama/tbImo/tbGt/tbTahun, bgNama/bgImo/bgGt/bgTahun, createdAt, updatedAt | → Penempatan, Payroll |
 | `Pelamar` | id, nomorPendaftaran (unik), namaLengkap, tempatLahir, tanggalLahir, jenisKelamin, noHp (unik), email (unik), alamat, kontakReferensi, posisiDilamar, pengalamanTahun, kapalTerakhir, jabatanTerakhir, status | → Dokumen, 1→1 Crew |
 | `Dokumen` | id, applicantId, jenis, filePath, nomor, tanggalTerbit, tanggalExpired, status, catatan | ← Pelamar |
 | `Crew` | id, applicantId (unik), tanggalBergabung, status, totalMasaKerja, jumlahLeavePay, namaBank, noRekening | ← Pelamar; → Kontrak, Penempatan, SeaServiceRecord, LeavePayDisbursement, PayrollDetail |
@@ -47,15 +52,18 @@
 | `Payroll` | id, vesselId, bulan, tahun, jumlahHari, status, jenis, tanggalFinalisasi, tanggalPembayaran, dibuatOleh | unik(vesselId, bulan, tahun, jenis); → PayrollDetail |
 | `PayrollDetail` | id, payrollId, crewId, jabatanKode, jabatanNama, segmentId, periodeKerja, hariAktif, gajiPokokSnapshot, gajiProrata, uangMakanSnapshot, uangMakanProrata, total, namaBank, noRekening | ← Payroll, Crew |
 | `LeavePayDisbursement` | id, crewId, tanggalPencairan, nominal, pencairanKe, masaKerjaSnapshot, catatanPerforma | ← Crew |
-| `Admin` | id, email (unik), passwordHash, mustChangePassword | — |
+| `Admin` | id, email (unik), passwordHash, role, active, mustChangePassword, createdAt, updatedAt | — |
 | `Vendor` | id, nama (unik), npwp, alamat | → VendorBank, Invoice, Pv |
 | `VendorBank` | id, vendorId, accountNo, accountName, bank | ← Vendor |
 | `Customer` | id, nama (unik), npwp, alamat | → CustomerBank, Invoice, Pv |
 | `CustomerBank` | id, customerId, accountNo, accountName, bank | ← Customer |
-| `Invoice` | id, no (unik), jenis (AR/AP), kategori, tipe, tanggal, bupot, vendorId?, customerId?, vendorName/customerName (snapshot), bankAccount*, inv?, ref, keterangan, dpp, ppn, pphPasal, pph, total, dueDate, statusFakturPajak, statusPembayaran, parentInvoiceId, incomplete | ← Vendor/Customer; → FakturPajak, PvItem |
+| `Invoice` | id, no (unik), jenis (AR/AP), kategori, tipe, tanggal, bupot, vendorId?, customerId?, vendorName/vendorNpwp/vendorAlamat atau customerName/customerNpwp/customerAlamat (snapshot), bankAccount*, inv?, ref, keterangan, dpp, ppn, pphPasal, pph, total, cargoQuantity, unitPrice, dueDate, masaPajakPPN, masaPajakPPH, statusFakturPajak, statusPembayaran, parentInvoiceId, incomplete, approvalStatus, approvalToken, approvalSentAt, approvalSentTo, approvedAt | ← Vendor/Customer; → FakturPajak, PvItem; unik(vendorId/customerId, inv) |
 | `FakturPajak` | id, invoiceId, nomor | ← Invoice |
-| `Pv` (voucher) | id, pvNo (unik), jenis (RV/PV), tanggal, vendorId?, customerId?, vendorName/customerName (snapshot), bankAccount*, chequeNo, issuedDate, bankCharge, balance, keterangan | ← Vendor/Customer; → PvItem |
+| `Pv` (voucher) | id, pvNo (unik), jenis (RV/PV), tanggal, vendorId?, customerId?, vendorName/vendorNpwp/vendorAlamat atau customerName/customerNpwp/customerAlamat (snapshot), bankAccount*, chequeNo, issuedDate, bankCharge, balance, keterangan | ← Vendor/Customer; → PvItem |
 | `PvItem` | id, pvId, invoiceId, nominal (DPP), includeTax | ← Pv, Invoice |
+| `Shipment` | id, kode (unik), tb, bg, ownerOperator, shipper, commodities, contactMaster, laycan, size, pol/agentPol/agentPolId/picPol/contactAgentPol, pod/agentPod/agentPodId/picPod/contactAgentPod, jadwal t*Pol/t*Pod, laytimePol, laytimePod, totalLaytime, laytimeAllowed, demurrageDespatch, dsrPol, dsrPod, position, remarks, status (PLANNED/ON_GOING/COMPLETED), latitude, longitude | → ShipmentDocument, OperationAgent (POL & POD) |
+| `ShipmentDocument` | id, shipmentId, nama, file, createdAt | ← Shipment (cascade) |
+| `OperationAgent` | id, tipe (POL/POD), nama, pic, kontak, createdAt, updatedAt | ← Shipment (agentPolId/agentPodId, onDelete SetNull); unik (tipe, nama) |
 
 ## ERD
 
@@ -74,6 +82,9 @@ erDiagram
     PAYROLL ||--o{ PAYROLL_DETAIL : "berisi"
     CREW ||--o{ PAYROLL_DETAIL : "muncul di"
     CREW ||--o{ LEAVE_PAY_DISBURSEMENT : "dicairkan"
+    SHIPMENT ||--o{ SHIPMENT_DOCUMENT : "memiliki"
+    OPERATION_AGENT ||--o{ SHIPMENT : "agen POL"
+    OPERATION_AGENT ||--o{ SHIPMENT : "agen POD"
 
     PELAMAR {
         string id PK
@@ -161,6 +172,26 @@ erDiagram
         int pencairanKe
         int masaKerjaSnapshot
     }
+    SHIPMENT {
+        string id PK
+        string kode UK
+        enum status
+        float latitude
+        float longitude
+    }
+    SHIPMENT_DOCUMENT {
+        string id PK
+        string shipmentId FK
+        string nama
+        string file
+    }
+    OPERATION_AGENT {
+        string id PK
+        enum tipe
+        string nama UK
+        string pic
+        string kontak
+    }
 ```
 
 ## Alur Data Utama
@@ -168,6 +199,7 @@ erDiagram
 Pelamar --diterima--> Crew --punya--> Kontrak --> Penempatan --> Segmen --> SeaServiceRecord
 Crew --muncul di--> PayrollDetail  (per segmen, per bulan, per jenis)
 Crew --punya--> LeavePayDisbursement (per pencairan)
+Shipment --memiliki--> ShipmentDocument (BL, invoice, COO, dsb.)
 ```
 
 ## Catatan Penting
@@ -178,3 +210,16 @@ Crew --punya--> LeavePayDisbursement (per pencairan)
 - Finance: `Invoice.jenis` (AR/AP) menentukan counterparty (Customer/Vendor) & snapshot yang diisi.
   `Pv` (voucher) memakai `jenis` RV/PV; `PvItem.nominal` = DPP, `includeTax` = melunasi PPN/PPH.
   Status invoice dihitung otomatis dari akumulasi nominal (`recomputeStatus`).
+- Approval invoice: `Invoice.approvalToken` dipakai untuk tautan publik `/approve/:token`;
+  setelah disetujui `approvalStatus=SUDAH_DIAPPROVE`, `approvedAt` diisi, token dihapus.
+- Operation: `Shipment` menyimpan jadwal voyage (Pol/Pod), laytime & demurrage/despatch,
+  posisi terakhir (`latitude`/`longitude`), dan status. Dashboard peta hanya mem-pin
+  `status=ON_GOING` yang koordinatnya terisi, lalu mengurutkan berdasarkan `updatedAt`.
+- `ShipmentDocument.file` menyimpan nama file UUID di folder `uploads/` (sama seperti dokumen pelamar).
+- Agen POL/POD berasal dari master `OperationAgent` yang **dipisah per tipe** (`POL`/`POD`,
+  unik per `(tipe, nama)`), lengkap dengan PIC + kontak. Saat agen dipilih, shipment menyimpan
+  `agentPolId`/`agentPodId` **dan** snapshot teks (`agentPol`, `picPol`, `contactAgentPol`, dst.)
+  agar laporan lama tidak berubah saat master diedit. Menghapus agen membuat FK jadi null, teks
+  snapshot tetap ada.
+- Memori field voyage (TB, BG, Owner/Operator, Shipper, Commodities, Contact Master, POL, POD)
+  diambil dari nilai unik tabel `Shipment` (`GET /api/operation/refs`), bukan tabel master.

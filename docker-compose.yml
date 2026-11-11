@@ -39,6 +39,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # [FUNGSI] Teruskan API key tile peta ke stage build frontend.
+        # [ALASAN] Vite menanam nilainya saat build; nilainya dibaca dari .env root.
+        VITE_GEOAPIFY_API_KEY: ${VITE_GEOAPIFY_API_KEY:-}
     container_name: marms_app
     restart: unless-stopped
     depends_on:

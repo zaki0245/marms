@@ -6,7 +6,7 @@ import fs from 'fs';
 import type { Request, Response } from 'express';
 import { AppError } from '../../shared/AppError';
 import { UPLOAD_DIR, verifyFileSignature } from '../../shared/upload';
-import { shipmentSchema } from './operation.model';
+import { agentSchema, shipmentSchema } from './operation.model';
 import * as service from './operation.service';
 
 // [FUNGSI] Ambil teks dari body multipart; kosong jadi null.
@@ -44,10 +44,12 @@ function parseBody(body: Record<string, unknown>) {
     laycan: str(body.laycan),
     pol: str(body.pol) ?? '',
     agentPol: str(body.agentPol),
+    agentPolId: str(body.agentPolId),
     picPol: str(body.picPol),
     contactAgentPol: str(body.contactAgentPol),
     pod: str(body.pod),
     agentPod: str(body.agentPod),
+    agentPodId: str(body.agentPodId),
     picPod: str(body.picPod),
     contactAgentPod: str(body.contactAgentPod),
     taPol: tgl(body.taPol),
@@ -167,4 +169,41 @@ export async function deleteShipment(req: Request, res: Response) {
   await service.deleteShipment(req.params.id);
   existing.documents.forEach((d) => hapusFile(d.file));
   res.status(204).end();
+}
+
+// ================== MASTER AGEN ==================
+
+export async function listAgents(req: Request, res: Response) {
+  const tipe = req.query.tipe === 'POL' || req.query.tipe === 'POD' ? req.query.tipe : undefined;
+  res.json(await service.listAgents(tipe));
+}
+
+export async function createAgent(req: Request, res: Response) {
+  const input = agentSchema.parse(req.body);
+  res.status(201).json(await service.createAgent(input));
+}
+
+export async function updateAgent(req: Request, res: Response) {
+  const existing = await service.getAgent(req.params.id);
+  if (!existing) {
+    res.status(404).json({ error: 'Agen tidak ditemukan' });
+    return;
+  }
+  const input = agentSchema.parse(req.body);
+  res.json(await service.updateAgent(req.params.id, input));
+}
+
+export async function deleteAgent(req: Request, res: Response) {
+  const existing = await service.getAgent(req.params.id);
+  if (!existing) {
+    res.status(404).json({ error: 'Agen tidak ditemukan' });
+    return;
+  }
+  await service.deleteAgent(req.params.id);
+  res.status(204).end();
+}
+
+// [FUNGSI] Nilai unik field voyage untuk saran input (memori).
+export async function refs(_req: Request, res: Response) {
+  res.json(await service.listRefs());
 }

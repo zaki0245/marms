@@ -526,10 +526,12 @@ model Shipment {
   size              Float?
   pol               String
   agentPol          String?
+  agentPolId        String?
   picPol            String?
   contactAgentPol   String?
   pod               String?
   agentPod          String?
+  agentPodId        String?
   picPod            String?
   contactAgentPod   String?
   taPol             DateTime?
@@ -561,8 +563,12 @@ model Shipment {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   documents         ShipmentDocument[]
+  agentPolRef       OperationAgent?  @relation("AgentPol", fields: [agentPolId], references: [id], onDelete: SetNull)
+  agentPodRef       OperationAgent?  @relation("AgentPod", fields: [agentPodId], references: [id], onDelete: SetNull)
 
   @@index([status])
+  @@index([agentPolId])
+  @@index([agentPodId])
 }
 
 // [FUNGSI] Dokumen pendukung satu shipment (BL, invoice, COO, dsb).
@@ -576,4 +582,27 @@ model ShipmentDocument {
   shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 
   @@index([shipmentId])
+}
+
+// [FUNGSI] Tipe agen: dipakai terpisah untuk pelabuhan muat (POL) & bongkar (POD).
+// [ALASAN] Satu nama bisa terdaftar di kedua daftar dengan PIC/kontak berbeda.
+enum AgentTipe {
+  POL
+  POD
+}
+
+// [FUNGSI] Master agen pelabuhan (dipakai POL & POD) beserta PIC dan kontak.
+// [ALASAN] Satu database agen; shipment menyimpan snapshot teks + relasi agar laporan lama tetap utuh.
+model OperationAgent {
+  id           String     @id @default(cuid())
+  tipe         AgentTipe  @default(POL)
+  nama         String
+  pic          String?
+  kontak       String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  shipmentsPol Shipment[] @relation("AgentPol")
+  shipmentsPod Shipment[] @relation("AgentPod")
+
+  @@unique([tipe, nama])
 }

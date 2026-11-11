@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import { api } from '../../api/client';
 import MapResizer from '../../components/MapResizer';
 import { pinKapal } from '../../components/leafletPin';
+import { TILE_ATTRIBUTION, TILE_URL } from '../../components/mapTiles';
 import { fmtUpdate, linkPosisi } from './types';
 
 interface Ongoing {
@@ -51,43 +52,48 @@ export default function OperationDashboard() {
         <p className="mt-4 text-gray-500">Memuat...</p>
       ) : (
         <>
-          <div className="card mt-4 overflow-hidden">
-            <MapContainer
-              center={[-2.5, 118]}
-              zoom={5}
-              scrollWheelZoom
-              className="h-[calc(100vh_-_11rem)] min-h-[420px] w-full"
-            >
-              <MapResizer />
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                crossOrigin="anonymous"
-              />
-              {dipetakan.map((s) => {
-                const link = linkPosisi(s.latitude, s.longitude);
-                return (
-                  <Marker key={s.id} position={[s.latitude!, s.longitude!]} icon={pinKapal}>
-                    <Popup>
-                      <div className="text-sm">
-                        <div className="font-semibold">{s.tb} / {s.bg}</div>
-                        <div className="text-xs text-gray-500">{s.kode}</div>
-                        <div className="mt-1">{s.pol} &rarr; {s.pod ?? 'TBA'}</div>
-                        <div>Posisi: {s.position ?? '-'}</div>
-                        {s.remarks && <div>{s.remarks}</div>}
-                        <div className="mt-1 text-xs text-gray-500">Update: {fmtUpdate(s.updatedAt)}</div>
-                        {link && (
-                          <a href={link} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-navy underline">
-                            Buka di Google Maps
-                          </a>
-                        )}
-                      </div>
-                    </Popup>
-                  </Marker>
-                );
-              })}
-            </MapContainer>
-          </div>
+          {TILE_URL ? (
+            <div className="card mt-4 overflow-hidden">
+              <MapContainer
+                center={[-2.5, 118]}
+                zoom={5}
+                scrollWheelZoom
+                className="h-[calc(100vh_-_11rem)] min-h-[420px] w-full"
+              >
+                <MapResizer />
+                <TileLayer
+                  attribution={TILE_ATTRIBUTION}
+                  url={TILE_URL}
+                />
+                {dipetakan.map((s) => {
+                  const link = linkPosisi(s.latitude, s.longitude);
+                  return (
+                    <Marker key={s.id} position={[s.latitude!, s.longitude!]} icon={pinKapal}>
+                      <Popup>
+                        <div className="text-sm">
+                          <div className="font-semibold">{s.tb} / {s.bg}</div>
+                          <div className="text-xs text-gray-500">{s.kode}</div>
+                          <div className="mt-1">{s.pol} &rarr; {s.pod ?? 'TBA'}</div>
+                          <div>Posisi: {s.position ?? '-'}</div>
+                          {s.remarks && <div>{s.remarks}</div>}
+                          <div className="mt-1 text-xs text-gray-500">Update: {fmtUpdate(s.updatedAt)}</div>
+                          {link && (
+                            <a href={link} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-navy underline">
+                              Buka di Google Maps
+                            </a>
+                          )}
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MapContainer>
+            </div>
+          ) : (
+            <div className="card mt-4 p-4 text-sm text-gray-500">
+              Peta belum dikonfigurasi (VITE_GEOAPIFY_API_KEY).
+            </div>
+          )}
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500">
             <span>{items.length} shipment berjalan · {dipetakan.length} tampil di peta</span>

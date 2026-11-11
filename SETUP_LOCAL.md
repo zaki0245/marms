@@ -26,6 +26,8 @@ cd ~/projects/marms
 ```bash
 cp .env.example .env
 # edit .env: isi SESSION_SECRET & ADMIN_PASSWORD (wajib, keduanya diminta docker-compose)
+# WAJIB untuk peta: isi VITE_GEOAPIFY_API_KEY (API key gratis dari geoapify.com)
+# opsional: SMTP_* + APP_BASE_URL bila ingin memakai email approval invoice
 ```
 
 ### 3. Install Dependency (root + frontend) — sekali
@@ -70,18 +72,19 @@ Tanpa urutan ini, `npm ci` akan gagal (prisma generate tidak menemukan schema) d
 
 ---
 
-## 8. Akses dari Browser Windows
+## 6. Akses dari Browser Windows
 - Beranda publik (rekrutmen): `http://localhost:3000`
-- Login admin: `http://localhost:3000/admin/login`
+- Login admin: `http://localhost:3000/login`
 - Adminer: `http://localhost:8080`
 - Akun admin awal: `admin@marms.com` / `Admin123!` (wajib ganti saat login pertama)
 
-## 9. Verifikasi Cepat
+## 7. Verifikasi Cepat
 - `docker compose ps` → service `db` status `Up (healthy)`.
 - Buka `http://localhost:3000/health` → `{"status":"ok"}`.
 - Buka `http://localhost:3000` → beranda publik tampil.
+- `npm test` → test prorata, masa kerja, laytime lulus.
 
-## 10. Jika Error
+## 8. Jika Error
 - Cek log: `docker compose logs db` (atau `docker compose logs app`).
 - Port bentrok → ubah port di `.env` dan `docker-compose.yml`.
 - Setelah mengubah schema/instal dependency, jalankan `docker compose up -d --build`.

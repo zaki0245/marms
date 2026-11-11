@@ -14,6 +14,10 @@ COPY client/package*.json ./
 RUN npm ci
 # [FUNGSI] Salin seluruh kode client lalu build produksi.
 COPY client/ ./
+# [FUNGSI] Sisipkan API key tile peta saat build (dipakai import.meta.env di client).
+# [ALASAN] Key tidak di-commit; nilainya datang dari build arg docker-compose (.env root).
+ARG VITE_GEOAPIFY_API_KEY
+ENV VITE_GEOAPIFY_API_KEY=$VITE_GEOAPIFY_API_KEY
 RUN npm run build
 
 # ---------- Stage 2: build backend (TypeScript) ----------

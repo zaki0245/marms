@@ -32,13 +32,13 @@ const app = express();
 //          berguna dan deteksi HTTPS keliru.
 app.set('trust proxy', 1);
 
-// [FUNGSI] Header keamanan dasar (nosniff, X-Frame-Options, dsb.) + izin tile peta OSM.
+// [FUNGSI] Header keamanan dasar (nosniff, X-Frame-Options, dsb.) + izin tile peta Geoapify.
 // [ALASAN] CSP default memblokir gambar lintas domain, sehingga peta Leaflet tampil kosong.
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        'img-src': ["'self'", 'data:', 'https://tile.openstreetmap.org'],
+        'img-src': ["'self'", 'data:', 'https://maps.geoapify.com'],
       },
     },
   })

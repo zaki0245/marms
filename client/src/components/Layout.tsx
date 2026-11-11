@@ -42,6 +42,7 @@ const FINANCE_MENU = [
 const OPERATION_MENU = [
   { to: '/dashboard/operation', label: 'Dashboard', exact: true },
   { to: '/dashboard/operation/shipment', label: 'Shipment' },
+  { to: '/dashboard/operation/agent', label: 'Agen' },
 ];
 
 interface Admin {

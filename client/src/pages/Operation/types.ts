@@ -12,6 +12,16 @@ export interface ShipmentDocument {
   createdAt: string;
 }
 
+export type AgentTipe = 'POL' | 'POD';
+
+export interface OperationAgent {
+  id: string;
+  tipe: AgentTipe;
+  nama: string;
+  pic: string | null;
+  kontak: string | null;
+}
+
 export interface Shipment {
   id: string;
   kode: string;
@@ -24,10 +34,12 @@ export interface Shipment {
   laycan: string | null;
   pol: string;
   agentPol: string | null;
+  agentPolId: string | null;
   picPol: string | null;
   contactAgentPol: string | null;
   pod: string | null;
   agentPod: string | null;
+  agentPodId: string | null;
   picPod: string | null;
   contactAgentPod: string | null;
   taPol: string | null;

@@ -11,6 +11,7 @@ import html2canvas from 'html2canvas';
 import { api } from '../../api/client';
 import MapResizer from '../../components/MapResizer';
 import { pinKapal } from '../../components/leafletPin';
+import { TILE_ATTRIBUTION, TILE_URL } from '../../components/mapTiles';
 import {
   Shipment,
   fmtDesimal,
@@ -285,7 +286,7 @@ export default function Laporan() {
 
               <Judul>Position Status</Judul>
               <div className="mt-2 overflow-hidden rounded border border-gray-300">
-                {punyaKoordinat ? (
+                {punyaKoordinat && TILE_URL ? (
                   <MapContainer
                     center={[s.latitude!, s.longitude!]}
                     zoom={5}
@@ -297,16 +298,15 @@ export default function Laporan() {
                   >
                     <MapResizer />
                     <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      crossOrigin="anonymous"
+                      attribution={TILE_ATTRIBUTION}
+                      url={TILE_URL}
                       eventHandlers={{ load: () => setMapSiap(true) }}
                     />
                     <Marker position={[s.latitude!, s.longitude!]} icon={pinKapal} />
                   </MapContainer>
                 ) : (
                   <div className="flex h-[100px] items-center justify-center text-xs text-gray-500">
-                    Posisi belum tersedia
+                    {punyaKoordinat ? 'Peta belum dikonfigurasi (VITE_GEOAPIFY_API_KEY)' : 'Posisi belum tersedia'}
                   </div>
                 )}
               </div>

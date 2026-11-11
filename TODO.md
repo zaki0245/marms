@@ -30,7 +30,7 @@
 - [x] Crew (filter kapal, status, masa kerja live).
 - [x] Tab Off Board (crew off board terpisah).
 - [x] Off board (alasan Relief/Cuti/Sakit/Habis Kontrak) + hitung masa kerja.
-- [x] Blokir penempatan jika dokumen expired.
+- [x] Dokumen expired TIDAK memblokir penempatan baru (tanggung jawab crew untuk perbarui).
 - [x] Perbarui dokumen expired (file baru + tanggal expired).
 - [x] Edit info bank (nama bank, no rekening).
 
@@ -59,11 +59,31 @@
 - [x] Cetak PDF voucher (logo, terbilang, tabel invoice, bank, tanda tangan).
 - [x] Dashboard Finance (hutang/piutang) & Laporan Rekap AR/AP (export Excel).
 
+## Modul 8 — Operation (Voyage Tongkang)
+- [x] CRUD Shipment: data TB/BG, owner/operator, shipper, komoditas, laycan, POL/POD + agen/PIC.
+- [x] Jadwal kegiatan voyage (arrival, berthing, commenced, cast off, departure) POL & POD.
+- [x] Hitung laytime, demurrage/despatch (`src/modules/operation/laytime.ts` + test).
+- [x] Status voyage `PLANNED`/`ON_GOING`/`COMPLETED` + posisi (koordinat & teks).
+- [x] Dokumen pendukung shipment (upload/hapus).
+- [x] Memori field voyage: TB, BG, Owner/Operator, Shipper, Commodities, Contact Master, POL, POD
+  (saran dari riwayat shipment, endpoint `/operation/refs` + `MemoryInput`).
+- [x] Master agen POL/POD (`OperationAgent`): nama/PIC/kontak, halaman Agen, tambah cepat "+"
+  di form shipment, PIC & kontak terisi otomatis saat memilih agen.
+- [x] Pisahkan agen POL & POD: kolom `tipe` (tab POL/POD di halaman Agen), unik per tipe,
+  dropdown POL hanya agen POL dan sebaliknya; migration memisahkan data agen lama.
+- [x] Backfill relasi agen untuk shipment lama dari nama agen yang sudah ada.
+- [x] Dashboard peta posisi shipment `ON_GOING` (tile Geoapify).
+- [x] Laporan voyage per shipment (cetak/print).
+- [x] Role `OPERATION` + menu sidebar terpisah.
+
 ## Fase Akhir — Tersisa
 - [x] Generate `SeaServiceRecord` otomatis saat off board (`imo` dari `tbImo`).
 - [x] Aktifkan alasan off board Cuti & Sakit di form (Relief/Cuti/Sakit/Habis Kontrak).
 - [x] Hapus kolom `dinilaiOleh` / `dicairkanOleh` yang tidak terpakai di leave pay.
-- [x] Test minimal (`npm test`): prorata & masa kerja live.
-- [ ] Validasi lokal end-to-end (cek seluruh alur dari daftar → payroll → leave pay).
-- [ ] Push ke GitHub.
+- [x] Test minimal (`npm test`): prorata, masa kerja, laytime.
+- [x] Audit tampilan HP: sidebar drawer di atas peta (`isolation: isolate` pada `.leaflet-container`).
+- [x] Ganti tile peta ke Geoapify `osm-carto` dengan API key (`VITE_GEOAPIFY_API_KEY`) agar tidak
+  kena blokir 403 OSM ("Access blocked") dan bebas dari batasan ToS CARTO.
+- [ ] Validasi lokal end-to-end (cek seluruh alur dari daftar → payroll → leave pay → shipment).
+- [x] Push ke GitHub (`origin` = `zaki0245/marms`, lokal sudah sinkron dengan `origin/main`).
 - [ ] (DITUNDA) DevOps: Docker production, K3s, CI/CD, OCI.

@@ -10,6 +10,14 @@ import * as c from './operation.controller';
 const router = Router();
 
 router.get('/dashboard', asyncHandler(c.dashboard));
+router.get('/refs', asyncHandler(c.refs));
+
+// [FUNGSI] Master agen pelabuhan (dipakai Agent POL/POD pada form shipment).
+router.get('/agents', asyncHandler(c.listAgents));
+router.post('/agents', asyncHandler(c.createAgent));
+router.put('/agents/:id', asyncHandler(c.updateAgent));
+router.delete('/agents/:id', asyncHandler(c.deleteAgent));
+
 router.get('/shipments', asyncHandler(c.listShipments));
 router.get('/shipments/:id', asyncHandler(c.getShipment));
 router.post('/shipments', upload.array('documents', 20), asyncHandler(c.createShipment));

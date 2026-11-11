@@ -28,15 +28,18 @@ menentukan payung mana yang bisa dibuka:
 
 | Role | Bisa akses |
 |---|---|
-| `SUPERADMIN` | Semua payung (Crewing + Finance) + menu **Kelola Akun** |
+| `SUPERADMIN` | Semua payung (Crewing + Finance + Operation) + menu **Kelola Akun** |
 | `CREWING` | Hanya modul Crewing |
 | `FINANCE` | Hanya modul Finance |
+| `OPERATION` | Hanya modul Operation |
 
 - Akun admin pertama (dari seed) otomatis jadi `SUPERADMIN`.
 - Menu **Kelola Akun** (khusus SUPERADMIN) untuk membuat akun, memilih role, dan
   mengaktifkan/nonaktifkan akun.
 - Modul **Finance (AP/AR)** sudah lengkap: Vendor, Customer, Invoice, Cetak voucher (PV/RV),
-  Laporan, Dashboard. Termasuk dua entitas AR (piutang) & AP (hutang).
+  Laporan, Dashboard, Konfigurasi. Termasuk dua entitas AR (piutang) & AP (hutang).
+- Modul **Operation** sudah lengkap: Shipment/voyage (termasuk laytime & demurrage), dokumen
+  shipment, Dashboard peta posisi kapal, dan Laporan voyage.
 
 ---
 
@@ -98,6 +101,10 @@ docker compose up -d --build                      # terapkan + restart app
 | `ADMIN_PASSWORD` | password kuat | WAJIB, dipakai sekali untuk seed |
 | `COOKIE_SECURE` | `true` | Karena Railway sudah HTTPS |
 | `CORS_ORIGIN` | (biarkan kosong) | App same-origin, jarang dipakai |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | mis. `smtp.gmail.com` / `587` / `false` | Opsional; dipakai untuk email approval invoice |
+| `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | akun SMTP & alamat pengirim | Opsional; bila kosong, fitur kirim approval tidak bisa dipakai |
+| `APP_BASE_URL` | `https://<domain-mu>` | Basis tautan approve di email |
+| `VITE_GEOAPIFY_API_KEY` | API key dari geoapify.com | WAJIB agar peta tampil; dipakai saat build frontend |
 | `NODE_ENV` | (otomatis `production` oleh Railway) | Jangan diubah |
 
 > **Membuat SESSION_SECRET acak:** jalankan di terminal lokal:
@@ -112,7 +119,7 @@ railway run npx prisma db seed
 
 (atau lewat menu Railway → **Command** / **Shell**, jalankan `npx prisma db seed`).
 
-Setelah itu login di `https://<domain-mu>/admin/login` dengan email & password admin
+Setelah itu login di `https://<domain-mu>/login` dengan email & password admin
 yang diisi di langkah 5. Saat login pertama, kamu diminta mengganti password.
 
 ### 7. Verifikasi
@@ -192,3 +199,8 @@ Jika suatu saat ingin pindah dari Railway ke server sendiri (VPS):
 - `COOKIE_SECURE=true` hanya kalau sudah HTTPS (Railway sudah otomatis).
 - Volume uploads wajib terpasang agar dokumen tidak hilang.
 - Ganti password admin setelah login pertama (aplikasi memaksa ini).
+- Peta memakai tile Geoapify (`https://maps.geoapify.com`) dan CSP `img-src` di `src/app.ts`
+  sudah disetel untuk domain itu. Isi `VITE_GEOAPIFY_API_KEY` sebelum build (tanpa key, peta
+  menampilkan pesan "Peta belum dikonfigurasi"). Batasi key ke HTTP referrer domain produksi di
+  dashboard Geoapify, dan jangan kembali ke `tile.openstreetmap.org` (server sukarela OSM
+  memblokir aplikasi dengan 403 "Access blocked").

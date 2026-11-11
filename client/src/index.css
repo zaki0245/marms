@@ -64,6 +64,12 @@ body {
   font-family: 'Geist', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* [FUNGSI] Peta Leaflet jadi stacking context sendiri. */
+/* [ALASAN] Pane & kontrol Leaflet ber-z-index 400-1000 dan menembus sidebar/drawer/modal (z 30-50) di HP. */
+.leaflet-container {
+  isolation: isolate;
+}
+
 /* [FUNGSI] Fokus yang jelas & konsisten pada semua input/select/textarea. */
 input:focus,
 select:focus,

@@ -18,10 +18,12 @@ export const shipmentSchema = z.object({
   laycan: teks,
   pol: z.string().trim().min(1, 'POL wajib diisi').max(255),
   agentPol: teks,
+  agentPolId: teks,
   picPol: teks,
   contactAgentPol: teks,
   pod: teks,
   agentPod: teks,
+  agentPodId: teks,
   picPod: teks,
   contactAgentPod: teks,
   taPol: z.date().nullable().optional(),
@@ -49,3 +51,14 @@ export const shipmentSchema = z.object({
 });
 
 export type ShipmentInput = z.infer<typeof shipmentSchema>;
+
+// [FUNGSI] Validasi master agen pelabuhan (POL/POD).
+// [ALASAN] Agen dipakai berulang; nama wajib unik, PIC & kontak opsional.
+export const agentSchema = z.object({
+  tipe: z.enum(['POL', 'POD']),
+  nama: z.string().trim().min(1, 'Nama agen wajib diisi').max(255),
+  pic: teks,
+  kontak: teks,
+});
+
+export type AgentInput = z.infer<typeof agentSchema>;

@@ -2,9 +2,12 @@
 // [FUNGSI] Modal form tambah/edit shipment (identitas, POL/POD, laytime, posisi, dokumen).
 // [ALASAN] Data voyage diisi sekali di sini; laytime dihitung backend saat disimpan.
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
-import { Shipment, ShipmentDocument, ShipmentStatus, STATUS_LABEL } from './types';
+import MemoryInput from '../../components/MemoryInput';
+import SearchableSelect from '../../components/SearchableSelect';
+import AgentForm from './AgentForm';
+import { OperationAgent, Shipment, ShipmentDocument, ShipmentStatus, STATUS_LABEL } from './types';
 
 const KOSONG = {
   tb: '',
@@ -16,10 +19,12 @@ const KOSONG = {
   laycan: '',
   pol: '',
   agentPol: '',
+  agentPolId: '',
   picPol: '',
   contactAgentPol: '',
   pod: '',
   agentPod: '',
+  agentPodId: '',
   picPod: '',
   contactAgentPod: '',
   taPol: '',
@@ -82,10 +87,12 @@ function dariShipment(s: Shipment): FormState {
     laycan: teks(s.laycan),
     pol: s.pol,
     agentPol: teks(s.agentPol),
+    agentPolId: teks(s.agentPolId),
     picPol: teks(s.picPol),
     contactAgentPol: teks(s.contactAgentPol),
     pod: teks(s.pod),
     agentPod: teks(s.agentPod),
+    agentPodId: teks(s.agentPodId),
     picPod: teks(s.picPod),
     contactAgentPod: teks(s.contactAgentPod),
     taPol: keInputTanggal(s.taPol),
@@ -128,9 +135,42 @@ export default function ShipmentForm({
   const [docs, setDocs] = useState<ShipmentDocument[]>(initial?.documents ?? []);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [agents, setAgents] = useState<OperationAgent[]>([]);
+  const [refs, setRefs] = useState<Record<string, string[]>>({});
+  const [agenUntuk, setAgenUntuk] = useState<'POL' | 'POD' | null>(null);
+
+  // [FUNGSI] Muat master agen & riwayat nilai field voyage (memori input).
+  useEffect(() => {
+    api.get<OperationAgent[]>('/operation/agents').then(({ data }) => setAgents(data)).catch(() => undefined);
+    api.get<Record<string, string[]>>('/operation/refs').then(({ data }) => setRefs(data)).catch(() => undefined);
+  }, []);
+
+  // [FUNGSI] Tautkan shipment lama yang belum punya id agen (cocokkan nama sesuai tipe).
+  useEffect(() => {
+    if (!agents.length) return;
+    setForm((f) => {
+      const pol = f.agentPolId ? null : agents.find((a) => a.tipe === 'POL' && a.nama === f.agentPol);
+      const pod = f.agentPodId ? null : agents.find((a) => a.tipe === 'POD' && a.nama === f.agentPod);
+      if (!pol && !pod) return f;
+      return {
+        ...f,
+        ...(pol ? { agentPolId: pol.id } : {}),
+        ...(pod ? { agentPodId: pod.id } : {}),
+      };
+    });
+  }, [agents]);
 
   function setField(k: keyof FormState, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  // [FUNGSI] Isi otomatis PIC & kontak saat agen dipilih; tetap bisa diubah manual.
+  function isiAgen(pos: 'POL' | 'POD', a: OperationAgent) {
+    setForm((f) =>
+      pos === 'POL'
+        ? { ...f, agentPolId: a.id, agentPol: a.nama, picPol: a.pic ?? '', contactAgentPol: a.kontak ?? '' }
+        : { ...f, agentPodId: a.id, agentPod: a.nama, picPod: a.pic ?? '', contactAgentPod: a.kontak ?? '' }
+    );
   }
 
   // [FUNGSI] Hapus satu dokumen langsung (tanpa menunggu Simpan).
@@ -205,6 +245,45 @@ export default function ShipmentForm({
     </div>
   );
 
+  // [FUNGSI] Input dengan saran dari riwayat shipment (memori).
+  const memori = (k: keyof FormState, label: string) => (
+    <div key={k}>
+      <label className="label">{label}</label>
+      <MemoryInput id={k} value={form[k]} options={refs[k] ?? []} onChange={(v) => setField(k, v)} />
+    </div>
+  );
+
+  // [FUNGSI] Pilih agen POL/POD dari master + tombol tambah cepat.
+  const agen = (pos: 'POL' | 'POD') => {
+    const idKey = pos === 'POL' ? 'agentPolId' : 'agentPodId';
+    return (
+      <div key={idKey}>
+        <label className="label">Agent {pos}</label>
+        <div className="mt-1 flex gap-1">
+          <SearchableSelect
+            value={form[idKey]}
+            options={agents.filter((a) => a.tipe === pos).map((a) => ({ id: a.id, label: a.nama }))}
+            placeholder={`Pilih agen ${pos}`}
+            className="input w-full"
+            wrapperClassName="flex-1"
+            onChange={(id) => {
+              const a = agents.find((x) => x.id === id);
+              if (a) isiAgen(pos, a);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setAgenUntuk(pos)}
+            aria-label={`Tambah agen ${pos}`}
+            className="shrink-0 rounded-md border border-gray-300 px-2.5 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const angka = (k: keyof FormState, label: string) => (
     <div key={k}>
       <label className="label">{label}</label>
@@ -241,12 +320,12 @@ export default function ShipmentForm({
           <section>
             <h4 className="font-semibold text-gray-900">Identitas &amp; Voyage</h4>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {teks('tb', 'TB *')}
-              {teks('bg', 'BG *')}
-              {teks('ownerOperator', 'Barges Owners / Operator')}
-              {teks('shipper', 'Shipper')}
-              {teks('commodities', 'Commodities')}
-              {teks('contactMaster', 'Contact Master / Captain')}
+              {memori('tb', 'TB *')}
+              {memori('bg', 'BG *')}
+              {memori('ownerOperator', 'Barges Owners / Operator')}
+              {memori('shipper', 'Shipper')}
+              {memori('commodities', 'Commodities')}
+              {memori('contactMaster', 'Contact Master / Captain')}
               {teks('laycan', 'Laycan')}
               <div>
                 <label className="label">Status</label>
@@ -262,8 +341,8 @@ export default function ShipmentForm({
           <section>
             <h4 className="font-semibold text-gray-900">Port of Loading (POL)</h4>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {teks('pol', 'POL *')}
-              {teks('agentPol', 'Agent POL')}
+              {memori('pol', 'POL *')}
+              {agen('POL')}
               {teks('picPol', 'PIC POL')}
               {teks('contactAgentPol', 'Contact Agent POL')}
               {waktu('taPol', 'Time Arrivals POL')}
@@ -279,8 +358,8 @@ export default function ShipmentForm({
           <section>
             <h4 className="font-semibold text-gray-900">Port of Discharge (POD)</h4>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {teks('pod', 'POD')}
-              {teks('agentPod', 'Agent POD')}
+              {memori('pod', 'POD')}
+              {agen('POD')}
               {teks('picPod', 'PIC POD')}
               {teks('contactAgentPod', 'Contact Agent POD')}
               {waktu('taPod', 'Time Arrivals POD')}
@@ -367,6 +446,19 @@ export default function ShipmentForm({
           </button>
         </div>
       </form>
+
+      {/* [FUNGSI] Tambah agen cepat tanpa menutup form shipment. */}
+      {agenUntuk && (
+        <AgentForm
+          tipe={agenUntuk}
+          onClose={() => setAgenUntuk(null)}
+          onSaved={(a) => {
+            setAgents((prev) => [...prev, a].sort((x, y) => x.nama.localeCompare(y.nama, 'id')));
+            isiAgen(agenUntuk, a);
+            setAgenUntuk(null);
+          }}
+        />
+      )}
     </div>
   );
 }

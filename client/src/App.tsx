@@ -30,6 +30,7 @@ import FinanceKonfigurasi from './pages/Finance/Konfigurasi';
 import Accounts from './pages/Accounts';
 import OperationDashboard from './pages/Operation/Dashboard';
 import OperationShipment from './pages/Operation/Shipment';
+import OperationAgent from './pages/Operation/Agent';
 import OperationLaporan from './pages/Operation/Laporan';
 
 export default function App() {
@@ -67,6 +68,7 @@ export default function App() {
         <Route path="finance/konfigurasi" element={<FinanceKonfigurasi />} />
         <Route path="operation" element={<OperationDashboard />} />
         <Route path="operation/shipment" element={<OperationShipment />} />
+        <Route path="operation/agent" element={<OperationAgent />} />
         <Route path="operation/laporan/:id" element={<OperationLaporan />} />
         <Route path="accounts" element={<Accounts />} />
         <Route path="settings" element={<Settings />} />

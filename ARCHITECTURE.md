@@ -27,7 +27,10 @@
 | Frontend | React 18 + Vite 5 + Tailwind CSS 3.4 |
 | Routing UI | react-router-dom 6 |
 | HTTP client | axios |
+| Peta | Leaflet + react-leaflet (tile Geoapify `osm-carto`, key via `VITE_GEOAPIFY_API_KEY`) |
+| Keamanan | helmet (CSP), cors allowlist, express-session, bcryptjs, rate limit in-memory |
 | Export | xlsx (Excel) + jsPDF/autotable (PDF) — di sisi frontend |
+| Test | `node:test` via `tsx` (`tests/*.test.ts`) |
 
 ## 3. Struktur Folder
 ```
@@ -41,7 +44,7 @@ marms/
 ├── src/
 │   ├── modules/
 │   │   ├── crewing/           # payung bisnis Crewing
-│   │   │   ├── master-data/   # Jabatan, Kapal, Pengaturan (uang makan)
+│   │   │   ├── master-data/   # Jabatan & Pengaturan (uang makan)
 │   │   │   ├── recruitment/   # pendaftaran & seleksi pelamar
 │   │   │   ├── crew-placement/# assign, off board, info bank
 │   │   │   ├── payroll/       # gaji & uang makan prorata
@@ -50,28 +53,38 @@ marms/
 │   │   ├── finance/           # payung bisnis Finance (AR/AP)
 │   │   │   ├── vendor/        # master Vendor (AP)
 │   │   │   ├── customer/      # master Customer (AR)
-│   │   │   ├── invoice/       # invoice AR & AP
+│   │   │   ├── invoice/       # invoice AR & AP + approval token
 │   │   │   ├── pv/            # voucher PV (AP) & RV (AR)
+│   │   │   ├── approve.*      # route publik approval voucher dari email
 │   │   │   ├── konfigurasi/   # nama/alamat perusahaan & penandatangan
 │   │   │   └── laporan/       # rekap & dashboard finance
-│   │   └── auth/              # login, logout, ganti password (lintas modul)
-│   ├── shared/                # prisma, AppError, asyncHandler, session, upload, masaKerja
+│   │   ├── operation/         # payung bisnis Operation
+│   │   │   ├── operation.*    # CRUD shipment, master agen, memori field voyage, dashboard
+│   │   │   └── laytime.ts     # hitung laytime, demurrage/despatch
+│   │   ├── kapal/             # master Kapal (TB + BG), lintas payung
+│   │   └── auth/              # login, logout, ganti password, kelola akun
+│   ├── shared/                # prisma, AppError, asyncHandler, session, authorization,
+│   │                          # rateLimit, mailer, upload, masaKerja, prorata, jabatanOrder
 │   ├── types/                 # deklarasi tipe express-session
 │   └── app.ts                 # titik masuk backend
 ├── client/
 │   ├── src/api/client.ts      # instance axios + format Rupiah
-│   ├── src/components/        # Layout (sidebar + auth), Logo
+│   ├── src/components/        # Layout, Pagination, sortable, SearchableSelect, MemoryInput,
+│   │                          # MapResizer, mapTiles, leafletPin, PublicLayout, Logo
 │   ├── src/constants.ts       # daftar 21 dokumen
 │   ├── src/pages/
 │   │   ├── Crewing/           # Dashboard, MasterData, Recruitment, Crew, Payroll, Reports
 │   │   ├── Finance/           # Dashboard, Input/Daftar Invoice, Cetak (PV/RV), Vendor, Customer, Laporan, Konfigurasi
+│   │   ├── Operation/         # Dashboard (peta), Shipment, ShipmentForm, Agent, AgentForm, Laporan
+│   │   ├── Kapal/             # master kapal
 │   │   ├── Accounts/          # kelola akun (superadmin)
 │   │   ├── Settings/          # pengaturan
 │   │   ├── Login.tsx          # login admin
-│   │   └── public/            # form pendaftaran publik
+│   │   └── public/            # form pendaftaran publik + approval voucher
 │   └── src/utils/             # export Excel/PDF, pvPrint (PDF voucher)
-├── uploads/                   # dokumen pelamar (Docker volume)
-└── docs/                      # dokumentasi
+├── scripts/                   # utilitas CLI (hash-password)
+├── tests/                     # test prorata, masa kerja, laytime
+└── uploads/                   # dokumen pelamar & shipment (Docker volume)
 ```
 
 ## 4. Aturan Modul (Public API)
@@ -109,22 +122,40 @@ Browser (React)  ←  HTTP response (JSON)  ←  controller  ←  service
 - Saat payroll dibuat, nilai gaji pokok/uang makan disalin ke detail (snapshot).
   Perubahan master jabatan/pengaturan NANTI tidak mengubah payroll lama.
 
-## 7. Autentikasi & Upload
-- Sesi login pakai `express-session` (cookie httpOnly, auto-logout 30 menit tidak aktif, `rolling`).
-- Route auth dipasang sebelum proteksi; semua endpoint `/api/*` dilindungi middleware auth,
-  kecuali whitelist publik: `POST /api/recruitment/pelamar` dan `GET /api/master-data/jabatan`.
-- File dokumen disimpan di `uploads/`, nama file acak (UUID), max 5 MB, PDF/JPG/PNG.
-  Dokumen bersifat opsional; sebagian punya tanggal expired; admin bisa memperbarui dokumen expired.
+## 7. Autentikasi, Role & Upload
+- Sesi login pakai `express-session` (cookie httpOnly, `sameSite=lax`, auto-logout 30 menit
+  tidak aktif dengan `rolling`, `secure` mengikuti `COOKIE_SECURE`).
+- `SESSION_SECRET` **wajib** di produksi (aplikasi menolak start bila kosong); hanya di
+  development memakai fallback `dev-secret`.
+- Route auth dipasang sebelum proteksi; semua endpoint `/api/*` dilindungi middleware auth +
+  pembatasan role di `src/app.ts`:
+  - `/api/operation/*` → `OPERATION` atau `SUPERADMIN`
+  - `/api/finance/*` → `FINANCE` atau `SUPERADMIN`
+  - sisanya → `CREWING` atau `SUPERADMIN`
+- Whitelist publik: `POST /api/recruitment/pelamar`, `GET /api/master-data/jabatan`,
+  `/api/auth/*`, dan `/api/approve/:token` (tautan approval voucher dari email).
+- Rate limit in-memory: login 5x salah per email → kunci 15 menit; pendaftaran pelamar
+  20x per IP → kunci 15 menit.
+- File dokumen disimpan di `uploads/` (dokumen pelamar + dokumen shipment), nama file UUID,
+  max 5 MB, PDF/JPG/PNG. Dokumen pelamar opsional; sebagian punya tanggal expired; admin bisa
+  memperbarui dokumen expired.
 
 ## 8. Penyajian Frontend & Health Check
 - Express menyajikan hasil build frontend (`client/dist`) sebagai file statis + SPA fallback
   (`app.get('*')` mengembalikan `index.html` untuk route non-`/api`).
 - Endpoint `/health` mengembalikan `{"status":"ok"}` untuk HEALTHCHECK Docker.
-- Dokumen pelamar disajikan via `/uploads/...`.
+- Dokumen disajikan via `/uploads/:filename` dan **wajib login**; nama file divalidasi dengan
+  regex UUID + ekstensi untuk mencegah path traversal.
 
-## 9. Catatan Keamanan (diketahui, belum diubah)
-- Rate limiting login bersifat in-memory (reset saat restart) — cukup untuk V1.
-- `cors()` terbuka untuk semua origin (belum di-allowlist).
-- `/uploads/*` dapat diakses tanpa login (nama file UUID acak).
-- `SESSION_SECRET` punya fallback `dev-secret`; wajib di-set di produksi.
+## 9. Catatan Keamanan
+- Rate limiting masih **in-memory** (reset saat restart) — cukup untuk V1.
+- `cors()` dibatasi ke origin `CORS_ORIGIN` (default `http://localhost:5173`) dan memakai
+  `credentials: true`. Saat produksi same-origin, variabel ini jarang dipakai.
+- `helmet` memasang CSP; `img-src` hanya mengizinkan `'self'`, `data:`, dan
+  `https://maps.geoapify.com` (tile peta Geoapify).
+- API key Geoapify ditanam di bundle frontend saat build (`VITE_GEOAPIFY_API_KEY`, build arg
+  Docker). Batasi key di dashboard Geoapify (HTTP referrer) dan rotasi bila bocor.
+- Dokumen `/uploads/*` tidak lagi publik (butuh sesi login).
+- Peta Leaflet diberi `isolation: isolate` di `client/src/index.css` agar pane-nya (z-index
+  400–1000) tidak menimpa sidebar/modal (z-index 30–50) di layar HP.
 
