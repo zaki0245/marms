@@ -57,6 +57,7 @@ export const invoiceSchema = z.object({
   masaPajakPPN: z.string().optional().nullable(),
   masaPajakPPH: z.string().optional().nullable(),
   statusFakturPajak: z.enum(FAKTUR_STATUS).optional(),
+  perluApproval: z.boolean().optional(),
   parentInvoiceId: z.string().optional().nullable(),
   fakturPajak: z.array(z.object({ nomor: z.string().min(1) })).optional().default([]),
 });

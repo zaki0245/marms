@@ -279,16 +279,18 @@ export default function Payroll() {
                 <td className="px-3 py-2 text-right tabular-nums">{p._count?.details ?? 0}</td>
                 <td className="px-3 py-2"><span className={statusBadge(p.status)}>{STATUS_LABEL[p.status]}</span></td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => openDetail(p)} className="text-gray-700 hover:text-gray-900">Detail</button>
-                  {p.status === 'DRAFT' && (
-                    <>
-                      <button onClick={() => finalize(p.id)} className="ml-3 text-positive hover:text-positive/70">Final</button>
-                      <button onClick={() => remove(p.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
-                    </>
-                  )}
-                  {p.status === 'FINAL' && (
-                    <button onClick={() => markPaid(p.id)} className="ml-3 text-positive hover:text-positive/70">Tandai Dibayar</button>
-                  )}
+                  <div className="flex justify-end gap-1.5">
+                    <button onClick={() => openDetail(p)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Detail</button>
+                    {p.status === 'DRAFT' && (
+                      <>
+                        <button onClick={() => finalize(p.id)} className="rounded-md border border-positive/40 px-2.5 py-1 text-xs text-positive hover:bg-positive/5">Final</button>
+                        <button onClick={() => remove(p.id)} className="rounded-md border border-negative/40 px-2.5 py-1 text-xs text-negative hover:bg-negative/5">Hapus</button>
+                      </>
+                    )}
+                    {p.status === 'FINAL' && (
+                      <button onClick={() => markPaid(p.id)} className="rounded-md border border-positive/40 px-2.5 py-1 text-xs text-positive hover:bg-positive/5">Tandai Dibayar</button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

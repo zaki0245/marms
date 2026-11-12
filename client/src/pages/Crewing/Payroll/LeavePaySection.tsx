@@ -168,10 +168,12 @@ export default function LeavePaySection() {
               <td className="px-3 py-2 text-right tabular-nums text-positive">{c.dibayar}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.sisa > 0 ? c.sisa : '-'}</td>
               <td className="px-3 py-2 text-right whitespace-nowrap">
-                {c.sisa > 0 && (
-                  <button onClick={() => openCairkan(c)} className="text-positive hover:text-positive/70">Cairkan</button>
-                )}
-                <button onClick={() => openRiwayat(c)} className="ml-3 text-gray-700 hover:text-gray-900">Riwayat</button>
+                <div className="flex justify-end gap-1.5">
+                  {c.sisa > 0 && (
+                    <button onClick={() => openCairkan(c)} className="rounded-md border border-positive/40 px-2.5 py-1 text-xs text-positive hover:bg-positive/5">Cairkan</button>
+                  )}
+                  <button onClick={() => openRiwayat(c)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Riwayat</button>
+                </div>
               </td>
             </tr>
           ))}
@@ -241,7 +243,9 @@ export default function LeavePaySection() {
                     <td className="px-3 py-2">{r.tanggalPencairan.slice(0, 10)}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{formatRupiah(r.nominal)}</td>
                     <td className="px-3 py-2 text-right whitespace-nowrap">
-                      <button onClick={() => openEditRiwayat(r)} className="text-gray-700 hover:text-gray-900">Edit</button>
+                      <div className="flex justify-end gap-1.5">
+                        <button onClick={() => openEditRiwayat(r)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Edit</button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -424,6 +424,7 @@ model Invoice {
   parentInvoiceId  String?
   incomplete       Boolean           @default(false)
   approvalStatus   ApprovalStatus    @default(BELUM_DIAPPROVE)
+  perluApproval    Boolean           @default(true)
   approvalToken    String?           @unique
   approvalSentAt   DateTime?
   approvalSentTo   String?

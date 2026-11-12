@@ -60,6 +60,7 @@ export async function resolveCustomerSnapshot(customerId: string, bankAccountId?
 // [FUNGSI] Susun data Invoice dari input (dipakai create & update).
 async function buildData(input: InvoiceInput): Promise<Omit<Prisma.InvoiceUncheckedCreateInput, 'no'>> {
   const jenis = input.jenis ?? 'AP';
+  const kategori = input.kategori ?? 'OTHERS';
   // [FUNGSI] Invoice DP tidak membawa PPN/PPH; PPN/PPH hanya di Pelunasan/final.
   const isDp = (input.tipe ?? 'REGULAR') === 'DP';
   const ppn = isDp ? null : input.ppn ?? null;
@@ -68,7 +69,7 @@ async function buildData(input: InvoiceInput): Promise<Omit<Prisma.InvoiceUnchec
 
   const base = {
     jenis,
-    kategori: input.kategori ?? 'OTHERS',
+    kategori,
     tipe: input.tipe ?? 'REGULAR',
     tanggal: new Date(input.tanggal),
     bupot: input.bupot || null,
@@ -87,6 +88,8 @@ async function buildData(input: InvoiceInput): Promise<Omit<Prisma.InvoiceUnchec
     masaPajakPPN: input.masaPajakPPN || null,
     masaPajakPPH: input.masaPajakPPH || null,
     statusFakturPajak: input.statusFakturPajak ?? 'BELUM_DITERIMA',
+    // [FUNGSI] Approval hanya untuk AP non-Freight; kategori lain dipaksa false.
+    perluApproval: jenis === 'AP' && kategori !== 'FREIGHT' ? input.perluApproval ?? true : false,
     parentInvoiceId: input.parentInvoiceId || null,
     // [FUNGSI] Belum lengkap = bupot belum diisi (boleh dilengkapi nanti).
     incomplete: !input.bupot,
@@ -279,6 +282,7 @@ export async function sendApproval(invoiceId: string) {
   });
   if (!inv) throw new AppError(404, 'Invoice tidak ditemukan');
   if (inv.jenis !== 'AP') throw new AppError(400, 'Hanya invoice AP yang bisa diajukan approval');
+  if (!inv.perluApproval) throw new AppError(400, 'Invoice ini tidak perlu approval');
 
   const konfig = await getKonfigurasi();
   const to = konfig.approvalEmail;
@@ -360,6 +364,7 @@ export async function setApprovalStatus(id: string, status: string) {
   const inv = await prisma.invoice.findUnique({ where: { id } });
   if (!inv) throw new AppError(404, 'Invoice tidak ditemukan');
   if (inv.jenis !== 'AP') throw new AppError(400, 'Hanya invoice AP yang punya approval');
+  if (!inv.perluApproval) throw new AppError(400, 'Invoice ini tidak perlu approval');
 
   const data = status === 'SUDAH_DIAPPROVE'
     ? { approvalStatus: 'SUDAH_DIAPPROVE' as const, approvedAt: new Date(), approvalToken: null }

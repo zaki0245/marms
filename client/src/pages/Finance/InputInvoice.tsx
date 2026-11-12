@@ -78,6 +78,7 @@ export default function InputInvoice() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [parents, setParents] = useState<{ id: string; no: string; inv: string; jenis: string }[]>([]);
   const [form, setForm] = useState(emptyForm);
+  const [perluApproval, setPerluApproval] = useState(true);
   const [faktur, setFaktur] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [quick, setQuick] = useState(false);
@@ -131,6 +132,7 @@ export default function InputInvoice() {
             parentInvoiceId: data.parentInvoiceId ?? '',
           });
           setFaktur((data.fakturPajak ?? []).map((f: any) => f.nomor));
+          setPerluApproval(data.perluApproval ?? true);
         })
         .catch(() => undefined);
     }
@@ -253,6 +255,7 @@ export default function InputInvoice() {
       masaPajakPPN: form.masaPajakPPN || null,
       masaPajakPPH: form.masaPajakPPH || null,
       statusFakturPajak: form.statusFakturPajak,
+      perluApproval: isAr || form.kategori === 'FREIGHT' ? false : perluApproval,
       parentInvoiceId: form.parentInvoiceId || null,
       fakturPajak: faktur.filter((n) => n.trim()).map((n) => ({ nomor: n.trim() })),
     };
@@ -310,6 +313,16 @@ export default function InputInvoice() {
               <label className="label">Tanggal Invoice *</label>
               <input required type="date" value={form.tanggal} onChange={(e) => setField('tanggal', e.target.value)} className={inputCls} />
             </div>
+            {/* [FUNGSI] Penentu munculnya tombol kirim email approval di daftar invoice. */}
+            {!isAr && form.kategori !== 'FREIGHT' && (
+              <div>
+                <label className="label">Perlu Approval</label>
+                <label className="mt-2 flex items-center gap-2 text-sm text-gray-700">
+                  <input type="checkbox" checked={perluApproval} onChange={(e) => setPerluApproval(e.target.checked)} />
+                  Kirim email approval
+                </label>
+              </div>
+            )}
             <div>
               <label className="label">Bupot</label>
               <input value={form.bupot} onChange={(e) => setField('bupot', e.target.value)} className={inputCls} />

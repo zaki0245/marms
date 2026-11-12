@@ -252,7 +252,9 @@ export default function Reports() {
                       <td className="px-4 py-2">{active?.tanggalMulai?.slice(0, 10) ?? '-'}</td>
                       <td className="px-4 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                       <td className="px-4 py-2 text-right">
-                        <button onClick={() => openDetail(c)} className="text-gray-700 hover:text-gray-900">Detail</button>
+                        <div className="flex justify-end gap-1.5">
+                          <button onClick={() => openDetail(c)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Detail</button>
+                        </div>
                       </td>
                     </tr>
                   );

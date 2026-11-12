@@ -57,7 +57,7 @@
 | `VendorBank` | id, vendorId, accountNo, accountName, bank | ← Vendor |
 | `Customer` | id, nama (unik), npwp, alamat | → CustomerBank, Invoice, Pv |
 | `CustomerBank` | id, customerId, accountNo, accountName, bank | ← Customer |
-| `Invoice` | id, no (unik), jenis (AR/AP), kategori, tipe, tanggal, bupot, vendorId?, customerId?, vendorName/vendorNpwp/vendorAlamat atau customerName/customerNpwp/customerAlamat (snapshot), bankAccount*, inv?, ref, keterangan, dpp, ppn, pphPasal, pph, total, cargoQuantity, unitPrice, dueDate, masaPajakPPN, masaPajakPPH, statusFakturPajak, statusPembayaran, parentInvoiceId, incomplete, approvalStatus, approvalToken, approvalSentAt, approvalSentTo, approvedAt | ← Vendor/Customer; → FakturPajak, PvItem; unik(vendorId/customerId, inv) |
+| `Invoice` | id, no (unik), jenis (AR/AP), kategori, tipe, tanggal, bupot, vendorId?, customerId?, vendorName/vendorNpwp/vendorAlamat atau customerName/customerNpwp/customerAlamat (snapshot), bankAccount*, inv?, ref, keterangan, dpp, ppn, pphPasal, pph, total, cargoQuantity, unitPrice, dueDate, masaPajakPPN, masaPajakPPH, statusFakturPajak, statusPembayaran, parentInvoiceId, incomplete, approvalStatus, perluApproval, approvalToken, approvalSentAt, approvalSentTo, approvedAt | ← Vendor/Customer; → FakturPajak, PvItem; unik(vendorId/customerId, inv) |
 | `FakturPajak` | id, invoiceId, nomor | ← Invoice |
 | `Pv` (voucher) | id, pvNo (unik), jenis (RV/PV), tanggal, vendorId?, customerId?, vendorName/vendorNpwp/vendorAlamat atau customerName/customerNpwp/customerAlamat (snapshot), bankAccount*, chequeNo, issuedDate, bankCharge, balance, keterangan | ← Vendor/Customer; → PvItem |
 | `PvItem` | id, pvId, invoiceId, nominal (DPP), includeTax | ← Pv, Invoice |
@@ -213,6 +213,8 @@ Shipment --memiliki--> ShipmentDocument (BL, invoice, COO, dsb.)
   Status invoice dihitung otomatis dari akumulasi nominal (`recomputeStatus`).
 - Approval invoice: `Invoice.approvalToken` dipakai untuk tautan publik `/approve/:token`;
   setelah disetujui `approvalStatus=SUDAH_DIAPPROVE`, `approvedAt` diisi, token dihapus.
+  `Invoice.perluApproval` (default true) menentukan tombol kirim email; nilainya dipaksa
+  `false` untuk AR dan kategori Freight.
 - Operation: `Shipment` menyimpan jadwal voyage (Pol/Pod), laytime & demurrage/despatch,
   posisi terakhir (`latitude`/`longitude`), dan status. Dashboard peta hanya mem-pin
   `status=ON_GOING` yang koordinatnya terisi, lalu mengurutkan berdasarkan `updatedAt`.

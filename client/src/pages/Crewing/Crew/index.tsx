@@ -413,13 +413,15 @@ export default function Crew() {
                     <td className="px-3 py-2">{CREW_STATUS[c.status] ?? c.status}</td>
                     <td className="px-3 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                     <td className="px-3 py-2 text-right whitespace-nowrap">
-                      {c.status === 'ON_BOARD' ? (
-                        <button onClick={() => openOffBoard(c)} className="text-negative hover:text-negative/70">Off Board</button>
-                      ) : (
-                        <button onClick={() => openAssignCrew(c)} className="text-positive hover:text-positive/70">Assign</button>
-                      )}
-                      <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-gray-900">Detail</button>
-                      <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
+                      <div className="flex justify-end gap-1.5">
+                        {c.status === 'ON_BOARD' ? (
+                          <button onClick={() => openOffBoard(c)} className="rounded-md border border-negative/40 px-2.5 py-1 text-xs text-negative hover:bg-negative/5">Off Board</button>
+                        ) : (
+                          <button onClick={() => openAssignCrew(c)} className="rounded-md border border-positive/40 px-2.5 py-1 text-xs text-positive hover:bg-positive/5">Assign</button>
+                        )}
+                        <button onClick={() => openDetail(c)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Detail</button>
+                        <button onClick={() => handleDelete(c)} className="rounded-md border border-negative/40 px-2.5 py-1 text-xs text-negative hover:bg-negative/5">Hapus</button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -459,9 +461,11 @@ export default function Crew() {
                 <td className="px-3 py-2">{c.applicant.posisiDilamar}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{c.masaKerja ?? c.totalMasaKerja} hari</td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => openAssignCrew(c)} className="text-positive hover:text-positive/70">Assign</button>
-                  <button onClick={() => openDetail(c)} className="ml-3 text-gray-700 hover:text-gray-900">Detail</button>
-                  <button onClick={() => handleDelete(c)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
+                  <div className="flex justify-end gap-1.5">
+                    <button onClick={() => openAssignCrew(c)} className="rounded-md border border-positive/40 px-2.5 py-1 text-xs text-positive hover:bg-positive/5">Assign</button>
+                    <button onClick={() => openDetail(c)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Detail</button>
+                    <button onClick={() => handleDelete(c)} className="rounded-md border border-negative/40 px-2.5 py-1 text-xs text-negative hover:bg-negative/5">Hapus</button>
+                  </div>
                 </td>
               </tr>
             ))}

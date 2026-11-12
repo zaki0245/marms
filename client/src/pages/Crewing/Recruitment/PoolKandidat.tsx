@@ -133,9 +133,11 @@ export default function PoolKandidat() {
               <td className="px-3 py-2">{p.posisiDilamar}</td>
               <td className="px-3 py-2">{p.noHp}</td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => openAssign(p)} className="rounded-md bg-navy px-3 py-1 text-xs font-medium text-white">
-                  Assign ke Kapal
-                </button>
+                <div className="flex justify-end gap-1.5">
+                  <button onClick={() => openAssign(p)} className="rounded-md border border-positive/40 px-2.5 py-1 text-xs text-positive hover:bg-positive/5">
+                    Assign ke Kapal
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

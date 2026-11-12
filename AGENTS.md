@@ -64,6 +64,8 @@ npx prisma migrate reset --force      # reset database + seed ulang
 - Status invoice (`BELUM_BAYAR`/`SEBAGIAN`/`LUNAS`) dihitung otomatis dari akumulasi nominal.
 - Approval invoice: kirim tautan ke email penerima (SMTP) → penerima klik `/approve/:token` →
   status `SUDAH_DIAPPROVE`. Token di-null-kan setelah disetujui/dibatalkan manual.
+  Hanya AP non-Freight dengan `perluApproval = true` yang bisa diajukan; mencentang
+  "Perlu Approval" di Input Invoice memunculkan tombol kirim email di Daftar Invoice.
 - Operation: status voyage `PLANNED`/`ON_GOING`/`COMPLETED`; peta dashboard hanya mem-pin
   shipment `ON_GOING` yang punya `latitude`/`longitude`. Laytime dihitung di
   `src/modules/operation/laytime.ts` (ada test di `tests/laytime.test.ts`).

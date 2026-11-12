@@ -194,12 +194,14 @@ export default function Jabatan() {
                   <td className="px-3 py-2">{j.nama}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{formatRupiah(j.gajiPokok)}</td>
                   <td className="px-3 py-2 text-right">
-                    <button onClick={() => startEdit(j)} className="text-gray-700 hover:text-gray-900">
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(j.kode)} className="ml-3 text-negative hover:text-negative/70">
-                      Hapus
-                    </button>
+                    <div className="flex justify-end gap-1.5">
+                      <button onClick={() => startEdit(j)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">
+                        Edit
+                      </button>
+                      <button onClick={() => handleDelete(j.kode)} className="rounded-md border border-negative/40 px-2.5 py-1 text-xs text-negative hover:bg-negative/5">
+                        Hapus
+                      </button>
+                    </div>
                   </td>
                 </>
               )}

@@ -32,6 +32,7 @@ interface Invoice {
   incomplete: boolean;
   approvalStatus: string;
   approvalSentAt: string | null;
+  perluApproval: boolean;
 }
 
 const STATUS_FAKTUR: Record<string, string> = { SUDAH_DITERIMA: 'Diterima', BELUM_DITERIMA: 'Belum diterima', TIDAK_ADA: 'Tidak ada' };
@@ -47,6 +48,7 @@ export default function DaftarInvoice() {
   const [items, setItems] = useState<Invoice[]>([]);
   const [filter, setFilter] = useState('SEMUA');
   const [approval, setApproval] = useState('SEMUA');
+  const [perlu, setPerlu] = useState('SEMUA');
   const [kategori, setKategori] = useState<string[]>([]);
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
@@ -130,6 +132,7 @@ export default function DaftarInvoice() {
     }
     if (filter !== 'SEMUA' && i.statusPembayaran !== filter) return false;
     if (jenis === 'AP' && approval !== 'SEMUA' && i.approvalStatus !== approval) return false;
+    if (jenis === 'AP' && perlu !== 'SEMUA' && i.perluApproval !== (perlu === 'YA')) return false;
     if (kategori.length && !kategori.includes(i.kategori)) return false;
     if (bulan || tahun) {
       const d = new Date(i.tanggal);
@@ -142,7 +145,7 @@ export default function DaftarInvoice() {
   // [FUNGSI] Reset halaman saat filter berubah agar tidak tertinggal di halaman terakhir.
   useEffect(() => {
     setPage(1);
-  }, [search, filter, approval, kategori, bulan, tahun, jenis, sort]);
+  }, [search, filter, approval, perlu, kategori, bulan, tahun, jenis, sort]);
 
   const pageRows = sortRows(filtered, sort, {
     no: (i) => i.no,
@@ -161,11 +164,12 @@ export default function DaftarInvoice() {
     faktur: (i) => STATUS_FAKTUR[i.statusFakturPajak] ?? i.statusFakturPajak,
     status: (i) => statusLabel(i.statusPembayaran),
     approval: (i) => (i.approvalStatus === 'SUDAH_DIAPPROVE' ? 'Sudah di Approve' : 'Belum di Approve'),
+    perlu: (i) => (i.perluApproval ? 'Ya' : 'Tidak'),
   }).slice((page - 1) * pageSize, page * pageSize);
 
   function doExport() {
     const columns = jenis === 'AP'
-      ? ['No Invoice', 'Tanggal', 'Vendor', 'INV', 'Keterangan', 'Kategori', 'Tipe', 'DPP', 'PPN', 'PPH', 'Total', 'Status Faktur', 'Status Pembayaran', 'Approval']
+      ? ['No Invoice', 'Tanggal', 'Vendor', 'INV', 'Keterangan', 'Kategori', 'Tipe', 'DPP', 'PPN', 'PPH', 'Total', 'Status Faktur', 'Status Pembayaran', 'Perlu Approval', 'Status Approval']
       : ['No Invoice', 'Tanggal', 'Customer', 'INV', 'Keterangan', 'Kategori', 'Tipe', 'Cargo Quantity', 'Unit Price', 'DPP', 'PPN', 'PPH', 'Total', 'Status Faktur', 'Status Pembayaran'];
 
     const rows = filtered.map((i) => {
@@ -189,7 +193,7 @@ export default function DaftarInvoice() {
         STATUS_FAKTUR[i.statusFakturPajak] ?? i.statusFakturPajak,
         statusLabel(i.statusPembayaran),
       ];
-      const approvalCol = jenis === 'AP' ? [i.approvalStatus === 'SUDAH_DIAPPROVE' ? 'Sudah di Approve' : 'Belum di Approve'] : [];
+      const approvalCol = jenis === 'AP' ? [i.perluApproval ? 'Ya' : 'Tidak', i.approvalStatus === 'SUDAH_DIAPPROVE' ? 'Sudah di Approve' : 'Belum di Approve'] : [];
       return [...base, ...cargo, ...tail, ...approvalCol];
     });
 
@@ -212,6 +216,7 @@ export default function DaftarInvoice() {
   const changeJenis = (j: 'AP' | 'AR') => {
     setJenis(j);
     setApproval('SEMUA');
+    setPerlu('SEMUA');
   };
 
   return (
@@ -233,51 +238,83 @@ export default function DaftarInvoice() {
         <button onClick={() => changeJenis('AR')} className={tabCls(jenis === 'AR')}>AR (Piutang)</button>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <label className="text-sm text-gray-500">Status bayar:</label>
-        <select value={filter} onChange={(e) => setFilter(e.target.value)} className={inputCls}>
-          <option value="SEMUA">Semua</option>
-          <option value="BELUM_BAYAR">{jenis === 'AR' ? 'Belum dibayar' : 'Belum bayar'}</option>
-          <option value="SEBAGIAN">{jenis === 'AR' ? 'Dibayar sebagian' : 'Sebagian'}</option>
-          <option value="LUNAS">Lunas</option>
-        </select>
-
-        {jenis === 'AP' && (
-          <>
-            <label className="text-sm text-gray-500">Approval:</label>
-            <select value={approval} onChange={(e) => setApproval(e.target.value)} className={inputCls}>
+      {/* [FUNGSI] Panel filter dengan label di atas kontrol agar rapi. */}
+      <div className="mt-4 rounded-lg border border-gray-200 bg-card p-3">
+        <div
+          className={`grid grid-cols-1 gap-3 sm:grid-cols-2 ${
+            jenis === 'AP' ? 'lg:grid-cols-6' : 'lg:grid-cols-4'
+          }`}
+        >
+          <div>
+            <label className="label">Status bayar</label>
+            <select value={filter} onChange={(e) => setFilter(e.target.value)} className={`${inputCls} mt-1 w-full`}>
               <option value="SEMUA">Semua</option>
-              <option value="SUDAH_DIAPPROVE">Sudah di Approve</option>
-              <option value="BELUM_DIAPPROVE">Belum di Approve</option>
+              <option value="BELUM_BAYAR">{jenis === 'AR' ? 'Belum dibayar' : 'Belum bayar'}</option>
+              <option value="SEBAGIAN">{jenis === 'AR' ? 'Dibayar sebagian' : 'Sebagian'}</option>
+              <option value="LUNAS">Lunas</option>
             </select>
-          </>
-        )}
+          </div>
 
-        <label className="text-sm text-gray-500">Kategori:</label>
-        {Object.entries(KATEGORI).map(([key, label]) => (
-          <label key={key} className="flex items-center gap-1 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={kategori.includes(key)}
-              onChange={() => toggleKategori(key)}
-            />
-            {label}
-          </label>
-        ))}
+          {jenis === 'AP' && (
+            <div>
+              <label className="label">Status Approval</label>
+              <select value={approval} onChange={(e) => setApproval(e.target.value)} className={`${inputCls} mt-1 w-full`}>
+                <option value="SEMUA">Semua</option>
+                <option value="SUDAH_DIAPPROVE">Sudah di Approve</option>
+                <option value="BELUM_DIAPPROVE">Belum di Approve</option>
+              </select>
+            </div>
+          )}
 
-        <label className="text-sm text-gray-500">Bulan:</label>
-        <select value={bulan} onChange={(e) => setBulan(e.target.value)} className={inputCls}>
-          <option value="">Semua</option>
-          {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
-        </select>
+          {jenis === 'AP' && (
+            <div>
+              <label className="label">Perlu Approval</label>
+              <select value={perlu} onChange={(e) => setPerlu(e.target.value)} className={`${inputCls} mt-1 w-full`}>
+                <option value="SEMUA">Semua</option>
+                <option value="YA">Ya</option>
+                <option value="TIDAK">Tidak</option>
+              </select>
+            </div>
+          )}
 
-        <label className="text-sm text-gray-500">Tahun:</label>
-        <select value={tahun} onChange={(e) => setTahun(e.target.value)} className={inputCls}>
-          <option value="">Semua</option>
-          {years.map((y) => <option key={y} value={y}>{y}</option>)}
-        </select>
+          <div>
+            <label className="label">Kategori</label>
+            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-md border border-gray-300 px-3 py-2">
+              {Object.entries(KATEGORI).map(([key, label]) => (
+                <label key={key} className="flex items-center gap-1 text-sm text-gray-700">
+                  <input type="checkbox" checked={kategori.includes(key)} onChange={() => toggleKategori(key)} />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
 
-        <input placeholder={`Cari no / ${jenis === 'AR' ? 'customer' : 'vendor'} / INV / keterangan...`} value={search} onChange={(e) => setSearch(e.target.value)} className={`${inputCls} w-64`} />
+          <div>
+            <label className="label">Bulan</label>
+            <select value={bulan} onChange={(e) => setBulan(e.target.value)} className={`${inputCls} mt-1 w-full`}>
+              <option value="">Semua</option>
+              {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="label">Tahun</label>
+            <select value={tahun} onChange={(e) => setTahun(e.target.value)} className={`${inputCls} mt-1 w-full`}>
+              <option value="">Semua</option>
+              {years.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-3 w-full sm:w-96">
+          <label className="label">Cari</label>
+          <input
+            placeholder={`Cari no / ${jenis === 'AR' ? 'customer' : 'vendor'} / INV / keterangan...`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`${inputCls} mt-1 w-full`}
+          />
+        </div>
       </div>
 
       <div className="mt-4 overflow-x-auto">
@@ -299,14 +336,15 @@ export default function DaftarInvoice() {
               <SortableTh label="Total" sortKey="total" sort={sort} onSort={toggle} className="px-3 py-2 text-right" />
               <SortableTh label="Faktur" sortKey="faktur" sort={sort} onSort={toggle} className="px-3 py-2" />
               <SortableTh label="Status" sortKey="status" sort={sort} onSort={toggle} className="px-3 py-2" />
-              {jenis === 'AP' && <SortableTh label="Approval" sortKey="approval" sort={sort} onSort={toggle} className="px-3 py-2" />}
+              {jenis === 'AP' && <SortableTh label="Perlu Approval" sortKey="perlu" sort={sort} onSort={toggle} className="px-3 py-2" />}
+              {jenis === 'AP' && <SortableTh label="Status Approval" sortKey="approval" sort={sort} onSort={toggle} className="px-3 py-2" />}
               <th className="px-3 py-2 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={jenis === 'AP' ? 15 : 16} className="px-3 py-6 text-center text-gray-500">Memuat...</td></tr>}
+            {loading && <tr><td colSpan={16} className="px-3 py-6 text-center text-gray-500">Memuat...</td></tr>}
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={jenis === 'AP' ? 15 : 16} className="px-3 py-6 text-center text-gray-500">Belum ada invoice.</td></tr>
+              <tr><td colSpan={16} className="px-3 py-6 text-center text-gray-500">Belum ada invoice.</td></tr>
             )}
             {!loading && pageRows.map((i) => (
               <tr key={i.id} className="border-t border-gray-100">
@@ -335,7 +373,14 @@ export default function DaftarInvoice() {
                 </td>
                 {jenis === 'AP' && (
                   <td className="px-3 py-2">
-                    {i.kategori === 'FREIGHT' ? null : isSuperAdmin ? (
+                    <span className={`rounded px-2 py-0.5 text-xs ${i.perluApproval ? 'bg-navy/10 text-navy' : 'bg-gray-100 text-gray-600'}`}>
+                      {i.perluApproval ? 'Ya' : 'Tidak'}
+                    </span>
+                  </td>
+                )}
+                {jenis === 'AP' && (
+                  <td className="px-3 py-2">
+                    {!i.perluApproval ? '-' : isSuperAdmin ? (
                       <select
                         value={i.approvalStatus}
                         onChange={(e) => changeApproval(i.id, e.target.value)}
@@ -354,13 +399,15 @@ export default function DaftarInvoice() {
                   </td>
                 )}
                 <td className="px-3 py-2 text-right whitespace-nowrap">
-                  <button onClick={() => navigate(`/dashboard/finance/invoice/input/${i.id}`)} className="text-gray-700 hover:text-gray-900">Edit</button>
-                  {jenis === 'AP' && i.approvalStatus !== 'SUDAH_DIAPPROVE' && i.kategori !== 'FREIGHT' && (
-                    <button onClick={() => sendApproval(i.id)} className="ml-3 text-gray-700 hover:text-gray-900">
-                      {i.approvalSentAt ? 'Kirim Ulang' : 'Kirim Approval'}
-                    </button>
-                  )}
-                  <button onClick={() => handleDelete(i.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
+                  <div className="flex justify-end gap-1.5">
+                    <button onClick={() => navigate(`/dashboard/finance/invoice/input/${i.id}`)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Edit</button>
+                    {jenis === 'AP' && i.perluApproval && i.approvalStatus !== 'SUDAH_DIAPPROVE' && (
+                      <button onClick={() => sendApproval(i.id)} className="rounded-md border border-navy/40 px-2.5 py-1 text-xs text-navy hover:bg-navy/5">
+                        {i.approvalSentAt ? 'Kirim Ulang' : 'Kirim Approval'}
+                      </button>
+                    )}
+                    <button onClick={() => handleDelete(i.id)} className="rounded-md border border-negative/40 px-2.5 py-1 text-xs text-negative hover:bg-negative/5">Hapus</button>
+                  </div>
                 </td>
               </tr>
             ))}

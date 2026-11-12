@@ -309,9 +309,11 @@ export default function Cetak() {
                   </td>
                   <td className="px-3 py-2 text-right font-semibold">{formatUang(pvTotal(pv))}</td>
                   <td className="px-3 py-2 text-right whitespace-nowrap">
-                    <button onClick={() => handleCetak(pv)} className="text-gray-700 hover:text-gray-900">Cetak</button>
-                    <button onClick={() => openEdit(pv)} className="ml-3 text-gray-700 hover:text-gray-900">Edit</button>
-                    <button onClick={() => deletePv(pv.id)} className="ml-3 text-negative hover:text-negative/70">Hapus</button>
+                    <div className="flex justify-end gap-1.5">
+                      <button onClick={() => handleCetak(pv)} className="rounded-md border border-navy/40 px-2.5 py-1 text-xs text-navy hover:bg-navy/5">Cetak</button>
+                      <button onClick={() => openEdit(pv)} className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-50">Edit</button>
+                      <button onClick={() => deletePv(pv.id)} className="rounded-md border border-negative/40 px-2.5 py-1 text-xs text-negative hover:bg-negative/5">Hapus</button>
+                    </div>
                   </td>
                 </tr>
               ))}

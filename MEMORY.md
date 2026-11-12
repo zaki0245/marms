@@ -55,6 +55,8 @@
   judul/label menyesuaikan jenis (`PAYMENT VOUCHER` vs `RECEIPT VOUCHER`).
 - Approval invoice: admin kirim tautan approval ke email penerima (SMTP). Penerima membuka
   `/approve/:token` tanpa login → status `SUDAH_DIAPPROVE` + `approvedAt`. Token hangus setelah dipakai.
+  Tombol kirim hanya ada bila `perluApproval = true` (AP non-Freight); diatur lewat checkbox
+  "Perlu Approval" pada Input Invoice.
 - **Operation:** satu shipment = satu voyage tongkang (TB + BG) dengan jadwal kegiatan POL/POD,
   laytime & demurrage/despatch, posisi terakhir (koordinat + teks), dokumen pendukung, dan status
   `PLANNED`/`ON_GOING`/`COMPLETED`. Dashboard peta hanya menampilkan shipment `ON_GOING`.
