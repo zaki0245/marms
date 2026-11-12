@@ -68,11 +68,11 @@ npx prisma migrate reset --force      # reset database + seed ulang
   shipment `ON_GOING` yang punya `latitude`/`longitude`. Laytime dihitung di
   `src/modules/operation/laytime.ts` (ada test di `tests/laytime.test.ts`).
 - Agen POL/POD memakai master `OperationAgent` yang dipisah per tipe (`POL`/`POD`, unik per
-  `(tipe, nama)`) lewat halaman Operation → Agen (tab POL/POD). Saat agen dipilih di form shipment,
+  `(tipe, nama)`) lewat halaman Operation → Data Operation → Agen (tab POL/POD). Saat agen dipilih di form shipment,
   PIC & Contact terisi otomatis tetapi tetap bisa diubah; shipment menyimpan
   `agentPolId`/`agentPodId` + snapshot teks.
 - Unit kapal (TB, BG, Owner/Operator, Contact Master) memakai master `OperationKapal` lewat
-  halaman Operation → Unit Kapal. Form shipment memilih unit (bisa tambah cepat via `+`), lalu
+  halaman Operation → Data Operation → Unit Kapal. Form shipment memilih unit (bisa tambah cepat via `+`), lalu
   keempat field terisi otomatis tetapi tetap bisa diubah; shipment menyimpan `operationKapalId` +
   snapshot teks agar laporan lama utuh.
 - Memori field voyage (Shipper, Commodities, POL, POD) berasal dari nilai unik data shipment
@@ -83,6 +83,11 @@ npx prisma migrate reset --force      # reset database + seed ulang
   CSP `img-src` di `src/app.ts` hanya mengizinkan `https://maps.geoapify.com`. Attribution wajib:
   "Powered by Geoapify" + "© OpenStreetMap contributors". Jangan kembali ke
   `tile.openstreetmap.org`: server tile sukarela OSM memblokir aplikasi (403 "Access blocked").
+  Link peta pada teks WhatsApp memakai tautan pendek **`/peta/<kode>?zoom=<n>`** (route publik
+  tanpa login). Server mem-proxy Geoapify Static Maps (`/v1/staticmap`, style `osm-carto`, marker
+  posisi) memakai `GEOAPIFY_API_KEY`/`VITE_GEOAPIFY_API_KEY`, jadi API key **tidak** ikut di link
+  yang dibagikan. Level zoom dari dropdown halaman Laporan juga dipakai peta pada kartu laporan
+  gambar (email). Atribusi sudah tercetak otomatis di gambar.
 - Jangan buat file DevOps (Docker production, K3s, CI/CD, OCI) di fase ini.
 
 ## 5. Validasi Sebelum Selesai

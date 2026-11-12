@@ -1,13 +1,13 @@
-// client/src/pages/Operation/UnitKapal.tsx
+// client/src/pages/Operation/DataOperation/UnitKapal.tsx
 // [FUNGSI] Master unit kapal Operation (TB + BG + owner + contact master).
 // [ALASAN] Satu sumber data unit kapal; form shipment memilih dari sini agar tidak ketik ulang.
 
 import { useEffect, useState } from 'react';
-import { api } from '../../api/client';
-import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
-import { SortableTh, sortRows, useSort } from '../../components/sortable';
+import { api } from '../../../api/client';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 import UnitKapalForm from './UnitKapalForm';
-import { OperationKapal } from './types';
+import { OperationKapal } from '../types';
 
 export default function UnitKapalPage() {
   const [items, setItems] = useState<OperationKapal[]>([]);
@@ -76,8 +76,7 @@ export default function UnitKapalPage() {
 
   return (
     <div>
-      <h1 className="page-title">Unit Kapal</h1>
-      <p className="mt-1 text-sm text-gray-500">Data TB, BG, owner/operator, dan contact master untuk shipment.</p>
+      <p className="text-sm text-gray-500">Data TB, BG, owner/operator, dan contact master untuk shipment.</p>
 
       {error && <div className="mt-3 alert-error">{error}</div>}
       {success && <div className="mt-3 alert-success">{success}</div>}

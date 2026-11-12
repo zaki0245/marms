@@ -1,13 +1,13 @@
-// client/src/pages/Operation/Agent.tsx
+// client/src/pages/Operation/DataOperation/Agent.tsx
 // [FUNGSI] Master agen pelabuhan (dipakai Agent POL/POD pada shipment).
 // [ALASAN] Satu sumber data agen beserta PIC & kontak; shipment menyimpan snapshot saat dipilih.
 
 import { useEffect, useState } from 'react';
-import { api } from '../../api/client';
-import Pagination, { DEFAULT_PAGE_SIZE } from '../../components/Pagination';
-import { SortableTh, sortRows, useSort } from '../../components/sortable';
+import { api } from '../../../api/client';
+import Pagination, { DEFAULT_PAGE_SIZE } from '../../../components/Pagination';
+import { SortableTh, sortRows, useSort } from '../../../components/sortable';
 import AgentForm from './AgentForm';
-import { AgentTipe, OperationAgent } from './types';
+import { AgentTipe, OperationAgent } from '../types';
 
 // [FUNGSI] Tab daftar agen per tipe pelabuhan.
 const TIPE: AgentTipe[] = ['POL', 'POD'];
@@ -80,8 +80,7 @@ export default function AgentPage() {
 
   return (
     <div>
-      <h1 className="page-title">Agen</h1>
-      <p className="mt-1 text-sm text-gray-500">Agen pelabuhan untuk POL/POD beserta PIC dan kontak.</p>
+      <p className="text-sm text-gray-500">Agen pelabuhan untuk POL/POD beserta PIC dan kontak.</p>
 
       {error && <div className="mt-3 alert-error">{error}</div>}
       {success && <div className="mt-3 alert-success">{success}</div>}

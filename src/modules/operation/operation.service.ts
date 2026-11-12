@@ -40,6 +40,15 @@ export function getShipment(id: string) {
   return prisma.shipment.findUnique({ where: { id }, include: DOKUMEN });
 }
 
+// [FUNGSI] Ambil koordinat shipment berdasarkan kode untuk gambar peta publik.
+// [ALASAN] Link peta di WhatsApp hanya butuh posisi, bukan seluruh data shipment.
+export function getPosisiByKode(kode: string) {
+  return prisma.shipment.findUnique({
+    where: { kode },
+    select: { latitude: true, longitude: true },
+  });
+}
+
 // [FUNGSI] Payload ringan untuk peta: hanya voyage yang sedang berjalan.
 export function listOngoing() {
   return prisma.shipment.findMany({

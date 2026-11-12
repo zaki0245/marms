@@ -17,7 +17,6 @@ import {
   fmtDesimal,
   fmtLaycan,
   fmtTanggalJam,
-  linkPosisi,
   tanggalLaporan,
 } from './types';
 
@@ -47,8 +46,8 @@ function Waktu({ label, iso }: { label: string; iso: string | null }) {
 }
 
 // [FUNGSI] Susun teks laporan WhatsApp persis template sheet (VDR).
-function buatTeks(s: Shipment): string {
-  const link = linkPosisi(s.latitude, s.longitude) ?? 'TBA';
+function buatTeks(s: Shipment, peta: string): string {
+  const link = peta || 'TBA';
   const garis = '-----------------------------------------';
   return [
     'DEAR ALL',
@@ -107,6 +106,18 @@ function buatTeks(s: Shipment): string {
   ].join('\n');
 }
 
+// [FUNGSI] Level zoom peta yang ditawarkan di laporan (WA & email).
+// [ALASAN] Angka 1-3 lebih mudah dipahami daripada nilai zoom Geoapify 5/8/11.
+const LEVEL_ZOOM = [
+  { level: 1, zoom: 5, label: 'Regional / pulau' },
+  { level: 2, zoom: 8, label: 'Provinsi' },
+  { level: 3, zoom: 11, label: 'Kota' },
+] as const;
+
+// [FUNGSI] Ukuran gambar peta statis di link WhatsApp (piksel).
+const LEBAR_PETA = 600;
+const TINGGI_PETA = 300;
+
 export default function Laporan() {
   const { id } = useParams();
   const [s, setS] = useState<Shipment | null>(null);
@@ -114,6 +125,7 @@ export default function Laporan() {
   const [pesanGambar, setPesanGambar] = useState('');
   const [pesanTeks, setPesanTeks] = useState('');
   const [mapSiap, setMapSiap] = useState(false);
+  const [zoom, setZoom] = useState(5);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -124,24 +136,29 @@ export default function Laporan() {
       .catch(() => setError('Gagal memuat shipment'));
   }, [id]);
 
-  // [FUNGSI] Reset status peta saat ganti shipment. | [ALASAN] Jangan copy sebelum peta baru termuat.
+  // [FUNGSI] Reset status peta saat ganti shipment/zoom. | [ALASAN] Jangan copy sebelum peta baru termuat.
   useEffect(() => {
     setMapSiap(false);
-  }, [s?.id]);
+  }, [s?.id, zoom]);
 
   // [FUNGSI] Buka tombol copy setelah 5 detik walau tile peta gagal dimuat.
   useEffect(() => {
     if (!s) return;
     const t = setTimeout(() => setMapSiap(true), 5000);
     return () => clearTimeout(t);
-  }, [s]);
+  }, [s, zoom]);
 
   if (error) return <div className="alert-error">{error}</div>;
   if (!s) return <p className="text-gray-500">Memuat...</p>;
 
   const punyaKoordinat = s.latitude != null && s.longitude != null;
   const bisaCopy = !punyaKoordinat || mapSiap;
-  const teks = buatTeks(s);
+  // [FUNGSI] Tautan pendek ke server sendiri; API key Geoapify tetap di backend.
+  // [ALASAN] Link ini dibagikan ke customer lewat WhatsApp dan tidak boleh memuat key.
+  const peta = punyaKoordinat
+    ? `${window.location.origin}/peta/${encodeURIComponent(s.kode)}${zoom === 5 ? '' : `?zoom=${zoom}`}`
+    : '';
+  const teks = buatTeks(s, peta);
   const kode = s.kode;
 
   async function buatBlob(): Promise<Blob | null> {
@@ -219,6 +236,21 @@ export default function Laporan() {
       </Link>
       <h1 className="page-title mt-2">Laporan {s.kode}</h1>
 
+      {/* [FUNGSI] Satu level zoom untuk peta di teks WhatsApp & gambar email. */}
+      <div className="mt-3 flex flex-wrap items-end gap-2">
+        <div>
+          <label className="label">Level zoom peta (WA &amp; email)</label>
+          <select value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="input mt-1 w-56">
+            {LEVEL_ZOOM.map((z) => (
+              <option key={z.zoom} value={z.zoom}>
+                Level {z.level} — {z.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <p className="text-xs text-gray-500">Berlaku untuk link peta WhatsApp dan peta pada gambar email.</p>
+      </div>
+
       <div className="mt-4 space-y-6">
         {/* ---------- Laporan gambar (email) ---------- */}
         <section className="card p-4">
@@ -288,8 +320,9 @@ export default function Laporan() {
               <div className="mt-2 overflow-hidden rounded border border-gray-300">
                 {punyaKoordinat && TILE_URL ? (
                   <MapContainer
+                    key={zoom}
                     center={[s.latitude!, s.longitude!]}
-                    zoom={5}
+                    zoom={zoom}
                     className="h-[180px] w-full"
                     dragging={false}
                     zoomControl={false}
@@ -323,6 +356,21 @@ export default function Laporan() {
             </button>
           </div>
           {pesanTeks && <p className="mt-2 text-xs text-gray-600">{pesanTeks}</p>}
+
+          {peta && (
+            <div className="mt-3 overflow-x-auto">
+              <a href={peta} target="_blank" rel="noreferrer">
+                <img
+                  src={peta}
+                  alt="Peta posisi kapal"
+                  width={LEBAR_PETA}
+                  height={TINGGI_PETA}
+                  className="h-auto max-w-full rounded border border-gray-200"
+                />
+              </a>
+            </div>
+          )}
+
           <pre className="mt-3 max-h-[420px] overflow-y-auto whitespace-pre-wrap rounded border border-gray-200 bg-surface p-4 text-[13px] text-gray-900">
             {teks}
           </pre>

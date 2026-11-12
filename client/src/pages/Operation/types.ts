@@ -57,14 +57,14 @@ export interface Shipment {
   clPol: string | null;
   coPol: string | null;
   tdPol: string | null;
-  dsPol: string | null;
+  dsPol: number | null;
   taPod: string | null;
   tbPod: string | null;
   sdPod: string | null;
   cdPod: string | null;
   coPod: string | null;
   tdPod: string | null;
-  dsPod: string | null;
+  dsPod: number | null;
   laytimePol: number | null;
   laytimePod: number | null;
   totalLaytime: number | null;

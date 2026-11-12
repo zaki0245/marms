@@ -1,5 +1,5 @@
 // client/src/components/mapTiles.ts
-// [FUNGSI] URL tile peta Geoapify (osm-carto) + atribusi wajib.
+// [FUNGSI] URL peta Geoapify (tile interaktif + gambar statis) + atribusi wajib.
 // [ALASAN] Dipakai dua halaman (Dashboard & Laporan) agar URL/atribusi tidak berbeda.
 // [ALASAN] Key dibaca dari VITE_GEOAPIFY_API_KEY saat build; kosong = peta tidak dirender.
 

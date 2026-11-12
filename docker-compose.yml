@@ -63,6 +63,10 @@ services:
       SMTP_PASS: ${SMTP_PASS:-}
       SMTP_FROM: ${SMTP_FROM:-}
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:3000}
+      # [FUNGSI] Key peta untuk endpoint publik /peta (gambar link WA).
+      # [ALASAN] Tanpa key di runtime, endpoint mengembalikan 503; VITE_ dipakai sebagai cadangan.
+      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-}
+      VITE_GEOAPIFY_API_KEY: ${VITE_GEOAPIFY_API_KEY:-}
     ports:
       - "3000:3000"
     volumes:

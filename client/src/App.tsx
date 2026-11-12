@@ -30,8 +30,9 @@ import FinanceKonfigurasi from './pages/Finance/Konfigurasi';
 import Accounts from './pages/Accounts';
 import OperationDashboard from './pages/Operation/Dashboard';
 import OperationShipment from './pages/Operation/Shipment';
-import OperationAgent from './pages/Operation/Agent';
-import OperationUnitKapal from './pages/Operation/UnitKapal';
+import OperationAgent from './pages/Operation/DataOperation/Agent';
+import OperationUnitKapal from './pages/Operation/DataOperation/UnitKapal';
+import OperationDataOperation from './pages/Operation/DataOperation';
 import OperationLaporan from './pages/Operation/Laporan';
 
 export default function App() {
@@ -69,8 +70,14 @@ export default function App() {
         <Route path="finance/konfigurasi" element={<FinanceKonfigurasi />} />
         <Route path="operation" element={<OperationDashboard />} />
         <Route path="operation/shipment" element={<OperationShipment />} />
-        <Route path="operation/agent" element={<OperationAgent />} />
-        <Route path="operation/unit-kapal" element={<OperationUnitKapal />} />
+        <Route path="operation/data-operation" element={<OperationDataOperation />}>
+          <Route index element={<Navigate to="unit-kapal" replace />} />
+          <Route path="unit-kapal" element={<OperationUnitKapal />} />
+          <Route path="agent" element={<OperationAgent />} />
+        </Route>
+        {/* [FUNGSI] Redirect URL lama ke tab Data Operation. */}
+        <Route path="operation/unit-kapal" element={<Navigate to="/dashboard/operation/data-operation/unit-kapal" replace />} />
+        <Route path="operation/agent" element={<Navigate to="/dashboard/operation/data-operation/agent" replace />} />
         <Route path="operation/laporan/:id" element={<OperationLaporan />} />
         <Route path="accounts" element={<Accounts />} />
         <Route path="settings" element={<Settings />} />

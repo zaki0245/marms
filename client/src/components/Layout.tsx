@@ -41,9 +41,8 @@ const FINANCE_MENU = [
 // [FUNGSI] Menu modul Operation (voyage tongkang).
 const OPERATION_MENU = [
   { to: '/dashboard/operation', label: 'Dashboard', exact: true },
+  { to: '/dashboard/operation/data-operation', label: 'Data Operation' },
   { to: '/dashboard/operation/shipment', label: 'Shipment' },
-  { to: '/dashboard/operation/unit-kapal', label: 'Unit Kapal' },
-  { to: '/dashboard/operation/agent', label: 'Agen' },
 ];
 
 interface Admin {

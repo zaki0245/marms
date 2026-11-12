@@ -6,8 +6,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import MemoryInput from '../../components/MemoryInput';
 import SearchableSelect from '../../components/SearchableSelect';
-import AgentForm from './AgentForm';
-import UnitKapalForm from './UnitKapalForm';
+import AgentForm from './DataOperation/AgentForm';
+import UnitKapalForm from './DataOperation/UnitKapalForm';
 import { OperationAgent, OperationKapal, Shipment, ShipmentDocument, ShipmentStatus, STATUS_LABEL } from './types';
 
 const KOSONG = {
@@ -56,8 +56,8 @@ type FormState = typeof KOSONG;
 
 // [FUNGSI] Daftar field yang disimpan sebagai tanggal.
 const FIELD_TANGGAL: (keyof FormState)[] = [
-  'taPol', 'tbPol', 'slPol', 'clPol', 'coPol', 'tdPol', 'dsPol',
-  'taPod', 'tbPod', 'sdPod', 'cdPod', 'coPod', 'tdPod', 'dsPod',
+  'taPol', 'tbPol', 'slPol', 'clPol', 'coPol', 'tdPol',
+  'taPod', 'tbPod', 'sdPod', 'cdPod', 'coPod', 'tdPod',
 ];
 
 // [FUNGSI] Ubah ISO dari server menjadi nilai input datetime-local (waktu WIB).
@@ -104,14 +104,14 @@ function dariShipment(s: Shipment): FormState {
     clPol: keInputTanggal(s.clPol),
     coPol: keInputTanggal(s.coPol),
     tdPol: keInputTanggal(s.tdPol),
-    dsPol: keInputTanggal(s.dsPol),
+    dsPol: angka(s.dsPol),
     taPod: keInputTanggal(s.taPod),
     tbPod: keInputTanggal(s.tbPod),
     sdPod: keInputTanggal(s.sdPod),
     cdPod: keInputTanggal(s.cdPod),
     coPod: keInputTanggal(s.coPod),
     tdPod: keInputTanggal(s.tdPod),
-    dsPod: keInputTanggal(s.dsPod),
+    dsPod: angka(s.dsPod),
     laytimeAllowed: angka(s.laytimeAllowed),
     dsrPol: angka(s.dsrPol),
     dsrPod: angka(s.dsrPod),
@@ -408,7 +408,7 @@ export default function ShipmentForm({
               {waktu('clPol', 'Completed Loading')}
               {waktu('coPol', 'Cast Off POL')}
               {waktu('tdPol', 'Time Departures POL')}
-              {waktu('dsPol', 'DS POL')}
+              {angka('dsPol', 'DS POL')}
             </div>
           </section>
 
@@ -425,7 +425,7 @@ export default function ShipmentForm({
               {waktu('cdPod', 'Completed Discharge')}
               {waktu('coPod', 'Cast Off POD')}
               {waktu('tdPod', 'Time Departures POD')}
-              {waktu('dsPod', 'DS POD')}
+              {angka('dsPod', 'DS POD')}
             </div>
           </section>
 

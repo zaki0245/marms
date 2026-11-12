@@ -540,14 +540,14 @@ model Shipment {
   clPol             DateTime?
   coPol             DateTime?
   tdPol             DateTime?
-  dsPol             DateTime?
+  dsPol             Float?
   taPod             DateTime?
   tbPod             DateTime?
   sdPod             DateTime?
   cdPod             DateTime?
   coPod             DateTime?
   tdPod             DateTime?
-  dsPod             DateTime?
+  dsPod             Float?
   laytimePol        Float?
   laytimePod        Float?
   totalLaytime      Float?

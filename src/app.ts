@@ -21,7 +21,7 @@ import { reportsRoutes } from './modules/crewing/reports';
 import { authRoutes } from './modules/auth';
 import { leavePayRoutes } from './modules/crewing/leave-pay';
 import { financeRoutes } from './modules/finance';
-import { operationRoutes } from './modules/operation';
+import { operationRoutes, petaRoutes } from './modules/operation';
 import approveRoutes from './modules/finance/approve.routes';
 import { sessionMiddleware } from './shared/session';
 
@@ -58,6 +58,10 @@ app.use('/api/auth', authRoutes);
 
 // [FUNGSI] Route publik approval voucher (tautan dari email) — sebelum proteksi.
 app.use('/api/approve', approveRoutes);
+
+// [FUNGSI] Route publik gambar peta posisi kapal (tautan pendek laporan WhatsApp).
+// [ALASAN] Customer membuka tanpa login; API key Geoapify diganti di sisi server.
+app.use('/peta', petaRoutes);
 
 // [FUNGSI] Lindungi semua endpoint /api kecuali whitelist publik, dan batasi per role.
 // [ALASAN] Payung bisnis: modul Crewing hanya untuk CREWING/SUPERADMIN, Finance hanya

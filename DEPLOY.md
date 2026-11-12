@@ -105,6 +105,7 @@ docker compose up -d --build                      # terapkan + restart app
 | `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | akun SMTP & alamat pengirim | Opsional; bila kosong, fitur kirim approval tidak bisa dipakai |
 | `APP_BASE_URL` | `https://<domain-mu>` | Basis tautan approve di email |
 | `VITE_GEOAPIFY_API_KEY` | API key dari geoapify.com | WAJIB agar peta tampil; dipakai saat build frontend |
+| `GEOAPIFY_API_KEY` | API key yang sama | Opsional; dipakai server untuk endpoint publik `/peta` (gambar peta di link WA). Bila kosong, server memakai `VITE_GEOAPIFY_API_KEY` |
 | `NODE_ENV` | (otomatis `production` oleh Railway) | Jangan diubah |
 
 > **Membuat SESSION_SECRET acak:** jalankan di terminal lokal:
@@ -201,6 +202,8 @@ Jika suatu saat ingin pindah dari Railway ke server sendiri (VPS):
 - Ganti password admin setelah login pertama (aplikasi memaksa ini).
 - Peta memakai tile Geoapify (`https://maps.geoapify.com`) dan CSP `img-src` di `src/app.ts`
   sudah disetel untuk domain itu. Isi `VITE_GEOAPIFY_API_KEY` sebelum build (tanpa key, peta
-  menampilkan pesan "Peta belum dikonfigurasi"). Batasi key ke HTTP referrer domain produksi di
+  menampilkan pesan "Peta belum dikonfigurasi"). Endpoint publik `/peta/<kode>` memakai
+  `GEOAPIFY_API_KEY` (fallback `VITE_GEOAPIFY_API_KEY`) dan mem-proxy gambar peta untuk link WA,
+  sehingga API key tidak muncul di tautan. Batasi key ke HTTP referrer domain produksi di
   dashboard Geoapify, dan jangan kembali ke `tile.openstreetmap.org` (server sukarela OSM
   memblokir aplikasi dengan 403 "Access blocked").
