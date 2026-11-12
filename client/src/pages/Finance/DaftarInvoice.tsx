@@ -2,7 +2,7 @@
 // [FUNGSI] Halaman daftar invoice Finance (tab AR/AP, filter status/approval/bulan/tahun, export Excel, hapus, edit).
 // [ALASAN] Rekap & kelola record invoice AR dan AP.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 import { exportExcel } from '../../utils/export';
@@ -50,6 +50,7 @@ export default function DaftarInvoice() {
   const [approval, setApproval] = useState('SEMUA');
   const [perlu, setPerlu] = useState('SEMUA');
   const [kategori, setKategori] = useState<string[]>([]);
+  const [kategoriOpen, setKategoriOpen] = useState(false);
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState('');
   const [search, setSearch] = useState('');
@@ -59,6 +60,7 @@ export default function DaftarInvoice() {
   const [error, setError] = useState('');
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const { sort, toggle } = useSort();
+  const kategoriRef = useRef<HTMLDivElement>(null);
 
   // [FUNGSI] Deteksi role SUPERADMIN untuk mengaktifkan ubah approval manual.
   useEffect(() => {
@@ -80,6 +82,16 @@ export default function DaftarInvoice() {
   useEffect(() => {
     load();
   }, [jenis]);
+
+  // [FUNGSI] Tutup dropdown kategori saat klik di luar area.
+  useEffect(() => {
+    if (!kategoriOpen) return;
+    function onDown(e: MouseEvent) {
+      if (!kategoriRef.current?.contains(e.target as Node)) setKategoriOpen(false);
+    }
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [kategoriOpen]);
 
   async function handleDelete(id: string) {
     if (!window.confirm('Hapus invoice ini?')) return;
@@ -118,6 +130,13 @@ export default function DaftarInvoice() {
   function toggleKategori(k: string) {
     setKategori((prev) => (prev.includes(k) ? prev.filter((x) => x !== k) : [...prev, k]));
   }
+
+  const kategoriLabel =
+    kategori.length === 0
+      ? 'Semua'
+      : kategori.length === 1
+        ? KATEGORI[kategori[0]] ?? kategori[0]
+        : `${kategori.length} dipilih`;
 
   const years = useMemo(() => {
     const set = new Set<string>();
@@ -277,16 +296,45 @@ export default function DaftarInvoice() {
             </div>
           )}
 
-          <div>
+          <div
+            className="relative"
+            ref={kategoriRef}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setKategoriOpen(false);
+            }}
+          >
             <label className="label">Kategori</label>
-            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-md border border-gray-300 px-3 py-2">
-              {Object.entries(KATEGORI).map(([key, label]) => (
-                <label key={key} className="flex items-center gap-1 text-sm text-gray-700">
-                  <input type="checkbox" checked={kategori.includes(key)} onChange={() => toggleKategori(key)} />
-                  {label}
+            <button
+              type="button"
+              onClick={() => setKategoriOpen((o) => !o)}
+              aria-expanded={kategoriOpen}
+              className={`${inputCls} mt-1 flex w-full items-center justify-between text-left`}
+            >
+              <span className={kategori.length ? 'text-gray-900' : 'text-gray-500'}>{kategoriLabel}</span>
+              <svg
+                className={`h-4 w-4 shrink-0 text-gray-500 transition-transform ${kategoriOpen ? 'rotate-180' : ''}`}
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {kategoriOpen && (
+              <div className="absolute left-0 right-0 z-20 mt-1 rounded-md border border-gray-200 bg-card p-2 shadow-lg">
+                <label className="flex items-center gap-2 rounded px-2 py-1 text-sm text-gray-700 hover:bg-gray-50">
+                  <input type="checkbox" checked={kategori.length === 0} onChange={() => setKategori([])} />
+                  Semua
                 </label>
-              ))}
-            </div>
+                {Object.entries(KATEGORI).map(([key, label]) => (
+                  <label key={key} className="flex items-center gap-2 rounded px-2 py-1 text-sm text-gray-700 hover:bg-gray-50">
+                    <input type="checkbox" checked={kategori.includes(key)} onChange={() => toggleKategori(key)} />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
