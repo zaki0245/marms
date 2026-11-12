@@ -4,7 +4,7 @@
 
 import { prisma } from '../../shared/prisma';
 import { hitungLaytime } from './laytime';
-import type { AgentInput, ShipmentInput } from './operation.model';
+import type { AgentInput, ShipmentInput, UnitKapalInput } from './operation.model';
 
 // [FUNGSI] Selalu sertakan dokumen pada detail shipment.
 const DOKUMEN = { documents: { orderBy: { createdAt: 'asc' as const } } };
@@ -126,21 +126,37 @@ export function deleteAgent(id: string) {
   return prisma.operationAgent.delete({ where: { id } });
 }
 
+// ================== MASTER UNIT KAPAL ==================
+
+export function listOperationKapal() {
+  return prisma.operationKapal.findMany({ orderBy: [{ tb: 'asc' }, { bg: 'asc' }] });
+}
+
+export function getOperationKapal(id: string) {
+  return prisma.operationKapal.findUnique({ where: { id } });
+}
+
+export function createOperationKapal(input: UnitKapalInput) {
+  return prisma.operationKapal.create({ data: input });
+}
+
+export function updateOperationKapal(id: string, input: UnitKapalInput) {
+  return prisma.operationKapal.update({ where: { id }, data: input });
+}
+
+export function deleteOperationKapal(id: string) {
+  return prisma.operationKapal.delete({ where: { id } });
+}
+
 // ================== MEMORI FIELD VOYAGE ==================
 
 // [FUNGSI] Nilai unik non-kosong per field shipment untuk saran input (datalist).
-// [ALASAN] Riwayat voyage sebelumnya jadi "ingatan"; tanpa tabel master tambahan.
+// [ALASAN] Field yang tidak punya tabel master (shipper, commodities, POL, POD) tetap punya "ingatan".
 const REF_QUERY = {
-  tb: () => prisma.shipment.findMany({ distinct: ['tb'], select: { tb: true }, orderBy: { tb: 'asc' } }).then((r) => r.map((x) => x.tb)),
-  bg: () => prisma.shipment.findMany({ distinct: ['bg'], select: { bg: true }, orderBy: { bg: 'asc' } }).then((r) => r.map((x) => x.bg)),
-  ownerOperator: () =>
-    prisma.shipment.findMany({ distinct: ['ownerOperator'], select: { ownerOperator: true }, orderBy: { ownerOperator: 'asc' } }).then((r) => r.map((x) => x.ownerOperator)),
   shipper: () =>
     prisma.shipment.findMany({ distinct: ['shipper'], select: { shipper: true }, orderBy: { shipper: 'asc' } }).then((r) => r.map((x) => x.shipper)),
   commodities: () =>
     prisma.shipment.findMany({ distinct: ['commodities'], select: { commodities: true }, orderBy: { commodities: 'asc' } }).then((r) => r.map((x) => x.commodities)),
-  contactMaster: () =>
-    prisma.shipment.findMany({ distinct: ['contactMaster'], select: { contactMaster: true }, orderBy: { contactMaster: 'asc' } }).then((r) => r.map((x) => x.contactMaster)),
   pol: () => prisma.shipment.findMany({ distinct: ['pol'], select: { pol: true }, orderBy: { pol: 'asc' } }).then((r) => r.map((x) => x.pol)),
   pod: () => prisma.shipment.findMany({ distinct: ['pod'], select: { pod: true }, orderBy: { pod: 'asc' } }).then((r) => r.map((x) => x.pod)),
 } as const;

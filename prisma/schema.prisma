@@ -562,13 +562,16 @@ model Shipment {
   longitude         Float?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+  operationKapalId  String?
   documents         ShipmentDocument[]
   agentPolRef       OperationAgent?  @relation("AgentPol", fields: [agentPolId], references: [id], onDelete: SetNull)
   agentPodRef       OperationAgent?  @relation("AgentPod", fields: [agentPodId], references: [id], onDelete: SetNull)
+  operationKapalRef OperationKapal?  @relation(fields: [operationKapalId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([agentPolId])
   @@index([agentPodId])
+  @@index([operationKapalId])
 }
 
 // [FUNGSI] Dokumen pendukung satu shipment (BL, invoice, COO, dsb).
@@ -605,4 +608,19 @@ model OperationAgent {
   shipmentsPod Shipment[] @relation("AgentPod")
 
   @@unique([tipe, nama])
+}
+
+// [FUNGSI] Master unit kapal Operation (TB + BG) beserta owner dan contact master.
+// [ALASAN] Satu database unit kapal; shipment menyimpan snapshot teks + relasi agar laporan lama tetap utuh.
+model OperationKapal {
+  id            String     @id @default(cuid())
+  tb            String
+  bg            String
+  ownerOperator String?
+  contactMaster String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  shipments     Shipment[]
+
+  @@unique([tb, bg])
 }

@@ -7,11 +7,13 @@ import { api } from '../../api/client';
 import MemoryInput from '../../components/MemoryInput';
 import SearchableSelect from '../../components/SearchableSelect';
 import AgentForm from './AgentForm';
-import { OperationAgent, Shipment, ShipmentDocument, ShipmentStatus, STATUS_LABEL } from './types';
+import UnitKapalForm from './UnitKapalForm';
+import { OperationAgent, OperationKapal, Shipment, ShipmentDocument, ShipmentStatus, STATUS_LABEL } from './types';
 
 const KOSONG = {
   tb: '',
   bg: '',
+  operationKapalId: '',
   ownerOperator: '',
   shipper: '',
   commodities: '',
@@ -80,6 +82,7 @@ function dariShipment(s: Shipment): FormState {
   return {
     tb: s.tb,
     bg: s.bg,
+    operationKapalId: teks(s.operationKapalId),
     ownerOperator: teks(s.ownerOperator),
     shipper: teks(s.shipper),
     commodities: teks(s.commodities),
@@ -136,12 +139,15 @@ export default function ShipmentForm({
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [agents, setAgents] = useState<OperationAgent[]>([]);
+  const [units, setUnits] = useState<OperationKapal[]>([]);
   const [refs, setRefs] = useState<Record<string, string[]>>({});
   const [agenUntuk, setAgenUntuk] = useState<'POL' | 'POD' | null>(null);
+  const [showUnitForm, setShowUnitForm] = useState(false);
 
-  // [FUNGSI] Muat master agen & riwayat nilai field voyage (memori input).
+  // [FUNGSI] Muat master agen, master unit kapal, & riwayat nilai field voyage (memori input).
   useEffect(() => {
     api.get<OperationAgent[]>('/operation/agents').then(({ data }) => setAgents(data)).catch(() => undefined);
+    api.get<OperationKapal[]>('/operation/kapal').then(({ data }) => setUnits(data)).catch(() => undefined);
     api.get<Record<string, string[]>>('/operation/refs').then(({ data }) => setRefs(data)).catch(() => undefined);
   }, []);
 
@@ -160,8 +166,30 @@ export default function ShipmentForm({
     });
   }, [agents]);
 
+  // [FUNGSI] Tautkan shipment lama yang belum punya id unit kapal (cocokkan TB + BG).
+  useEffect(() => {
+    if (!units.length) return;
+    setForm((f) => {
+      if (f.operationKapalId) return f;
+      const u = units.find((x) => x.tb === f.tb && x.bg === f.bg);
+      return u ? { ...f, operationKapalId: u.id } : f;
+    });
+  }, [units]);
+
   function setField(k: keyof FormState, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  // [FUNGSI] Isi otomatis TB, BG, owner, & contact master saat unit kapal dipilih.
+  function isiUnit(u: OperationKapal) {
+    setForm((f) => ({
+      ...f,
+      operationKapalId: u.id,
+      tb: u.tb,
+      bg: u.bg,
+      ownerOperator: u.ownerOperator ?? '',
+      contactMaster: u.contactMaster ?? '',
+    }));
   }
 
   // [FUNGSI] Isi otomatis PIC & kontak saat agen dipilih; tetap bisa diubah manual.
@@ -284,6 +312,34 @@ export default function ShipmentForm({
     );
   };
 
+  // [FUNGSI] Pilih unit kapal dari master + tombol tambah cepat.
+  const unit = () => (
+    <div className="sm:col-span-2">
+      <label className="label">Unit Kapal (TB / BG)</label>
+      <div className="mt-1 flex gap-1">
+        <SearchableSelect
+          value={form.operationKapalId}
+          options={units.map((u) => ({ id: u.id, label: `${u.tb} / ${u.bg}` }))}
+          placeholder="Pilih unit kapal"
+          className="input w-full"
+          wrapperClassName="flex-1"
+          onChange={(id) => {
+            const u = units.find((x) => x.id === id);
+            if (u) isiUnit(u);
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => setShowUnitForm(true)}
+          aria-label="Tambah unit kapal"
+          className="shrink-0 rounded-md border border-gray-300 px-2.5 text-sm text-gray-700 hover:bg-gray-50"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+
   const angka = (k: keyof FormState, label: string) => (
     <div key={k}>
       <label className="label">{label}</label>
@@ -320,12 +376,13 @@ export default function ShipmentForm({
           <section>
             <h4 className="font-semibold text-gray-900">Identitas &amp; Voyage</h4>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {memori('tb', 'TB *')}
-              {memori('bg', 'BG *')}
-              {memori('ownerOperator', 'Barges Owners / Operator')}
+              {unit()}
+              {teks('tb', 'TB *')}
+              {teks('bg', 'BG *')}
+              {teks('ownerOperator', 'Barges Owners / Operator')}
               {memori('shipper', 'Shipper')}
               {memori('commodities', 'Commodities')}
-              {memori('contactMaster', 'Contact Master / Captain')}
+              {teks('contactMaster', 'Contact Master / Captain')}
               {teks('laycan', 'Laycan')}
               <div>
                 <label className="label">Status</label>
@@ -446,6 +503,18 @@ export default function ShipmentForm({
           </button>
         </div>
       </form>
+
+      {/* [FUNGSI] Tambah unit kapal cepat tanpa menutup form shipment. */}
+      {showUnitForm && (
+        <UnitKapalForm
+          onClose={() => setShowUnitForm(false)}
+          onSaved={(u) => {
+            setUnits((prev) => [...prev, u].sort((x, y) => `${x.tb} ${x.bg}`.localeCompare(`${y.tb} ${y.bg}`, 'id')));
+            isiUnit(u);
+            setShowUnitForm(false);
+          }}
+        />
+      )}
 
       {/* [FUNGSI] Tambah agen cepat tanpa menutup form shipment. */}
       {agenUntuk && (

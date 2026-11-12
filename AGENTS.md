@@ -71,9 +71,13 @@ npx prisma migrate reset --force      # reset database + seed ulang
   `(tipe, nama)`) lewat halaman Operation → Agen (tab POL/POD). Saat agen dipilih di form shipment,
   PIC & Contact terisi otomatis tetapi tetap bisa diubah; shipment menyimpan
   `agentPolId`/`agentPodId` + snapshot teks.
-- Memori field voyage (TB, BG, Owner/Operator, Shipper, Commodities, Contact Master, POL, POD)
-  berasal dari nilai unik data shipment (`GET /api/operation/refs`) dan ditampilkan lewat
-  `MemoryInput` (datalist). Tidak ada tabel master untuk field-field ini.
+- Unit kapal (TB, BG, Owner/Operator, Contact Master) memakai master `OperationKapal` lewat
+  halaman Operation → Unit Kapal. Form shipment memilih unit (bisa tambah cepat via `+`), lalu
+  keempat field terisi otomatis tetapi tetap bisa diubah; shipment menyimpan `operationKapalId` +
+  snapshot teks agar laporan lama utuh.
+- Memori field voyage (Shipper, Commodities, POL, POD) berasal dari nilai unik data shipment
+  (`GET /api/operation/refs`) dan ditampilkan lewat `MemoryInput` (datalist). Tidak ada tabel master
+  untuk field-field ini.
 - Tile peta memakai **Geoapify** style `osm-carto` (`https://maps.geoapify.com/v1/tile/...`).
   API key dibaca dari `VITE_GEOAPIFY_API_KEY` (root `.env`, ditanam saat build frontend), dan
   CSP `img-src` di `src/app.ts` hanya mengizinkan `https://maps.geoapify.com`. Attribution wajib:

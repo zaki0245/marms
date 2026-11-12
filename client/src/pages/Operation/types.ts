@@ -22,6 +22,14 @@ export interface OperationAgent {
   kontak: string | null;
 }
 
+export interface OperationKapal {
+  id: string;
+  tb: string;
+  bg: string;
+  ownerOperator: string | null;
+  contactMaster: string | null;
+}
+
 export interface Shipment {
   id: string;
   kode: string;
@@ -42,6 +50,7 @@ export interface Shipment {
   agentPodId: string | null;
   picPod: string | null;
   contactAgentPod: string | null;
+  operationKapalId: string | null;
   taPol: string | null;
   tbPol: string | null;
   slPol: string | null;

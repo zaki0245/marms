@@ -26,6 +26,7 @@ export const shipmentSchema = z.object({
   agentPodId: teks,
   picPod: teks,
   contactAgentPod: teks,
+  operationKapalId: teks,
   taPol: z.date().nullable().optional(),
   tbPol: z.date().nullable().optional(),
   slPol: z.date().nullable().optional(),
@@ -62,3 +63,14 @@ export const agentSchema = z.object({
 });
 
 export type AgentInput = z.infer<typeof agentSchema>;
+
+// [FUNGSI] Validasi master unit kapal Operation (TB + BG + owner + contact master).
+// [ALASAN] Unit kapal dipakai berulang; TB & BG wajib, owner & contact master opsional.
+export const unitKapalSchema = z.object({
+  tb: z.string().trim().min(1, 'TB wajib diisi').max(255),
+  bg: z.string().trim().min(1, 'BG wajib diisi').max(255),
+  ownerOperator: teks,
+  contactMaster: teks,
+});
+
+export type UnitKapalInput = z.infer<typeof unitKapalSchema>;

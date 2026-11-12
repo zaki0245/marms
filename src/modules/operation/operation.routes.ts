@@ -18,6 +18,12 @@ router.post('/agents', asyncHandler(c.createAgent));
 router.put('/agents/:id', asyncHandler(c.updateAgent));
 router.delete('/agents/:id', asyncHandler(c.deleteAgent));
 
+// [FUNGSI] Master unit kapal Operation (TB + BG + owner + contact master).
+router.get('/kapal', asyncHandler(c.listOperationKapal));
+router.post('/kapal', asyncHandler(c.createOperationKapal));
+router.put('/kapal/:id', asyncHandler(c.updateOperationKapal));
+router.delete('/kapal/:id', asyncHandler(c.deleteOperationKapal));
+
 router.get('/shipments', asyncHandler(c.listShipments));
 router.get('/shipments/:id', asyncHandler(c.getShipment));
 router.post('/shipments', upload.array('documents', 20), asyncHandler(c.createShipment));

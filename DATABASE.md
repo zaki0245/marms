@@ -61,9 +61,10 @@
 | `FakturPajak` | id, invoiceId, nomor | ← Invoice |
 | `Pv` (voucher) | id, pvNo (unik), jenis (RV/PV), tanggal, vendorId?, customerId?, vendorName/vendorNpwp/vendorAlamat atau customerName/customerNpwp/customerAlamat (snapshot), bankAccount*, chequeNo, issuedDate, bankCharge, balance, keterangan | ← Vendor/Customer; → PvItem |
 | `PvItem` | id, pvId, invoiceId, nominal (DPP), includeTax | ← Pv, Invoice |
-| `Shipment` | id, kode (unik), tb, bg, ownerOperator, shipper, commodities, contactMaster, laycan, size, pol/agentPol/agentPolId/picPol/contactAgentPol, pod/agentPod/agentPodId/picPod/contactAgentPod, jadwal t*Pol/t*Pod, laytimePol, laytimePod, totalLaytime, laytimeAllowed, demurrageDespatch, dsrPol, dsrPod, position, remarks, status (PLANNED/ON_GOING/COMPLETED), latitude, longitude | → ShipmentDocument, OperationAgent (POL & POD) |
+| `Shipment` | id, kode (unik), tb, bg, ownerOperator, shipper, commodities, contactMaster, laycan, size, pol/agentPol/agentPolId/picPol/contactAgentPol, pod/agentPod/agentPodId/picPod/contactAgentPod, operationKapalId, jadwal t*Pol/t*Pod, laytimePol, laytimePod, totalLaytime, laytimeAllowed, demurrageDespatch, dsrPol, dsrPod, position, remarks, status (PLANNED/ON_GOING/COMPLETED), latitude, longitude | → ShipmentDocument, OperationAgent (POL & POD), OperationKapal |
 | `ShipmentDocument` | id, shipmentId, nama, file, createdAt | ← Shipment (cascade) |
 | `OperationAgent` | id, tipe (POL/POD), nama, pic, kontak, createdAt, updatedAt | ← Shipment (agentPolId/agentPodId, onDelete SetNull); unik (tipe, nama) |
+| `OperationKapal` | id, tb, bg, ownerOperator, contactMaster, createdAt, updatedAt | ← Shipment (operationKapalId, onDelete SetNull); unik (tb, bg) |
 
 ## ERD
 
@@ -221,5 +222,9 @@ Shipment --memiliki--> ShipmentDocument (BL, invoice, COO, dsb.)
   `agentPolId`/`agentPodId` **dan** snapshot teks (`agentPol`, `picPol`, `contactAgentPol`, dst.)
   agar laporan lama tidak berubah saat master diedit. Menghapus agen membuat FK jadi null, teks
   snapshot tetap ada.
-- Memori field voyage (TB, BG, Owner/Operator, Shipper, Commodities, Contact Master, POL, POD)
-  diambil dari nilai unik tabel `Shipment` (`GET /api/operation/refs`), bukan tabel master.
+- Unit kapal Operation berasal dari master `OperationKapal` (unik per `(tb, bg)`) berisi TB, BG,
+  owner/operator, dan contact master. Saat unit dipilih, shipment menyimpan `operationKapalId`
+  **dan** snapshot teks (`tb`, `bg`, `ownerOperator`, `contactMaster`). Menghapus unit membuat FK
+  jadi null, teks snapshot tetap ada.
+- Memori field voyage (Shipper, Commodities, POL, POD) diambil dari nilai unik tabel `Shipment`
+  (`GET /api/operation/refs`), bukan tabel master.

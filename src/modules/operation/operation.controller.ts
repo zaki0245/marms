@@ -6,7 +6,7 @@ import fs from 'fs';
 import type { Request, Response } from 'express';
 import { AppError } from '../../shared/AppError';
 import { UPLOAD_DIR, verifyFileSignature } from '../../shared/upload';
-import { agentSchema, shipmentSchema } from './operation.model';
+import { agentSchema, shipmentSchema, unitKapalSchema } from './operation.model';
 import * as service from './operation.service';
 
 // [FUNGSI] Ambil teks dari body multipart; kosong jadi null.
@@ -52,6 +52,7 @@ function parseBody(body: Record<string, unknown>) {
     agentPodId: str(body.agentPodId),
     picPod: str(body.picPod),
     contactAgentPod: str(body.contactAgentPod),
+    operationKapalId: str(body.operationKapalId),
     taPol: tgl(body.taPol),
     tbPol: tgl(body.tbPol),
     slPol: tgl(body.slPol),
@@ -206,4 +207,35 @@ export async function deleteAgent(req: Request, res: Response) {
 // [FUNGSI] Nilai unik field voyage untuk saran input (memori).
 export async function refs(_req: Request, res: Response) {
   res.json(await service.listRefs());
+}
+
+// ================== MASTER UNIT KAPAL ==================
+
+export async function listOperationKapal(_req: Request, res: Response) {
+  res.json(await service.listOperationKapal());
+}
+
+export async function createOperationKapal(req: Request, res: Response) {
+  const input = unitKapalSchema.parse(req.body);
+  res.status(201).json(await service.createOperationKapal(input));
+}
+
+export async function updateOperationKapal(req: Request, res: Response) {
+  const existing = await service.getOperationKapal(req.params.id);
+  if (!existing) {
+    res.status(404).json({ error: 'Unit kapal tidak ditemukan' });
+    return;
+  }
+  const input = unitKapalSchema.parse(req.body);
+  res.json(await service.updateOperationKapal(req.params.id, input));
+}
+
+export async function deleteOperationKapal(req: Request, res: Response) {
+  const existing = await service.getOperationKapal(req.params.id);
+  if (!existing) {
+    res.status(404).json({ error: 'Unit kapal tidak ditemukan' });
+    return;
+  }
+  await service.deleteOperationKapal(req.params.id);
+  res.status(204).end();
 }

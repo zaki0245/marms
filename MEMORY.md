@@ -58,8 +58,11 @@
 - **Operation:** satu shipment = satu voyage tongkang (TB + BG) dengan jadwal kegiatan POL/POD,
   laytime & demurrage/despatch, posisi terakhir (koordinat + teks), dokumen pendukung, dan status
   `PLANNED`/`ON_GOING`/`COMPLETED`. Dashboard peta hanya menampilkan shipment `ON_GOING`.
-- Field voyage yang berulang (TB, BG, Owner/Operator, Shipper, Commodities, Contact Master, POL,
-  POD) punya memori dari data shipment sebelumnya (`GET /api/operation/refs`), bukan tabel master.
+- Field voyage yang berulang (Shipper, Commodities, POL, POD) punya memori dari data shipment
+  sebelumnya (`GET /api/operation/refs`), bukan tabel master.
+- Unit kapal (TB, BG, Owner/Operator, Contact Master) adalah master `OperationKapal` (unik per
+  `(tb, bg)`) di halaman Operation → Unit Kapal. Memilih unit mengisi keempat field otomatis;
+  shipment tetap menyimpan snapshot teks + FK `operationKapalId` (FK jadi null bila unit dihapus).
 - Agen POL/POD adalah master `OperationAgent` yang **dipisah per tipe** (`POL`/`POD`, unik per
   `(tipe, nama)`), lengkap dengan PIC & kontak. Halaman Agen memakai tab POL/POD; memilih agen
   mengisi PIC/kontak otomatis. Shipment tetap menyimpan snapshot teks + FK
