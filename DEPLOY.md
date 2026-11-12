@@ -121,7 +121,8 @@ railway run npx prisma db seed
 (atau lewat menu Railway → **Command** / **Shell**, jalankan `npx prisma db seed`).
 
 Setelah itu login di `https://<domain-mu>/login` dengan email & password admin
-yang diisi di langkah 5. Saat login pertama, kamu diminta mengganti password.
+yang diisi di langkah 5. Password bisa diganti kapan saja lewat menu **Ganti Password**,
+atau direset oleh Superadmin melalui **Kelola Akun**.
 
 ### 7. Verifikasi
 - Buka `https://<domain-mu>/health` → muncul `{"status":"ok"}`.
@@ -202,7 +203,7 @@ Jika suatu saat ingin pindah dari Railway ke server sendiri (VPS):
 - Ganti password admin setelah login pertama (aplikasi memaksa ini).
 - Peta memakai tile Geoapify (`https://maps.geoapify.com`) dan CSP `img-src` di `src/app.ts`
   sudah disetel untuk domain itu. Isi `VITE_GEOAPIFY_API_KEY` sebelum build (tanpa key, peta
-  menampilkan pesan "Peta belum dikonfigurasi"). Endpoint publik `/peta/<kode>` memakai
+  menampilkan pesan "Peta belum dikonfigurasi"). Endpoint publik `/peta/<token>` memakai
   `GEOAPIFY_API_KEY` (fallback `VITE_GEOAPIFY_API_KEY`) dan mem-proxy gambar peta untuk link WA,
   sehingga API key tidak muncul di tautan. Batasi key ke HTTP referrer domain produksi di
   dashboard Geoapify, dan jangan kembali ke `tile.openstreetmap.org` (server sukarela OSM

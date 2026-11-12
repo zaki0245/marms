@@ -33,6 +33,7 @@ export interface OperationKapal {
 export interface Shipment {
   id: string;
   kode: string;
+  petaToken: string;
   tb: string;
   bg: string;
   ownerOperator: string | null;

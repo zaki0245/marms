@@ -18,5 +18,7 @@ router.post('/change-password', asyncHandler(c.changePassword));
 router.get('/accounts', requireRole('SUPERADMIN'), asyncHandler(c.listAccounts));
 router.post('/accounts', requireRole('SUPERADMIN'), asyncHandler(c.createAccount));
 router.patch('/accounts/:id', requireRole('SUPERADMIN'), asyncHandler(c.updateAccount));
+router.delete('/accounts/:id', requireRole('SUPERADMIN'), asyncHandler(c.deleteAccount));
+router.get('/audit-log', requireRole('SUPERADMIN'), asyncHandler(c.listAuditLog));
 
 export default router;

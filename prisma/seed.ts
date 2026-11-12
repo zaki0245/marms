@@ -51,11 +51,11 @@ async function main() {
   await prisma.admin.upsert({
     where: { email },
     update: {},
-    create: { email, passwordHash, role: 'SUPERADMIN', active: true, mustChangePassword: true },
+    create: { email, passwordHash, role: 'SUPERADMIN', active: true },
   });
 
   console.log('Seed selesai: 8 jabatan, 1 pengaturan, 1 akun admin.');
-  console.log(`Admin login -> email: ${email} | password: ${password} (wajib ganti)`);
+  console.log(`Admin login -> email: ${email} | password: ${password}`);
 }
 
 main()

@@ -52,7 +52,8 @@
 | `Payroll` | id, vesselId, bulan, tahun, jumlahHari, status, jenis, tanggalFinalisasi, tanggalPembayaran, dibuatOleh | unik(vesselId, bulan, tahun, jenis); → PayrollDetail |
 | `PayrollDetail` | id, payrollId, crewId, jabatanKode, jabatanNama, segmentId, periodeKerja, hariAktif, gajiPokokSnapshot, gajiProrata, uangMakanSnapshot, uangMakanProrata, total, namaBank, noRekening | ← Payroll, Crew |
 | `LeavePayDisbursement` | id, crewId, tanggalPencairan, nominal, pencairanKe, masaKerjaSnapshot, catatanPerforma | ← Crew |
-| `Admin` | id, email (unik), passwordHash, role, active, mustChangePassword, createdAt, updatedAt | — |
+| `Admin` | id, email (unik), passwordHash, role, active, sessionVersion, createdAt, updatedAt | — |
+| `AuditLog` | id, adminId, adminEmail (snapshot), aksi, detail, createdAt | ← indeks createdAt |
 | `Vendor` | id, nama (unik), npwp, alamat | → VendorBank, Invoice, Pv |
 | `VendorBank` | id, vendorId, accountNo, accountName, bank | ← Vendor |
 | `Customer` | id, nama (unik), npwp, alamat | → CustomerBank, Invoice, Pv |
@@ -61,7 +62,7 @@
 | `FakturPajak` | id, invoiceId, nomor | ← Invoice |
 | `Pv` (voucher) | id, pvNo (unik), jenis (RV/PV), tanggal, vendorId?, customerId?, vendorName/vendorNpwp/vendorAlamat atau customerName/customerNpwp/customerAlamat (snapshot), bankAccount*, chequeNo, issuedDate, bankCharge, balance, keterangan | ← Vendor/Customer; → PvItem |
 | `PvItem` | id, pvId, invoiceId, nominal (DPP), includeTax | ← Pv, Invoice |
-| `Shipment` | id, kode (unik), tb, bg, ownerOperator, shipper, commodities, contactMaster, laycan, size, pol/agentPol/agentPolId/picPol/contactAgentPol, pod/agentPod/agentPodId/picPod/contactAgentPod, operationKapalId, jadwal t*Pol/t*Pod, laytimePol, laytimePod, totalLaytime, laytimeAllowed, demurrageDespatch, dsrPol, dsrPod, position, remarks, status (PLANNED/ON_GOING/COMPLETED), latitude, longitude | → ShipmentDocument, OperationAgent (POL & POD), OperationKapal |
+| `Shipment` | id, kode (unik), petaToken (unik), tb, bg, ownerOperator, shipper, commodities, contactMaster, laycan, size, pol/agentPol/agentPolId/picPol/contactAgentPol, pod/agentPod/agentPodId/picPod/contactAgentPod, operationKapalId, jadwal t*Pol/t*Pod, laytimePol, laytimePod, totalLaytime, laytimeAllowed, demurrageDespatch, dsrPol, dsrPod, position, remarks, status (PLANNED/ON_GOING/COMPLETED), latitude, longitude | → ShipmentDocument, OperationAgent (POL & POD), OperationKapal |
 | `ShipmentDocument` | id, shipmentId, nama, file, createdAt | ← Shipment (cascade) |
 | `OperationAgent` | id, tipe (POL/POD), nama, pic, kontak, createdAt, updatedAt | ← Shipment (agentPolId/agentPodId, onDelete SetNull); unik (tipe, nama) |
 | `OperationKapal` | id, tb, bg, ownerOperator, contactMaster, createdAt, updatedAt | ← Shipment (operationKapalId, onDelete SetNull); unik (tb, bg) |

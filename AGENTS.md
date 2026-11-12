@@ -54,6 +54,12 @@ npx prisma migrate reset --force      # reset database + seed ulang
 - Nomor pendaftaran pelamar: `PLR-YYYY-NNNN`, reset tiap tahun.
 - Duplikat pelamar (email ATAU HP sama) ditolak.
 - Dokumen expired tidak memblokir penempatan baru; perbarui dokumen expired jadi tanggung jawab crew (admin tetap bisa perbarui).
+- Akun admin dikelola SUPERADMIN di halaman **Kelola Akun** (buat, ubah role, aktif/nonaktif,
+  reset password, hapus); SUPERADMIN tidak bisa menghapus akunnya sendiri. Password tidak wajib
+  diganti saat login pertama — user bisa mengganti sendiri lewat menu **Ganti Password**.
+  Perubahan password/role/nonaktif menaikkan `sessionVersion` sehingga sesi lama langsung putus.
+  Aksi sensitif dicatat ke `AuditLog` dan tampil di bagian **Riwayat Aktivitas**. Password minimal
+  8 karakter.
 - Masa kerja live: bertambah saat crew On Board (lihat `src/shared/masaKerja.ts`).
 - Leave pay: tiap 180 hari setelah 180 hari pertama (kelayakan mulai 360 hari).
 - Finance dibagi dua entitas: **AP** (hutang ke Vendor → voucher **PV**) dan **AR** (piutang dari
@@ -85,8 +91,8 @@ npx prisma migrate reset --force      # reset database + seed ulang
   CSP `img-src` di `src/app.ts` hanya mengizinkan `https://maps.geoapify.com`. Attribution wajib:
   "Powered by Geoapify" + "© OpenStreetMap contributors". Jangan kembali ke
   `tile.openstreetmap.org`: server tile sukarela OSM memblokir aplikasi (403 "Access blocked").
-  Link peta pada teks WhatsApp memakai tautan pendek **`/peta/<kode>?zoom=<n>`** (route publik
-  tanpa login). Server mem-proxy Geoapify Static Maps (`/v1/staticmap`, style `osm-carto`, marker
+  Link peta pada teks WhatsApp memakai tautan pendek **`/peta/<token>?zoom=<n>`** (route publik
+  tanpa login; token acak per shipment agar kode berurutan tidak bisa ditebak). Server mem-proxy Geoapify Static Maps (`/v1/staticmap`, style `osm-carto`, marker
   posisi) memakai `GEOAPIFY_API_KEY`/`VITE_GEOAPIFY_API_KEY`, jadi API key **tidak** ikut di link
   yang dibagikan. Level zoom dari dropdown halaman Laporan juga dipakai peta pada kartu laporan
   gambar (email). Atribusi sudah tercetak otomatis di gambar.

@@ -156,7 +156,7 @@ export default function Laporan() {
   // [FUNGSI] Tautan pendek ke server sendiri; API key Geoapify tetap di backend.
   // [ALASAN] Link ini dibagikan ke customer lewat WhatsApp dan tidak boleh memuat key.
   const peta = punyaKoordinat
-    ? `${window.location.origin}/peta/${encodeURIComponent(s.kode)}${zoom === 5 ? '' : `?zoom=${zoom}`}`
+    ? `${window.location.origin}/peta/${encodeURIComponent(s.petaToken)}${zoom === 5 ? '' : `?zoom=${zoom}`}`
     : '';
   const teks = buatTeks(s, peta);
   const kode = s.kode;

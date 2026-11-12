@@ -17,7 +17,12 @@ export function makeRateLimiter(options: { maxAttempts: number; lockMs: number; 
       if (entry && entry.lockedUntil > now) {
         throw new AppError(429, options.message);
       }
-      const count = (entry?.count ?? 0) + 1;
+      // [FUNGSI] Setelah masa lock berakhir, mulai hitungan baru.
+      // [ALASAN] Tanpa ini, satu kali kena lock membuat akun terkunci selamanya.
+      if (entry && entry.lockedUntil > 0) {
+        attempts.delete(key);
+      }
+      const count = (attempts.get(key)?.count ?? 0) + 1;
       if (count >= options.maxAttempts) {
         attempts.set(key, { count, lockedUntil: now + options.lockMs });
       } else {

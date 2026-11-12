@@ -44,7 +44,7 @@ function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFil
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // [ALASAN] Maksimal 5 MB per file.
+  limits: { fileSize: 5 * 1024 * 1024, files: 20, fields: 80, parts: 100 }, // [ALASAN] Maksimal 5 MB per file + batas jumlah bagian.
 });
 
 // [FUNGSI] Verifikasi magic bytes (isi file), bukan cuma ekstensi.

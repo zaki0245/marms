@@ -12,7 +12,14 @@ import type { Role } from '@prisma/client';
 export async function getCurrentAdmin(req: Request) {
   const id = req.session?.adminId;
   if (!id) return null;
-  return prisma.admin.findUnique({ where: { id }, select: { id: true, role: true, active: true } });
+  const admin = await prisma.admin.findUnique({
+    where: { id },
+    select: { id: true, role: true, active: true, sessionVersion: true },
+  });
+  if (!admin || !admin.active) return null;
+  // [FUNGSI] Tolak sesi lama setelah password/role/status diubah.
+  if (req.session.sessionVersion !== admin.sessionVersion) return null;
+  return admin;
 }
 
 // [FUNGSI] Middleware pembatas role.

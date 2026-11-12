@@ -498,9 +498,22 @@ model Admin {
   passwordHash        String
   role                Role     @default(SUPERADMIN)
   active              Boolean  @default(true)
-  mustChangePassword  Boolean  @default(true)
+  sessionVersion      Int      @default(0)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+}
+
+// [FUNGSI] Catatan aksi sensitif (akun, password, approval).
+// [ALASAN] Jejak audit tetap ada walau akun pelaku sudah dihapus (email disimpan sebagai snapshot).
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  adminEmail String?
+  aksi       String
+  detail     String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 // ================== OPERATION ==================
@@ -517,6 +530,7 @@ enum ShipmentStatus {
 model Shipment {
   id                String         @id @default(cuid())
   kode              String         @unique
+  petaToken         String         @unique
   tb                String
   bg                String
   ownerOperator     String?

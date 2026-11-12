@@ -76,7 +76,7 @@ Tanpa urutan ini, `npm ci` akan gagal (prisma generate tidak menemukan schema) d
 - Beranda publik (rekrutmen): `http://localhost:3000`
 - Login admin: `http://localhost:3000/login`
 - Adminer: `http://localhost:8080`
-- Akun admin awal: `admin@marms.com` / `Admin123!` (wajib ganti saat login pertama)
+- Akun admin awal: `admin@marms.com` / `Admin123!` (ganti kapan saja lewat menu Ganti Password)
 
 ## 7. Verifikasi Cepat
 - `docker compose ps` → service `db` status `Up (healthy)`.

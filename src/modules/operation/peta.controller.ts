@@ -37,7 +37,7 @@ export async function gambarPeta(req: Request, res: Response) {
     return;
   }
 
-  const posisi = await service.getPosisiByKode(req.params.kode);
+  const posisi = await service.getPosisiByToken(req.params.token);
   if (!posisi || posisi.latitude == null || posisi.longitude == null) {
     res.status(404).json({ error: 'Posisi kapal tidak ditemukan' });
     return;

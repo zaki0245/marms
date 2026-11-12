@@ -48,7 +48,6 @@ const OPERATION_MENU = [
 interface Admin {
   email: string;
   role: Role;
-  mustChangePassword: boolean;
 }
 
 // [FUNGSI] Key section sidebar yang bisa dibuka/tutup.
@@ -96,6 +95,8 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [checking, setChecking] = useState(true);
+  const [showPw, setShowPw] = useState(false);
+  const [passwordLama, setPasswordLama] = useState('');
   const [passwordBaru, setPasswordBaru] = useState('');
   const [pwError, setPwError] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
@@ -178,8 +179,9 @@ export default function Layout() {
     setPwLoading(true);
     setPwError('');
     try {
-      await api.post('/auth/change-password', { passwordBaru });
-      setAdmin((a) => (a ? { ...a, mustChangePassword: false } : a));
+      await api.post('/auth/change-password', { passwordLama, passwordBaru });
+      setShowPw(false);
+      setPasswordLama('');
       setPasswordBaru('');
     } catch (err: any) {
       setPwError(err?.response?.data?.error ?? 'Gagal mengganti password');
@@ -422,6 +424,15 @@ export default function Layout() {
               </button>
               <div className="mt-1 truncate px-2 text-sm text-white/70 dark:text-gray-600">{admin.email}</div>
               <button
+                onClick={() => {
+                  setPwError('');
+                  setShowPw(true);
+                }}
+                className="mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-white/80 hover:bg-white/10 hover:text-white dark:text-gray-600 dark:hover:bg-gray-100"
+              >
+                Ganti Password
+              </button>
+              <button
                 onClick={handleLogout}
                 className="mt-1 w-full rounded-md px-2 py-1.5 text-left text-sm text-red-200 hover:bg-white/10 hover:text-red-100 dark:text-negative dark:hover:bg-negative/5"
               >
@@ -437,20 +448,30 @@ export default function Layout() {
         </main>
       </div>
 
-      {/* Modal ganti password wajib (login pertama) */}
-      {admin.mustChangePassword && (
+      {/* Modal ganti password mandiri (opsional). */}
+      {showPw && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <form onSubmit={handleChangePassword} className="w-full max-w-sm rounded-lg border border-gray-200 bg-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">Ganti Password</h3>
-            <p className="mt-1 text-sm text-gray-500">Anda wajib mengganti password setelah login pertama.</p>
             {pwError && <div className="mt-3 rounded-md bg-negative/5 p-3 text-sm text-negative">{pwError}</div>}
-            <div className="mt-3">
-              <label className="label">Password Baru (min 6 karakter)</label>
-              <input type="password" required minLength={6} value={passwordBaru} onChange={(e) => setPasswordBaru(e.target.value)} className="input mt-1 w-full" />
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className="label">Password Lama</label>
+                <input type="password" required value={passwordLama} onChange={(e) => setPasswordLama(e.target.value)} className="input mt-1 w-full" />
+              </div>
+              <div>
+                <label className="label">Password Baru (min 8 karakter)</label>
+                <input type="password" required minLength={8} value={passwordBaru} onChange={(e) => setPasswordBaru(e.target.value)} className="input mt-1 w-full" />
+              </div>
             </div>
-            <button type="submit" disabled={pwLoading} className="btn-primary mt-4 w-full disabled:opacity-50">
-              {pwLoading ? 'Menyimpan...' : 'Simpan'}
-            </button>
+            <div className="mt-4 flex justify-end gap-2">
+              <button type="button" onClick={() => setShowPw(false)} className="btn-secondary">
+                Batal
+              </button>
+              <button type="submit" disabled={pwLoading} className="btn-primary disabled:opacity-50">
+                {pwLoading ? 'Menyimpan...' : 'Simpan'}
+              </button>
+            </div>
           </form>
         </div>
       )}

@@ -8,6 +8,6 @@ import * as c from './peta.controller';
 
 const router = Router();
 
-router.get('/:kode', asyncHandler(c.gambarPeta));
+router.get('/:token', asyncHandler(c.gambarPeta));
 
 export default router;

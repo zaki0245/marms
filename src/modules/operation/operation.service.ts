@@ -3,6 +3,7 @@
 // [ALASAN] Semua akses database shipment terpusat di sini.
 
 import { prisma } from '../../shared/prisma';
+import crypto from 'crypto';
 import { hitungLaytime } from './laytime';
 import type { AgentInput, ShipmentInput, UnitKapalInput } from './operation.model';
 
@@ -40,11 +41,11 @@ export function getShipment(id: string) {
   return prisma.shipment.findUnique({ where: { id }, include: DOKUMEN });
 }
 
-// [FUNGSI] Ambil koordinat shipment berdasarkan kode untuk gambar peta publik.
-// [ALASAN] Link peta di WhatsApp hanya butuh posisi, bukan seluruh data shipment.
-export function getPosisiByKode(kode: string) {
+// [FUNGSI] Ambil koordinat shipment berdasarkan token peta untuk gambar peta publik.
+// [ALASAN] Token acak mencegah orang menebak posisi shipment lain dari kode berurutan.
+export function getPosisiByToken(token: string) {
   return prisma.shipment.findUnique({
-    where: { kode },
+    where: { petaToken: token },
     select: { latitude: true, longitude: true },
   });
 }
@@ -77,6 +78,7 @@ export async function createShipment(input: ShipmentInput, dokumen: DokumenInput
       ...input,
       ...laytime,
       kode: await generateKode(),
+      petaToken: crypto.randomUUID(),
       documents: dokumen.length ? { create: dokumen } : undefined,
     },
     include: DOKUMEN,
