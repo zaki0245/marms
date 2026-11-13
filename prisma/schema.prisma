@@ -568,8 +568,6 @@ model Shipment {
   totalLaytime      Float?
   laytimeAllowed    Float?
   demurrageDespatch Float?
-  dsrPol            Float?
-  dsrPod            Float?
   position          String?
   remarks           String?
   status            ShipmentStatus @default(PLANNED)

@@ -68,8 +68,6 @@ function parseBody(body: Record<string, unknown>) {
     tdPod: tgl(body.tdPod),
     dsPod: num(body.dsPod),
     laytimeAllowed: num(body.laytimeAllowed),
-    dsrPol: num(body.dsrPol),
-    dsrPod: num(body.dsrPod),
     position: str(body.position),
     remarks: str(body.remarks),
     status: str(body.status) ?? 'PLANNED',

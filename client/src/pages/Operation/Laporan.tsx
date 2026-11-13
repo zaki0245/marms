@@ -14,7 +14,7 @@ import { pinKapal } from '../../components/leafletPin';
 import { TILE_ATTRIBUTION, TILE_URL } from '../../components/mapTiles';
 import {
   Shipment,
-  fmtDesimal,
+  fmtDs,
   fmtLaycan,
   fmtTanggalJam,
   tanggalLaporan,
@@ -60,8 +60,8 @@ function buatTeks(s: Shipment, peta: string): string {
     '',
     `LAYCAN : ${fmtLaycan(s.laycan)}`,
     garis,
-    `DSR POL : ${fmtDesimal(s.dsrPol)}`,
-    `DSR POD : ${fmtDesimal(s.dsrPod)}`,
+    `DS POL : ${fmtDs(s.dsPol)}`,
+    `DS POD : ${fmtDs(s.dsPod)}`,
     garis,
     `POL : ${s.pol}`,
     `POD : ${s.pod ?? 'TBA'}`,
@@ -292,8 +292,8 @@ export default function Laporan() {
                 <Info label="Position">{s.position ?? 'TBA'}</Info>
                 <Info label="POD">{s.pod ?? 'TBA'}</Info>
                 <Info label="Current Status">{s.remarks ?? 'TBA'}</Info>
-                <Info label="DSR POL">{fmtDesimal(s.dsrPol)}</Info>
-                <Info label="DSR POD">{fmtDesimal(s.dsrPod)}</Info>
+                <Info label="DS POL">{fmtDs(s.dsPol)}</Info>
+                <Info label="DS POD">{fmtDs(s.dsPod)}</Info>
               </div>
 
               <Judul>Port of Loading</Judul>

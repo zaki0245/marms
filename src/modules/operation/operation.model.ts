@@ -42,8 +42,6 @@ export const shipmentSchema = z.object({
   tdPod: z.date().nullable().optional(),
   dsPod: z.number().nullable().optional(),
   laytimeAllowed: z.number().nonnegative().nullable().optional(),
-  dsrPol: z.number().nonnegative().nullable().optional(),
-  dsrPod: z.number().nonnegative().nullable().optional(),
   position: teks,
   remarks: z.string().trim().max(1000).nullable().optional(),
   status: z.enum(['PLANNED', 'ON_GOING', 'COMPLETED']),

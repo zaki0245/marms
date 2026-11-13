@@ -17,6 +17,12 @@ const hitungan = new Map<string, { count: number; mulai: number }>();
 
 function batasi(ip: string) {
   const now = Date.now();
+  // [FUNGSI] Buang IP yang tidak aktif saat Map membesar. | [ALASAN] Cegah memori tumbuh terus per IP unik.
+  if (hitungan.size > 5_000) {
+    for (const [key, h] of hitungan) {
+      if (now - h.mulai > 60_000) hitungan.delete(key);
+    }
+  }
   const h = hitungan.get(ip);
   if (!h || now - h.mulai > 60_000) {
     hitungan.set(ip, { count: 1, mulai: now });
@@ -55,6 +61,6 @@ export async function gambarPeta(req: Request, res: Response) {
   }
 
   res.set('Content-Type', upstream.headers.get('content-type') ?? 'image/jpeg');
-  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Cache-Control', 'private, max-age=60');
   res.send(Buffer.from(await upstream.arrayBuffer()));
 }

@@ -44,8 +44,6 @@ const KOSONG = {
   tdPod: '',
   dsPod: '',
   laytimeAllowed: '',
-  dsrPol: '',
-  dsrPod: '',
   position: '',
   remarks: '',
   status: 'PLANNED',
@@ -113,8 +111,6 @@ function dariShipment(s: Shipment): FormState {
     tdPod: keInputTanggal(s.tdPod),
     dsPod: angka(s.dsPod),
     laytimeAllowed: angka(s.laytimeAllowed),
-    dsrPol: angka(s.dsrPol),
-    dsrPod: angka(s.dsrPod),
     position: teks(s.position),
     remarks: teks(s.remarks),
     status: s.status,
@@ -430,11 +426,9 @@ export default function ShipmentForm({
           </section>
 
           <section>
-            <h4 className="font-semibold text-gray-900">Laytime &amp; DSR</h4>
+            <h4 className="font-semibold text-gray-900">Laytime</h4>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
               {angka('laytimeAllowed', 'Laytime Allowed (hari)')}
-              {angka('dsrPol', 'DSR POL')}
-              {angka('dsrPod', 'DSR POD')}
             </div>
           </section>
 

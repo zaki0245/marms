@@ -3,6 +3,8 @@
 // [ALASAN] Dipakai ulang di semua daftar bertabel; page size dinamis sesuai pilihan user.
 // ponytail: pagination client-side (slice). Upgrade ke server-side (Prisma take/skip) bila data menembus puluhan ribu baris.
 
+import { useEffect } from 'react';
+
 export const PAGE_SIZES = [10, 25, 50, 100];
 export const DEFAULT_PAGE_SIZE = 25;
 
@@ -15,8 +17,14 @@ interface Props {
 }
 
 export default function Pagination({ page, pageSize, total, onPageChange, onPageSizeChange }: Props) {
-  if (total === 0) return null;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  // [FUNGSI] Tarik halaman kembali ke halaman terakhir yang ada. | [ALASAN] Setelah hapus/filter, halaman aktif bisa melewati total.
+  useEffect(() => {
+    if (page > totalPages) onPageChange(totalPages);
+  }, [page, totalPages, onPageChange]);
+
+  if (total === 0) return null;
   const from = (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
 

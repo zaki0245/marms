@@ -71,8 +71,6 @@ export interface Shipment {
   totalLaytime: number | null;
   laytimeAllowed: number | null;
   demurrageDespatch: number | null;
-  dsrPol: number | null;
-  dsrPod: number | null;
   position: string | null;
   remarks: string | null;
   status: ShipmentStatus;
@@ -146,6 +144,12 @@ export function fmtUpdate(iso: string): string {
 export function fmtDesimal(n: number | null): string {
   if (n == null) return 'TBA';
   return String(Math.round(n * 100) / 100);
+}
+
+// [FUNGSI] Nilai DS selalu 3 angka di belakang koma, mis. 7554.310. | [ALASAN] Format DS pada laporan voyage.
+export function fmtDs(n: number | null): string {
+  if (n == null) return 'TBA';
+  return n.toFixed(3);
 }
 
 // [FUNGSI] Link posisi kapal yang bisa dibuka dari WhatsApp/email.
